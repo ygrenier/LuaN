@@ -1,13 +1,44 @@
-﻿<Window x:Class="LuaStudio.MainWindow"
+﻿<Fluent:RibbonWindow x:Class="LuaStudio.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LuaStudio"
+        xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" WindowState="Maximized">
+        Title="Lua Studio" Height="350" Width="525" WindowState="Maximized">
     <Grid>
-        <local:EditorControl
-            />
+        <DockPanel>
+            <Fluent:Ribbon DockPanel.Dock="Top">
+                <Fluent:Ribbon.Menu>
+                    <Fluent:Backstage>
+                        
+                    </Fluent:Backstage>
+                </Fluent:Ribbon.Menu>
+                <Fluent:RibbonTabItem Header="Home">
+                    <Fluent:RibbonGroupBox Header="File">
+                        <Fluent:Button Header="New" Size="Middle"/>
+                        <Fluent:Button Header="Open" Size="Middle"/>
+                        <Fluent:Button Header="Save" Size="Middle"/>
+                        <Fluent:Button Header="Save as..." Size="Middle"/>
+                        <Fluent:Button Header="Close" Size="Middle"/>
+                    </Fluent:RibbonGroupBox>
+                    <Fluent:RibbonGroupBox Header="Run">
+                        <Fluent:Button Header="Run" Size="Middle"/>
+                        <Fluent:Button Header="Debug" Size="Middle"/>
+                    </Fluent:RibbonGroupBox>
+                </Fluent:RibbonTabItem>
+            </Fluent:Ribbon>
+            
+            <TabControl>
+                <TabItem Header="Script1.lua">
+                    <local:EditorControl />
+                </TabItem>
+                <TabItem Header="Script2.lua">
+                    <local:EditorControl />
+                </TabItem>
+            </TabControl>
+            
+        </DockPanel>
     </Grid>
-</Window>
+</Fluent:RibbonWindow>
