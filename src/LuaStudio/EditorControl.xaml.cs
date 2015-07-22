@@ -36,8 +36,6 @@ namespace LuaStudio
 
             teEditor.TextArea.TextEntered += TextArea_TextEntered;
             teEditor.TextArea.TextEntering += TextArea_TextEntering;
-
-
         }
 
         void TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -49,6 +47,7 @@ namespace LuaStudio
         {
             UpdateFolding();
         }
+
         class SecInfos
         {
             public HighlightedSection Section { get; set; }
@@ -129,6 +128,14 @@ namespace LuaStudio
                 //FoldingManager.Uninstall(fManager);
             }
         }
+
+        public TextDocument Document
+        {
+            get { return (TextDocument)GetValue(DocumentProperty); }
+            set { SetValue(DocumentProperty, value); }
+        }
+        public static readonly DependencyProperty DocumentProperty =
+            DependencyProperty.Register("Document", typeof(TextDocument), typeof(EditorControl), new PropertyMetadata(new TextDocument()));
 
     }
 }

@@ -23,6 +23,10 @@ namespace LuaStudio
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new ViewModels.AppViewModel();
         }
+
+        public ViewModels.AppViewModel ViewModel { get { return (ViewModels.AppViewModel)DataContext; } }
+
     }
 }
