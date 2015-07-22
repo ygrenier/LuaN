@@ -74,7 +74,7 @@ namespace LuaStudio
                 foreach (var kw in kws)
                 {
                     var kn = doc.GetText(kw.Offset, kw.Length);
-                    if (kn == "function" || kn == "while")
+                    if (kn == "function" || kn == "while" || kn == "if" || kn == "repeat" || kn == "for")
                     {
                         sections.Push(new SecInfos() {
                             Section = kw,
@@ -82,11 +82,42 @@ namespace LuaStudio
                             LineNumber = i
                         });
                     }
+                    //else if (kn == "elseif" || kn == "else")
+                    //{
+                    //    if (sections.Any(s => s.Keyword == "if" || s.Keyword == "elseif"))
+                    //    {
+                    //        SecInfos s = null;
+                    //        do { s = sections.Pop(); } while (s.Keyword != "if" && s.Keyword != "elseif");
+                    //        if (s.LineNumber < i)
+                    //        {
+                    //            foldings.Add(new NewFolding(s.Section.Offset + s.Section.Length, kw.Offset + kw.Length));
+                    //        }
+                    //    }
+
+                    //    sections.Push(new SecInfos() {
+                    //        Section = kw,
+                    //        Keyword = kn,
+                    //        LineNumber = i
+                    //    });
+                    //}
+                    else if (kn == "until")
+                    {
+                        if (sections.Any(s=>s.Keyword=="repeat"))
+                        {
+                            SecInfos s = null;
+                            do { s = sections.Pop(); } while (s.Keyword != "repeat");
+                            if (s.LineNumber < i)
+                            {
+                                foldings.Add(new NewFolding(s.Section.Offset + s.Section.Length, kw.Offset + kw.Length));
+                            }
+                        }
+                    }
                     else if (kn == "end")
                     {
-                        if (sections.Count > 0)
+                        if (sections.Any(s => s.Keyword != "repeat"))
                         {
-                            var s = sections.Pop();
+                            SecInfos s = null;
+                            do { s = sections.Pop(); } while (s.Keyword == "repeat");
                             if (s.LineNumber < i)
                             {
                                 foldings.Add(new NewFolding(s.Section.Offset+s.Section.Length, kw.Offset + kw.Length));
