@@ -21,11 +21,14 @@ namespace LuaStudio.ViewModels
         {
             get { return _ScriptContent; }
             set {
-                if (_ScriptContent != null)
-                    _ScriptContent.Changed -= ScriptContent_Changed;
-                SetProperty(ref _ScriptContent, value, () => ScriptContent);
-                if (_ScriptContent != null)
-                    _ScriptContent.Changed += ScriptContent_Changed;
+                if (_ScriptContent != value)
+                {
+                    if (_ScriptContent != null)
+                        _ScriptContent.Changed -= ScriptContent_Changed;
+                    SetProperty(ref _ScriptContent, value, () => ScriptContent);
+                    if (_ScriptContent != null)
+                        _ScriptContent.Changed += ScriptContent_Changed;
+                }
             }
         }
         private TextDocument _ScriptContent;

@@ -4,11 +4,16 @@
                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                      xmlns:vm="clr-namespace:LuaStudio.ViewModels"
+                     xmlns:vw="clr-namespace:LuaStudio.Views"
                      xmlns:local="clr-namespace:LuaStudio"
                      xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
+                     xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
                      mc:Ignorable="d"
                      d:DataContext="{d:DesignInstance Type=vm:AppViewModel, IsDesignTimeCreatable=True}"
                      Title="Lua Studio" Height="350" Width="525" WindowState="Maximized">
+    <Fluent:RibbonWindow.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding NewScriptCommand}"/>
+    </Fluent:RibbonWindow.InputBindings>
     <Grid>
         <DockPanel>
             <Fluent:Ribbon DockPanel.Dock="Top">
@@ -19,7 +24,7 @@
                 </Fluent:Ribbon.Menu>-->
                 <Fluent:RibbonTabItem Header="Home">
                     <Fluent:RibbonGroupBox Header="File">
-                        <Fluent:Button Header="New" Size="Middle" Command="{Binding NewScriptCommand}"/>
+                        <Fluent:Button Header="New" Size="Middle" Command="{Binding NewScriptCommand}" />
                         <Fluent:Button Header="Open" Size="Middle"/>
                         <Fluent:Button Header="Save" Size="Middle"/>
                         <Fluent:Button Header="Save as..." Size="Middle"/>
@@ -32,13 +37,60 @@
                 </Fluent:RibbonTabItem>
             </Fluent:Ribbon>
 
-            <TabControl x:Name="listScripts" 
-                        ItemsSource="{Binding Scripts}"
-                        SelectedItem="{Binding ActiveScript}"
-                        Style="{DynamicResource ListScripts}"
-                        >
-            </TabControl>
-
+            <dock:DockingManager DocumentsSource="{Binding Scripts}" 
+                                 ActiveContent="{Binding ActiveScript, Mode=TwoWay}"
+                                 >
+                <dock:DockingManager.Theme>
+                    <dock:MetroTheme />
+                </dock:DockingManager.Theme>
+                <!--<dock:DockingManager.LayoutItemContainerStyle>
+                    <Style TargetType="dock:LayoutDocumentItem">
+                        <Setter Property="Title" Value="{Binding Model.Filename}"/>
+                    </Style>
+                </dock:DockingManager.LayoutItemContainerStyle>-->
+                <dock:DockingManager.DocumentHeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Content.Filename}"></TextBlock>
+                            <TextBlock Text="*" Visibility="{Binding Path=Content.Modified, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </dock:DockingManager.DocumentHeaderTemplate>
+                <dock:DockingManager.LayoutItemTemplateSelector>
+                    <vw:DockLayoutTemplateSelector>
+                        <vw:DockLayoutTemplateSelector.DocumentTemplate>
+                            <DataTemplate DataType="vm:ScriptFileViewModel">
+                                <Grid>
+                                    <local:EditorControl 
+                                        Document="{Binding ScriptContent}" />
+                                </Grid>
+                            </DataTemplate>
+                        </vw:DockLayoutTemplateSelector.DocumentTemplate>
+                    </vw:DockLayoutTemplateSelector>
+                </dock:DockingManager.LayoutItemTemplateSelector>
+                <dock:DockingManager.LayoutItemContainerStyleSelector>
+                    <vw:DockLayoutStyleSelector>
+                        <vw:DockLayoutStyleSelector.DocumentStyle>
+                            <Style TargetType="{x:Type dock:LayoutDocumentItem}">
+                                <Setter Property="Title" Value="{Binding Model.Filename}" />
+                                
+                            </Style>
+                        </vw:DockLayoutStyleSelector.DocumentStyle>
+                    </vw:DockLayoutStyleSelector>
+                </dock:DockingManager.LayoutItemContainerStyleSelector>
+                <dock:LayoutRoot>
+                    <dock:LayoutPanel Orientation="Horizontal">
+                        <dock:LayoutDocumentPaneGroup>
+                            <dock:LayoutDocumentPane>
+                            </dock:LayoutDocumentPane>
+                        </dock:LayoutDocumentPaneGroup>
+                        <!--<dock:LayoutAnchorablePane>
+                            <dock:LayoutAnchorable Title="Test"/>
+                        </dock:LayoutAnchorablePane>-->
+                    </dock:LayoutPanel>
+                </dock:LayoutRoot>
+            </dock:DockingManager>
+            
         </DockPanel>
     </Grid>
 </Fluent:RibbonWindow>

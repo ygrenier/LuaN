@@ -7,27 +7,5 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Converters.xaml" />
     </ResourceDictionary.MergedDictionaries>
-
-    <Style x:Key="ListScripts" TargetType="TabControl">
-        <Setter Property="ContentTemplate">
-            <Setter.Value>
-                <DataTemplate DataType="vm:ScriptFileViewModel">
-                    <local:EditorControl Document="{Binding ScriptContent}" />
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="ItemTemplate">
-            <Setter.Value>
-                <DataTemplate DataType="vm:ScriptFileViewModel">
-                    <Border>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Filename}" />
-                            <TextBlock Text="*" Margin="4,0,0,0" Visibility="{Binding Modified, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
     
 </ResourceDictionary>

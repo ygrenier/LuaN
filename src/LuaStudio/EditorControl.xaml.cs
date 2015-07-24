@@ -45,7 +45,7 @@ namespace LuaStudio
 
         void TextArea_TextEntered(object sender, TextCompositionEventArgs e)
         {
-            UpdateFolding();
+            //UpdateFolding();
         }
 
         class SecInfos
@@ -135,7 +135,10 @@ namespace LuaStudio
             set { SetValue(DocumentProperty, value); }
         }
         public static readonly DependencyProperty DocumentProperty =
-            DependencyProperty.Register("Document", typeof(TextDocument), typeof(EditorControl), new PropertyMetadata(new TextDocument()));
-
+            DependencyProperty.Register("Document", typeof(TextDocument), typeof(EditorControl), new PropertyMetadata(new TextDocument(), TextDocumentChanged));
+        private static void TextDocumentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(e.NewValue);
+        }
     }
 }
