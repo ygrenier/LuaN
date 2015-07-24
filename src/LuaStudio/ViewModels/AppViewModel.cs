@@ -12,7 +12,6 @@ namespace LuaStudio.ViewModels
     /// </summary>
     public class AppViewModel : ViewModel
     {
-        int _NewScriptCount;
         ObservableCollection<TextEditors.ITextDefinition> _TextDefinitions = null;
 
         /// <summary>
@@ -20,11 +19,10 @@ namespace LuaStudio.ViewModels
         /// </summary>
         public AppViewModel()
         {
-            Scripts = new ObservableCollection<ScriptFileViewModel>();
             Documents = new ObservableCollection<DocumentViewModel>();
-            NewScriptCommand = new RelayCommand(() => NewScript());
             NewEditorCommand = new RelayCommand<TextEditors.ITextDefinition>(d =>
               {
+                  d = d ?? TextDefinitions.FirstOrDefault();
                   if (d != null)
                       OpenNewEditorCommand(d);
               });
@@ -76,35 +74,6 @@ namespace LuaStudio.ViewModels
         /// Command to create a new editor
         /// </summary>
         public RelayCommand<TextEditors.ITextDefinition> NewEditorCommand { get; private set; }
-
-
-
-
-
-
-
-
-
-
-
-        public ScriptFileViewModel NewScript()
-        {
-            ScriptFileViewModel result = new ScriptFileViewModel();
-            Scripts.Add(result);
-            result.Filename = String.Format("NoName{0}", ++_NewScriptCount);
-            ActiveScript = result;
-            return result;
-        }
-
-        public ObservableCollection<ScriptFileViewModel> Scripts { get; private set; }
-
-        public ScriptFileViewModel ActiveScript
-        {
-            get { return _ActiveScript; }
-            set { SetProperty(ref _ActiveScript, value, () => ActiveScript); }
-        }
-        private ScriptFileViewModel _ActiveScript;
-
-        public RelayCommand NewScriptCommand { get; private set; }
+        
     }
 }
