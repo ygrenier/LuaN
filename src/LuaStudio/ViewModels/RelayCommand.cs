@@ -39,4 +39,36 @@ namespace LuaStudio.ViewModels
 
     }
 
+    public class RelayCommand<T> : ICommand
+    {
+        Action<T> _Execute;
+        Func<T, bool> _CanExecute;
+
+        public RelayCommand(Action<T> execute, Func<T, bool> canExecute = null)
+        {
+            if (execute == null) throw new ArgumentNullException("execute");
+            this._Execute = execute;
+            this._CanExecute = canExecute;
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            if (_CanExecute != null && parameter is T)
+                return _CanExecute((T)parameter);
+            return true;
+        }
+
+        public void Execute(object parameter)
+        {
+            _Execute((T)parameter);
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+    }
+
 }

@@ -16,7 +16,7 @@
     </Fluent:RibbonWindow.InputBindings>
     <Grid>
         <DockPanel>
-            <Fluent:Ribbon DockPanel.Dock="Top">
+            <Fluent:Ribbon DockPanel.Dock="Top" KeyboardNavigation.IsTabStop="False" KeyboardNavigation.TabNavigation="None">
                 <!--<Fluent:Ribbon.Menu>
                     <Fluent:Backstage>
 
@@ -24,11 +24,19 @@
                 </Fluent:Ribbon.Menu>-->
                 <Fluent:RibbonTabItem Header="Home">
                     <Fluent:RibbonGroupBox Header="File">
-                        <Fluent:Button Header="New" Size="Middle" Command="{Binding NewScriptCommand}" />
-                        <Fluent:Button Header="Open" Size="Middle"/>
-                        <Fluent:Button Header="Save" Size="Middle"/>
+                        <Fluent:DropDownButton Header="New" Size="Middle" ItemsSource="{Binding TextDefinitions}">
+                            <Fluent:DropDownButton.ItemContainerStyle>
+                                <Style TargetType="Fluent:MenuItem">
+                                    <Setter Property="Header" Value="{Binding Caption}"/>
+                                    <Setter Property="Command" Value="{Binding ViewModel.NewEditorCommand, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" />
+                                    <Setter Property="CommandParameter" Value="{Binding}"/>
+                                </Style>
+                            </Fluent:DropDownButton.ItemContainerStyle>
+                        </Fluent:DropDownButton>
+                        <Fluent:Button Header="Open" Size="Middle" />
+                        <!--<Fluent:Button Header="Save" Size="Middle"/>
                         <Fluent:Button Header="Save as..." Size="Middle"/>
-                        <Fluent:Button Header="Close" Size="Middle"/>
+                        <Fluent:Button Header="Close" Size="Middle"/>-->
                     </Fluent:RibbonGroupBox>
                     <Fluent:RibbonGroupBox Header="Run">
                         <Fluent:Button Header="Run" Size="Middle"/>
@@ -37,22 +45,17 @@
                 </Fluent:RibbonTabItem>
             </Fluent:Ribbon>
 
-            <dock:DockingManager DocumentsSource="{Binding Scripts}" 
-                                 ActiveContent="{Binding ActiveScript, Mode=TwoWay}"
+            <dock:DockingManager DocumentsSource="{Binding Documents}" 
+                                 ActiveContent="{Binding CurrentDocument, Mode=TwoWay}"
                                  >
                 <dock:DockingManager.Theme>
                     <dock:MetroTheme />
                 </dock:DockingManager.Theme>
-                <!--<dock:DockingManager.LayoutItemContainerStyle>
-                    <Style TargetType="dock:LayoutDocumentItem">
-                        <Setter Property="Title" Value="{Binding Model.Filename}"/>
-                    </Style>
-                </dock:DockingManager.LayoutItemContainerStyle>-->
                 <dock:DockingManager.DocumentHeaderTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Content.Filename}"></TextBlock>
-                            <TextBlock Text="*" Visibility="{Binding Path=Content.Modified, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
+                            <TextBlock Text="{Binding Content.Title}"></TextBlock>
+                            <TextBlock Text="*" Visibility="{Binding Path=Content.IsDirty, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
                         </StackPanel>
                     </DataTemplate>
                 </dock:DockingManager.DocumentHeaderTemplate>
@@ -66,6 +69,14 @@
                                 </Grid>
                             </DataTemplate>
                         </vw:DockLayoutTemplateSelector.DocumentTemplate>
+                        <vw:DockLayoutTemplateSelector.TextEditorTemplate>
+                            <DataTemplate DataType="vm:TextEditorViewModel">
+                                <Grid>
+                                    <local:EditorControl 
+                                        Document="{Binding TextContent}" />
+                                </Grid>
+                            </DataTemplate>
+                        </vw:DockLayoutTemplateSelector.TextEditorTemplate>
                     </vw:DockLayoutTemplateSelector>
                 </dock:DockingManager.LayoutItemTemplateSelector>
                 <dock:DockingManager.LayoutItemContainerStyleSelector>
@@ -73,9 +84,13 @@
                         <vw:DockLayoutStyleSelector.DocumentStyle>
                             <Style TargetType="{x:Type dock:LayoutDocumentItem}">
                                 <Setter Property="Title" Value="{Binding Model.Filename}" />
-                                
                             </Style>
                         </vw:DockLayoutStyleSelector.DocumentStyle>
+                        <vw:DockLayoutStyleSelector.TextEditorStyle>
+                            <Style TargetType="{x:Type dock:LayoutDocumentItem}">
+                                <Setter Property="Title" Value="{Binding Model.Title}" />
+                            </Style>
+                        </vw:DockLayoutStyleSelector.TextEditorStyle>
                     </vw:DockLayoutStyleSelector>
                 </dock:DockingManager.LayoutItemContainerStyleSelector>
                 <dock:LayoutRoot>
@@ -84,13 +99,9 @@
                             <dock:LayoutDocumentPane>
                             </dock:LayoutDocumentPane>
                         </dock:LayoutDocumentPaneGroup>
-                        <!--<dock:LayoutAnchorablePane>
-                            <dock:LayoutAnchorable Title="Test"/>
-                        </dock:LayoutAnchorablePane>-->
                     </dock:LayoutPanel>
                 </dock:LayoutRoot>
             </dock:DockingManager>
-            
         </DockPanel>
     </Grid>
 </Fluent:RibbonWindow>

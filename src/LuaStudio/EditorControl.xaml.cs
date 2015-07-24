@@ -24,9 +24,12 @@ namespace LuaStudio
     /// </summary>
     public partial class EditorControl : UserControl
     {
+        DispatcherTimer _FocusTimer;
         public EditorControl()
         {
             InitializeComponent();
+
+            this.Loaded += EditorControl_Loaded;
 
             var sh = HighlightingManager.Instance.LoadHighlighter("Lua", "Lua files", new String[] { ".lua", ".wlua" });
             var sh2 = HighlightingManager.Instance.GetDefinition("Lua");
@@ -36,6 +39,29 @@ namespace LuaStudio
 
             teEditor.TextArea.TextEntered += TextArea_TextEntered;
             teEditor.TextArea.TextEntering += TextArea_TextEntering;
+
+            _FocusTimer = new DispatcherTimer();
+            _FocusTimer.Interval = TimeSpan.FromSeconds(1);
+            _FocusTimer.Tick += _FocusTimer_Tick;
+        }
+
+        private void _FocusTimer_Tick(object sender, EventArgs e)
+        {
+            _FocusTimer.Stop();
+            try
+            {
+                UpdateFolding();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.GetBaseException().Message);
+            }
+        }
+
+        private void EditorControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            teEditor.Focus();
+            _FocusTimer.Start();
         }
 
         void TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -46,6 +72,8 @@ namespace LuaStudio
         void TextArea_TextEntered(object sender, TextCompositionEventArgs e)
         {
             //UpdateFolding();
+            _FocusTimer.Stop();
+            _FocusTimer.Start();
         }
 
         class SecInfos
