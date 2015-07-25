@@ -57,6 +57,9 @@ namespace LuaStudio
             return _Container.GetExportedValue<T>();
         }
 
+        [Import]
+        public Services.IMessengerService Messenger { get; private set; }
+
         /// <summary>
         /// Current singleton instance
         /// </summary>

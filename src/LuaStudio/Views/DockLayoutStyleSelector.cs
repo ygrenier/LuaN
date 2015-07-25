@@ -11,12 +11,16 @@ namespace LuaStudio.Views
     {
         public override Style SelectStyle(object item, DependencyObject container)
         {
-            if (item is ViewModels.TextEditorViewModel)
+            if (item is ViewModels.Documents.TextEditorViewModel)
                 return TextEditorStyle;
+            if (item is ViewModels.ToolViewModel)
+                return ToolWindowStyle;
             return base.SelectStyle(item, container);
         }
 
         public Style TextEditorStyle { get; set; }
+
+        public Style ToolWindowStyle { get; set; }
 
     }
 }

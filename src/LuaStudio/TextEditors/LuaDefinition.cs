@@ -21,7 +21,7 @@ namespace LuaStudio.TextEditors
     {
         IHighlightingDefinition _HighlightingDefinition;
         List<SnippetDefinition> _Snippets;
-        List<ICompletionData> _SnippetsCompletion, _KeywordsCompletion;
+        List<ICompletionData> _SnippetsCompletion;//, _KeywordsCompletion;
         static String[] _Keywords = new String[]
         {
             "and", "break", "do", "else", "elseif","end",

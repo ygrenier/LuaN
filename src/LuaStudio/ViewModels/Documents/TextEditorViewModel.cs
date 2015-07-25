@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace LuaStudio.ViewModels
+namespace LuaStudio.ViewModels.Documents
 {
 
     /// <summary>

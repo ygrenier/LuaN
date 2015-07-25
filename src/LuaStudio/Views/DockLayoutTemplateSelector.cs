@@ -11,12 +11,16 @@ namespace LuaStudio.Views
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (item is ViewModels.TextEditorViewModel)
+            if (item is ViewModels.Documents.TextEditorViewModel)
                 return TextEditorTemplate;
+            if (item is ViewModels.ToolViewModel)
+                return ToolWindowTemplate;
             return base.SelectTemplate(item, container);
         }
 
         public DataTemplate TextEditorTemplate { get; set; }
+
+        public DataTemplate ToolWindowTemplate { get; set; }
 
     }
 }

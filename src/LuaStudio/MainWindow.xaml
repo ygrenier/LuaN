@@ -52,11 +52,18 @@
             </Fluent:Ribbon>
 
             <dock:DockingManager DocumentsSource="{Binding Documents}" 
+                                 AnchorablesSource="{Binding Tools}"
                                  ActiveContent="{Binding CurrentDocument, Mode=TwoWay}"
                                  >
                 <dock:DockingManager.Theme>
+                    <!--<dock:AeroTheme />-->
                     <dock:MetroTheme />
                 </dock:DockingManager.Theme>
+                <dock:DockingManager.AnchorableHeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Content.Title}" />
+                    </DataTemplate>
+                </dock:DockingManager.AnchorableHeaderTemplate>
                 <dock:DockingManager.DocumentHeaderTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -88,6 +95,12 @@
                                 <Setter Property="CloseCommand" Value="{Binding Model.CloseDocumentCommand}" />
                             </Style>
                         </vw:DockLayoutStyleSelector.TextEditorStyle>
+                        <vw:DockLayoutStyleSelector.ToolWindowStyle>
+                            <Style TargetType="{x:Type dock:LayoutAnchorableItem}">
+                                <Setter Property="Title" Value="{Binding Model.Title}" />
+                                <Setter Property="IsActive" Value="False"/>
+                            </Style>
+                        </vw:DockLayoutStyleSelector.ToolWindowStyle>
                     </vw:DockLayoutStyleSelector>
                 </dock:DockingManager.LayoutItemContainerStyleSelector>
                 <dock:LayoutRoot>

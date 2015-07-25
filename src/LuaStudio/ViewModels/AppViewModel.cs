@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LuaStudio.Services;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace LuaStudio.ViewModels
     public class AppViewModel : ViewModel
     {
         ObservableCollection<TextEditors.ITextDefinition> _TextDefinitions = null;
+        Services.IMessengerService Messenger;
 
         /// <summary>
         /// Create a new ViewModel
@@ -22,6 +24,8 @@ namespace LuaStudio.ViewModels
         {
             Documents = new ObservableCollection<DocumentViewModel>();
             Documents.CollectionChanged += Documents_CollectionChanged;
+            Tools = new ObservableCollection<ToolViewModel>();
+            Tools.Add(new ViewModels.Tools.SnippetsToolViewModel());
             NewEditorCommand = new RelayCommand<TextEditors.ITextDefinition>(d =>
               {
                   d = d ?? TextDefinitions.FirstOrDefault();
@@ -53,6 +57,7 @@ namespace LuaStudio.ViewModels
                 () => CanCloseCurrentDocument
                 );
             CloseAllDocumentsCommand = new RelayCommand(() => CloseAllDocuments());
+            Messenger = AppContext.Current.Messenger;
         }
 
         private void Documents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -60,12 +65,28 @@ namespace LuaStudio.ViewModels
             if(e.NewItems!=null)
             {
                 foreach (DocumentViewModel document in e.NewItems)
+                {
                     document.AppViewModel = this;
+                    Messenger.SendMessage(new DocumentNotifyMessage
+                    {
+                        Sender = this,
+                        Document = document,
+                        Notification = DocumentNotification.Added
+                    });
+                }
             }
             if (e.OldItems != null)
             {
                 foreach (DocumentViewModel document in e.OldItems)
+                {
                     document.AppViewModel = this;
+                    Messenger.SendMessage(new DocumentNotifyMessage
+                    {
+                        Sender = this,
+                        Document = document,
+                        Notification = DocumentNotification.Removed
+                    });
+                }
             }
         }
 
@@ -88,7 +109,7 @@ namespace LuaStudio.ViewModels
         public DocumentViewModel OpenFile(String filename)
         {
             var tdef = AppContext.Current.GetTextDefinitions().FirstOrDefault(td => td.FileIsTypeOf(filename));
-            var result = new TextEditorViewModel();
+            var result = new Documents.TextEditorViewModel();
             result.TextDefinition = tdef;
             result.Load(filename);
             Documents.Add(result);
@@ -184,7 +205,7 @@ namespace LuaStudio.ViewModels
         /// </summary>
         public DocumentViewModel OpenNewEditor(TextEditors.ITextDefinition definition)
         {
-            var result = new TextEditorViewModel();
+            var result = new Documents.TextEditorViewModel();
             result.TextDefinition = definition;
             Documents.Add(result);
             CurrentDocument = result;
@@ -197,6 +218,11 @@ namespace LuaStudio.ViewModels
         public ObservableCollection<DocumentViewModel> Documents { get; private set; }
 
         /// <summary>
+        /// List of tools
+        /// </summary>
+        public ObservableCollection<ToolViewModel> Tools { get; private set; }
+
+        /// <summary>
         /// Document actually in edition
         /// </summary>
         public DocumentViewModel CurrentDocument
@@ -206,14 +232,18 @@ namespace LuaStudio.ViewModels
             {
                 if (_CurrentDocument != null)
                     _CurrentDocument.PropertyChanged -= CurrentDocument_PropertyChanged;
-                if (SetProperty(ref _CurrentDocument, value, () => CurrentDocument))
+                SetProperty(ref _CurrentDocument, value, () => CurrentDocument);
+                if (_CurrentDocument != null)
+                    _CurrentDocument.PropertyChanged += CurrentDocument_PropertyChanged;
+                RaisePropertyChanged(() => CanSaveCurrentDocument);
+                RaisePropertyChanged(() => CanSaveAsCurrentDocument);
+                RaisePropertyChanged(() => CanCloseCurrentDocument);
+                Messenger.SendMessage(new DocumentNotifyMessage
                 {
-                    if (_CurrentDocument != null)
-                        _CurrentDocument.PropertyChanged += CurrentDocument_PropertyChanged;
-                    RaisePropertyChanged(() => CanSaveCurrentDocument);
-                    RaisePropertyChanged(() => CanSaveAsCurrentDocument);
-                    RaisePropertyChanged(() => CanCloseCurrentDocument);
-                }
+                    Sender = this,
+                    Document = value,
+                    Notification = DocumentNotification.IsActive
+                });
             }
         }
         private DocumentViewModel _CurrentDocument;
@@ -281,5 +311,17 @@ namespace LuaStudio.ViewModels
         /// </summary>
         public bool CanCloseCurrentDocument { get { return CurrentDocument != null && CurrentDocument.CanClose; } }
 
+    }
+
+    public class DocumentNotifyMessage : Message
+    {
+        public DocumentViewModel Document { get; set; }
+        public DocumentNotification Notification { get; set; }
+    }
+    public enum DocumentNotification
+    {
+        Added,
+        IsActive,
+        Removed
     }
 }
