@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -24,6 +25,7 @@ namespace LuaStudio
         AppContext() {
             // Create catalogs
             AggregateCatalog catalog = new AggregateCatalog();
+            catalog.Catalogs.Add(new DirectoryCatalog(Path.GetDirectoryName(typeof(AppContext).Assembly.Location)));
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(AppContext).Assembly));
             // Build MEF container
             _Container = new CompositionContainer(catalog);

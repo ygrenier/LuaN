@@ -18,6 +18,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using LuaStudio.TextEditors;
+using ICSharpCode.AvalonEdit.CodeCompletion;
+using System.Threading.Tasks;
 
 namespace LuaStudio
 {
@@ -26,21 +28,22 @@ namespace LuaStudio
     /// </summary>
     public partial class EditorControl : UserControl
     {
+        readonly Object LockObject = new object();
         DispatcherTimer _FocusTimer;
         ITextFoldingStrategy _TextFolding;
+        CompletionWindow _CompletionWindow;
 
         class CustomTabCommand : ICommand
         {
-            public CustomTabCommand(EditorControl control, ICommand oldTabCommand)
+            public CustomTabCommand(EditorControl control, ICommand baseCommand)
             {
                 this.Editor = control;
                 this.TextEditor = control.teEditor;
-                this.OldTabCommand = oldTabCommand;
+                this.BaseCommand = baseCommand;
             }
 
             public bool CanExecute(object parameter)
             {
-                //return OldTabCommand.CanExecute(parameter);
                 return true;
             }
 
@@ -64,15 +67,49 @@ namespace LuaStudio
                         }
                     }
                 }
-                OldTabCommand.Execute(parameter);
+                BaseCommand.Execute(parameter);
             }
 
-            public event EventHandler CanExecuteChanged;
+            public event EventHandler CanExecuteChanged { add { } remove { } }
             public EditorControl Editor { get; private set; }
             public TextEditor TextEditor { get; private set; }
-            public ICommand OldTabCommand { get; private set; }
+            public ICommand BaseCommand { get; private set; }
         }
+        class OpenCompletionCommand : ICommand
+        {
+            public OpenCompletionCommand(EditorControl control)
+            {
+                this.Editor = control;
+                this.TextEditor = control.teEditor;
+            }
 
+            public bool CanExecute(object parameter)
+            {
+                return true;
+            }
+
+            public void Execute(object parameter)
+            {
+                if (TextEditor.SelectionLength == 0 && Editor.TextDefinition != null && Editor._CompletionWindow==null)
+                {
+                    String word = null;
+                    int wordStart = DocumentUtilities.FindPrevWordStart(TextEditor.Document, TextEditor.CaretOffset);
+                    if (wordStart > 0)
+                    {
+                        word = TextEditor.Document.GetText(wordStart, TextEditor.CaretOffset - wordStart);
+                    }
+                    else
+                    {
+                        wordStart = TextEditor.CaretOffset;
+                    }
+                    Editor.OpenCompletion(wordStart, word);
+                }
+            }
+
+            public event EventHandler CanExecuteChanged { add { } remove { } }
+            public EditorControl Editor { get; private set; }
+            public TextEditor TextEditor { get; private set; }
+        }
         public EditorControl()
         {
             InitializeComponent();
@@ -92,6 +129,8 @@ namespace LuaStudio
             var newTabBinding = new KeyBinding(new CustomTabCommand(this, tabBinding.Command), tabBinding.Key, tabBinding.Modifiers);
             teEditor.TextArea.DefaultInputHandler.Editing.InputBindings.Add(newTabBinding);
 
+            var kBind = new KeyBinding(new OpenCompletionCommand(this), Key.Space, ModifierKeys.Control);
+            teEditor.TextArea.DefaultInputHandler.Editing.InputBindings.Add(kBind);
         }
 
         private void TextDefinitionChanged(ITextDefinition oldDef, ITextDefinition newDef)
@@ -131,7 +170,15 @@ namespace LuaStudio
 
         void TextArea_TextEntering(object sender, TextCompositionEventArgs e)
         {
-
+            //if (e.Text.Length > 0 && _CompletionWindow != null)
+            //{
+            //    if (!char.IsLetterOrDigit(e.Text[0]))
+            //    {
+            //        // Whenever a non-letter is typed while the completion window is open,
+            //        // insert the currently selected element.
+            //        _CompletionWindow.CompletionList.RequestInsertion(e);
+            //    }
+            //}
         }
 
         void TextArea_TextEntered(object sender, TextCompositionEventArgs e)
@@ -139,6 +186,103 @@ namespace LuaStudio
             //UpdateFolding();
             _FocusTimer.Stop();
             _FocusTimer.Start();
+
+            int wordStart = DocumentUtilities.FindPrevWordStart(teEditor.Document, teEditor.CaretOffset);
+            if (TextDefinition!= null && _CompletionWindow == null && Char.IsLetterOrDigit(e.Text.FirstOrDefault()) && (teEditor.CaretOffset-wordStart)< 2)
+            {
+                OpenCompletion(wordStart, e.Text);
+                //var td = TextDefinition;
+                //var ta = teEditor.TextArea;
+                
+                //var cData = td.GetCompletionData(ta);
+                //if (cData != null && cData.Any())
+                //{
+                //    CompletionWindow cw = new CompletionWindow(teEditor.TextArea)
+                //    {
+                //        CloseWhenCaretAtBeginning = true,
+                //    };
+                //    cw.CompletionList.IsFiltering = false;
+                //    //cw.CompletionList.ListBox.ItemTemplateSelector
+                //    cData = cData.OrderBy(d => d.Text).ThenBy(d => d.Priority);
+                //    IList<ICompletionData> data = cw.CompletionList.CompletionData;
+                //    foreach (var cd in cData)
+                //        data.Add(cd);
+                //    cw.Closed += delegate
+                //    {
+                //        lock (LockObject)
+                //        _CompletionWindow = null;
+                //    };
+                //    cw.CompletionList.SelectionChanged += (cs, ce) =>
+                //    {
+                //        CompletionList cl = cs as CompletionList;
+                //        if (cl != null && cl.SelectedItem == null && _CompletionWindow != null)
+                //        {
+                //            _CompletionWindow.Close();
+                //            _CompletionWindow = null;
+                //        }
+                //    };
+                //    cw.StartOffset = wordStart;
+                //    cw.EndOffset = teEditor.CaretOffset;
+                //    cw.CompletionList.SelectItem(e.Text);
+                //    if (cw.CompletionList.SelectedItem != null)
+                //    {
+                //        _CompletionWindow = cw;
+                //        cw.Show();
+                //    }
+                //    else
+                //    {
+                //        cw.Close();
+                //    }
+                //}
+            }
+        }
+
+        void OpenCompletion(int wordStart, String selText)
+        {
+            var td = TextDefinition;
+            var ta = teEditor.TextArea;
+
+            var cData = td.GetCompletionData(ta);
+            if (cData != null && cData.Any())
+            {
+                CompletionWindow cw = new CompletionWindow(teEditor.TextArea)
+                {
+                    CloseWhenCaretAtBeginning = true,
+                };
+                cw.CompletionList.IsFiltering = false;
+                //cw.CompletionList.ListBox.ItemTemplateSelector
+                cData = cData.OrderBy(d => d.Text).ThenBy(d => d.Priority);
+                IList<ICompletionData> data = cw.CompletionList.CompletionData;
+                foreach (var cd in cData)
+                    data.Add(cd);
+                cw.Closed += delegate
+                {
+                    lock (LockObject)
+                    _CompletionWindow = null;
+                };
+                cw.CompletionList.SelectionChanged += (cs, ce) =>
+                {
+                    CompletionList cl = cs as CompletionList;
+                    if (cl != null && cl.SelectedItem == null && _CompletionWindow != null)
+                    {
+                        _CompletionWindow.Close();
+                        _CompletionWindow = null;
+                    }
+                };
+                cw.StartOffset = wordStart;
+                cw.EndOffset = teEditor.CaretOffset;
+                if (!String.IsNullOrWhiteSpace(selText))
+                    cw.CompletionList.SelectItem(selText);
+                if (String.IsNullOrWhiteSpace(selText) || cw.CompletionList.SelectedItem != null)
+                {
+                    _CompletionWindow = cw;
+                    cw.Show();
+                }
+                else
+                {
+                    cw.Close();
+                }
+            }
         }
 
         FoldingManager foldingManager;
@@ -146,7 +290,7 @@ namespace LuaStudio
         {
             if (foldingManager == null)
                 foldingManager = FoldingManager.Install(teEditor.TextArea);
-            var foldings = ((_TextFolding != null) ? _TextFolding.BuildFoldings(foldingManager, teEditor.Document) : Enumerable.Empty<NewFolding>())
+            var foldings = ((_TextFolding != null) ? _TextFolding.BuildFoldings(foldingManager, teEditor.TextArea) : Enumerable.Empty<NewFolding>())
                 .OrderBy(f => f.StartOffset)
                 .ToList();
             foldingManager.UpdateFoldings(foldings, -1);

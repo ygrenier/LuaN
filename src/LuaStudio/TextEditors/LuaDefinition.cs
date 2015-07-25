@@ -8,6 +8,8 @@ using System.Text;
 using ICSharpCode.AvalonEdit.Folding;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Snippets;
+using ICSharpCode.AvalonEdit.CodeCompletion;
+using ICSharpCode.AvalonEdit.Editing;
 
 namespace LuaStudio.TextEditors
 {
@@ -19,6 +21,14 @@ namespace LuaStudio.TextEditors
     {
         IHighlightingDefinition _HighlightingDefinition;
         List<SnippetDefinition> _Snippets;
+        List<ICompletionData> _SnippetsCompletion, _KeywordsCompletion;
+        static String[] _Keywords = new String[]
+        {
+            "and", "break", "do", "else", "elseif","end",
+            "false", "for", "function", "goto", "if", "in",
+            "local", "nil", "not", "or", "repeat", "return",
+            "then", "true", "until", "while"
+        };
 
         #region Folding management
         class SecInfos
@@ -28,11 +38,11 @@ namespace LuaStudio.TextEditors
             public String Caption { get; set; }
             public int LineNumber { get; set; }
         }
-        IEnumerable<NewFolding> ITextFoldingStrategy.BuildFoldings(FoldingManager foldingManager, TextDocument document)
+        IEnumerable<NewFolding> ITextFoldingStrategy.BuildFoldings(FoldingManager foldingManager, TextArea textArea)
         {
-            DocumentHighlighter dh = new DocumentHighlighter(document, GetHighlightDefinition());
+            DocumentHighlighter dh = textArea.GetService(typeof(IHighlighter)) as DocumentHighlighter;
             Stack<SecInfos> sections = new Stack<SecInfos>();
-            for (int i = 1; i <= document.LineCount; i++)
+            for (int i = 1; i <= textArea.Document.LineCount; i++)
             {
                 //var line = document.GetLineByNumber(i);
                 var line = dh.HighlightLine(i);
@@ -40,7 +50,7 @@ namespace LuaStudio.TextEditors
                     .Where(s => s.Color != null && s.Color.Name == "Keyword");
                 foreach (var kw in kws)
                 {
-                    var kn = document.GetText(kw.Offset, kw.Length);
+                    var kn = textArea.Document.GetText(kw.Offset, kw.Length);
                     if (kn == "function" || kn == "while" || kn == "if" || kn == "repeat" || kn == "for")
                     {
                         sections.Push(new SecInfos()
@@ -353,7 +363,6 @@ namespace LuaStudio.TextEditors
                     }
                 };
                 _Snippets.Add(snippet);
-
             }
             return _Snippets;
         }
@@ -365,6 +374,31 @@ namespace LuaStudio.TextEditors
         public SnippetDefinition FindSnippet(String word)
         {
             return GetSnippets().FirstOrDefault(s => String.Equals(s.Word, word, StringComparison.Ordinal));
+        }
+
+        /// <summary>
+        /// Build the completion data
+        /// </summary>
+        public IEnumerable<ICompletionData> GetCompletionData(TextArea area)
+        {
+            DocumentHighlighter dh = area.GetService(typeof(IHighlighter)) as DocumentHighlighter;
+            if (dh != null)
+            {
+                var coff = area.Caret.Offset;
+                var line = dh.HighlightLine(area.Caret.Line);
+                var sp = line.Sections.FirstOrDefault(s => s.Offset <= coff && coff <= s.Offset + s.Length);
+                if (sp != null)
+                {
+                    if (sp.Color.Name == "Comment" || sp.Color.Name == "String") return null;
+                }
+            }
+            if (_SnippetsCompletion == null)
+            {
+                _SnippetsCompletion = GetSnippets().Select(s => new SnippetCompletionData(s)).Cast<ICompletionData>().ToList();
+                //_KeywordsCompletion = _Keywords.Select(kw => new KeywordCompletionData(kw)).Cast<ICompletionData>().ToList();
+            }
+            //return _SnippetsCompletion.Concat(_KeywordsCompletion);
+            return _SnippetsCompletion;
         }
 
         /// <summary>

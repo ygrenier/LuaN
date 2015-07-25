@@ -1,4 +1,5 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Folding;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,6 @@ namespace LuaStudio.TextEditors
         /// <summary>
         /// Build flodings
         /// </summary>
-        IEnumerable<NewFolding> BuildFoldings(FoldingManager foldingManager, TextDocument document);
+        IEnumerable<NewFolding> BuildFoldings(FoldingManager foldingManager, TextArea textArea);
     }
 }

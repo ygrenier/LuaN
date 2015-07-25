@@ -1,4 +1,6 @@
-﻿using ICSharpCode.AvalonEdit.Highlighting;
+﻿using ICSharpCode.AvalonEdit.CodeCompletion;
+using ICSharpCode.AvalonEdit.Editing;
+using ICSharpCode.AvalonEdit.Highlighting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +36,10 @@ namespace LuaStudio.TextEditors
         /// </summary>
         /// <returns></returns>
         SnippetDefinition FindSnippet(String word);
+        /// <summary>
+        /// Build the completion data
+        /// </summary>
+        IEnumerable<ICompletionData> GetCompletionData(TextArea area);
         /// <summary>
         /// Name of the definition
         /// </summary>
