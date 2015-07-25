@@ -26,6 +26,15 @@ namespace LuaStudio.TextEditors
         /// </summary>
         ITextFoldingStrategy GetFoldingStrategy();
         /// <summary>
+        /// List all snippets registered
+        /// </summary>
+        IEnumerable<SnippetDefinition> GetSnippets();
+        /// <summary>
+        /// Find a snippet for a word
+        /// </summary>
+        /// <returns></returns>
+        SnippetDefinition FindSnippet(String word);
+        /// <summary>
         /// Name of the definition
         /// </summary>
         String Name { get; }

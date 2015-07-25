@@ -2,6 +2,7 @@
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Folding;
+using ICSharpCode.AvalonEdit.Snippets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,50 @@ namespace LuaStudio
         DispatcherTimer _FocusTimer;
         ITextFoldingStrategy _TextFolding;
 
+        class CustomTabCommand : ICommand
+        {
+            public CustomTabCommand(EditorControl control, ICommand oldTabCommand)
+            {
+                this.Editor = control;
+                this.TextEditor = control.teEditor;
+                this.OldTabCommand = oldTabCommand;
+            }
+
+            public bool CanExecute(object parameter)
+            {
+                //return OldTabCommand.CanExecute(parameter);
+                return true;
+            }
+
+            public void Execute(object parameter)
+            {
+                if (TextEditor.SelectionLength == 0 && Editor.TextDefinition != null)
+                {
+                    int wordStart = DocumentUtilities.FindPrevWordStart(TextEditor.Document, TextEditor.CaretOffset);
+                    if (wordStart >= 0)
+                    {
+                        string word = TextEditor.Document.GetText(wordStart, TextEditor.CaretOffset - wordStart);
+                        var snippet = Editor.TextDefinition.FindSnippet(word);
+                        if (snippet != null)
+                        {
+                            using (TextEditor.Document.RunUpdate())
+                            {
+                                TextEditor.Document.Remove(wordStart, TextEditor.CaretOffset - wordStart);
+                                snippet.Insert(TextEditor.TextArea);
+                            }
+                            return;
+                        }
+                    }
+                }
+                OldTabCommand.Execute(parameter);
+            }
+
+            public event EventHandler CanExecuteChanged;
+            public EditorControl Editor { get; private set; }
+            public TextEditor TextEditor { get; private set; }
+            public ICommand OldTabCommand { get; private set; }
+        }
+
         public EditorControl()
         {
             InitializeComponent();
@@ -40,11 +85,18 @@ namespace LuaStudio
             _FocusTimer = new DispatcherTimer();
             _FocusTimer.Interval = TimeSpan.FromSeconds(1);
             _FocusTimer.Tick += _FocusTimer_Tick;
+
+            var editingKeyBindings = teEditor.TextArea.DefaultInputHandler.Editing.InputBindings.OfType<KeyBinding>();
+            var tabBinding = editingKeyBindings.Single(b => b.Key == Key.Tab && b.Modifiers == ModifierKeys.None);
+            teEditor.TextArea.DefaultInputHandler.Editing.InputBindings.Remove(tabBinding);
+            var newTabBinding = new KeyBinding(new CustomTabCommand(this, tabBinding.Command), tabBinding.Key, tabBinding.Modifiers);
+            teEditor.TextArea.DefaultInputHandler.Editing.InputBindings.Add(newTabBinding);
+
         }
 
         private void TextDefinitionChanged(ITextDefinition oldDef, ITextDefinition newDef)
         {
-            if(newDef!= null)
+            if (newDef != null)
             {
                 teEditor.SyntaxHighlighting = newDef.GetHighlightDefinition();
                 _TextFolding = newDef.GetFoldingStrategy();
@@ -79,7 +131,7 @@ namespace LuaStudio
 
         void TextArea_TextEntering(object sender, TextCompositionEventArgs e)
         {
-            
+
         }
 
         void TextArea_TextEntered(object sender, TextCompositionEventArgs e)

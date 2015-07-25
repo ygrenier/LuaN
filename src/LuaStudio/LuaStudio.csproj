@@ -107,9 +107,11 @@
     <Compile Include="Services\DialogService.cs" />
     <Compile Include="Services\IDialogButton.cs" />
     <Compile Include="Services\IDialogService.cs" />
+    <Compile Include="TextEditors\DocumentUtilities.cs" />
     <Compile Include="TextEditors\ITextDefinition.cs" />
     <Compile Include="TextEditors\ITextFoldingStrategy.cs" />
     <Compile Include="TextEditors\LuaDefinition.cs" />
+    <Compile Include="TextEditors\SnippetDefinition.cs" />
     <Compile Include="ViewModels\AppViewModel.cs" />
     <Compile Include="ViewModels\DocumentViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
