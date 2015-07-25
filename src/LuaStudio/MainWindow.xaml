@@ -14,6 +14,8 @@
     <Fluent:RibbonWindow.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding NewEditorCommand}"/>
         <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenFileCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveFileCommand}"/>
+        <KeyBinding Modifiers="Ctrl+Shift" Key="S" Command="{Binding SaveAllFilesCommand}"/>
     </Fluent:RibbonWindow.InputBindings>
     <Grid>
         <DockPanel>
@@ -35,9 +37,10 @@
                             </Fluent:DropDownButton.ItemContainerStyle>
                         </Fluent:DropDownButton>
                         <Fluent:Button Header="Open" Size="Middle" Command="{Binding OpenFileCommand}" />
-                        <!--<Fluent:Button Header="Save" Size="Middle"/>
-                        <Fluent:Button Header="Save as..." Size="Middle"/>
-                        <Fluent:Button Header="Close" Size="Middle"/>-->
+                        <Fluent:Button Header="Save" Size="Middle" Command="{Binding SaveFileCommand}"/>
+                        <Fluent:Button Header="Save as..." Size="Middle" Command="{Binding SaveAsFileCommand}"/>
+                        <Fluent:Button Header="Save all" Size="Middle" Command="{Binding SaveAllFilesCommand}"/>
+                        <!--<Fluent:Button Header="Close" Size="Middle"/>-->
                     </Fluent:RibbonGroupBox>
                     <Fluent:RibbonGroupBox Header="Run">
                         <Fluent:Button Header="Run" Size="Middle"/>

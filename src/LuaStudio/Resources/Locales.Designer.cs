@@ -79,6 +79,15 @@ namespace LuaStudio.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Save file.
+        /// </summary>
+        internal static string SaveFileTitle {
+            get {
+                return ResourceManager.GetString("SaveFileTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Lua Script.
         /// </summary>
         internal static string TextDefinition_Lua_Caption {

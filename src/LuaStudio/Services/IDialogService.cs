@@ -21,5 +21,15 @@ namespace LuaStudio.Services
             bool acceptAllFileTypes = true
             );
 
+        /// <summary>
+        /// Display a selector to save a file
+        /// </summary>
+        Task<String> FileSave(
+            String title,
+            String defaultFilename = null,
+            String defaultPath = null,
+            TextEditors.ITextDefinition definition = null,
+            bool acceptAllFileTypes = true
+            );
     }
 }

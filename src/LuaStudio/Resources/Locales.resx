@@ -125,6 +125,10 @@
     <value>Open files</value>
     <comment>Title for the file selector when open files</comment>
   </data>
+  <data name="SaveFileTitle" xml:space="preserve">
+    <value>Save file</value>
+    <comment>Title for the file selector when save a file</comment>
+  </data>
   <data name="TextDefinition_Lua_Caption" xml:space="preserve">
     <value>Lua Script</value>
     <comment>Caption for the Lua definition</comment>

@@ -41,6 +41,41 @@ namespace LuaStudio.ViewModels
             IsDirty = false;
         }
 
+        protected void Save(String filename)
+        {
+            using (var wrt = new StreamWriter(filename))
+                TextContent.WriteTextTo(wrt);
+            Filename = filename;
+            IsDirty = false;
+        }
+
+        /// <summary>
+        /// Save the content
+        /// </summary>
+        /// <returns></returns>
+        public override bool Save()
+        {
+            if (String.IsNullOrWhiteSpace(Filename))
+                return SaveAs();
+            Save(Filename);
+            return true;
+        }
+
+        /// <summary>
+        /// Save the content as a new name
+        /// </summary>
+        public override bool SaveAs()
+        {
+            var dial = AppContext.Current.GetService<Services.IDialogService>();
+            var filename = dial.FileSave(Locales.SaveFileTitle).Result;
+            if (!String.IsNullOrWhiteSpace(filename))
+            {
+                Save(filename);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Text content of the document
         /// </summary>
@@ -71,6 +106,7 @@ namespace LuaStudio.ViewModels
                 if(SetProperty(ref _Filename, value, () => Filename))
                 {
                     Title = Path.GetFileName(Filename);
+                    CanSaveChanged();
                 }
             }
         }
@@ -82,7 +118,10 @@ namespace LuaStudio.ViewModels
         public bool IsDirty
         {
             get { return _IsDirty; }
-            protected set { SetProperty(ref _IsDirty, value, () => IsDirty); }
+            protected set {
+                if (SetProperty(ref _IsDirty, value, () => IsDirty))
+                    CanSaveChanged();
+            }
         }
         private bool _IsDirty = false;
 
@@ -97,19 +136,14 @@ namespace LuaStudio.ViewModels
         private ITextDefinition _TextDefinition;
 
         /// <summary>
-        /// Command for saving the document
+        /// Can save when the document is dirty or filename
         /// </summary>
-        public RelayCommand SaveCommand { get; private set; }
+        public override bool CanSave { get { return IsDirty || String.IsNullOrWhiteSpace(Filename); } }
 
         /// <summary>
-        /// Command for saving the document as another name
+        /// Can save as new name
         /// </summary>
-        public RelayCommand SaveAsCommand { get; private set; }
-
-        /// <summary>
-        /// Command for closing the document
-        /// </summary>
-        public RelayCommand CloseCommand { get; set; }
+        public override bool CanSaveAs { get { return true; } }
 
     }
 
