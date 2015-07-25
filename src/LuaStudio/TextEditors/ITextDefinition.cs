@@ -17,10 +17,14 @@ namespace LuaStudio.TextEditors
         /// </summary>
         bool FileIsTypeOf(String filename);
         /// <summary>
-        /// Get the highlighting definition for this texte
+        /// Get the highlighting definition for this text
         /// </summary>
         /// <returns></returns>
         IHighlightingDefinition GetHighlightDefinition();
+        /// <summary>
+        /// Get the folding strategy for this text
+        /// </summary>
+        ITextFoldingStrategy GetFoldingStrategy();
         /// <summary>
         /// Name of the definition
         /// </summary>

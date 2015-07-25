@@ -26,6 +26,8 @@ namespace LuaStudio
     public partial class EditorControl : UserControl
     {
         DispatcherTimer _FocusTimer;
+        ITextFoldingStrategy _TextFolding;
+
         public EditorControl()
         {
             InitializeComponent();
@@ -45,11 +47,15 @@ namespace LuaStudio
             if(newDef!= null)
             {
                 teEditor.SyntaxHighlighting = newDef.GetHighlightDefinition();
+                _TextFolding = newDef.GetFoldingStrategy();
             }
             else
             {
                 teEditor.SyntaxHighlighting = null;
+                _TextFolding = null;
             }
+            _FocusTimer.Stop();
+            _FocusTimer.Start();
         }
 
         private void _FocusTimer_Tick(object sender, EventArgs e)
@@ -83,85 +89,16 @@ namespace LuaStudio
             _FocusTimer.Start();
         }
 
-        class SecInfos
-        {
-            public HighlightedSection Section { get; set; }
-            public String Keyword { get; set; }
-            public String Caption { get; set; }
-            public int LineNumber { get; set; }
-        }
         FoldingManager foldingManager;
         private void UpdateFolding()
         {
-            if(foldingManager==null)
+            if (foldingManager == null)
                 foldingManager = FoldingManager.Install(teEditor.TextArea);
-            var doc = teEditor.Document;
-            DocumentHighlighter dh = new DocumentHighlighter(doc, teEditor.SyntaxHighlighting);
-            Stack<SecInfos> sections = new Stack<SecInfos>();
-            List<NewFolding> foldings = new List<NewFolding>();
-            for (int i = 1; i <= doc.LineCount; i++)
-            {
-                //var line = doc.GetLineByNumber(i);
-                var line = dh.HighlightLine(i);
-                var kws = line.Sections
-                    .Where(s => s.Color != null && s.Color.Name == "Keyword");
-                foreach (var kw in kws)
-                {
-                    var kn = doc.GetText(kw.Offset, kw.Length);
-                    if (kn == "function" || kn == "while" || kn == "if" || kn == "repeat" || kn == "for")
-                    {
-                        sections.Push(new SecInfos() {
-                            Section = kw,
-                            Keyword = kn,
-                            LineNumber = i
-                        });
-                    }
-                    //else if (kn == "elseif" || kn == "else")
-                    //{
-                    //    if (sections.Any(s => s.Keyword == "if" || s.Keyword == "elseif"))
-                    //    {
-                    //        SecInfos s = null;
-                    //        do { s = sections.Pop(); } while (s.Keyword != "if" && s.Keyword != "elseif");
-                    //        if (s.LineNumber < i)
-                    //        {
-                    //            foldings.Add(new NewFolding(s.Section.Offset + s.Section.Length, kw.Offset + kw.Length));
-                    //        }
-                    //    }
-
-                    //    sections.Push(new SecInfos() {
-                    //        Section = kw,
-                    //        Keyword = kn,
-                    //        LineNumber = i
-                    //    });
-                    //}
-                    else if (kn == "until")
-                    {
-                        if (sections.Any(s=>s.Keyword=="repeat"))
-                        {
-                            SecInfos s = null;
-                            do { s = sections.Pop(); } while (s.Keyword != "repeat");
-                            if (s.LineNumber < i)
-                            {
-                                foldings.Add(new NewFolding(s.Section.Offset + s.Section.Length, kw.Offset + kw.Length));
-                            }
-                        }
-                    }
-                    else if (kn == "end")
-                    {
-                        if (sections.Any(s => s.Keyword != "repeat"))
-                        {
-                            SecInfos s = null;
-                            do { s = sections.Pop(); } while (s.Keyword == "repeat");
-                            if (s.LineNumber < i)
-                            {
-                                foldings.Add(new NewFolding(s.Section.Offset+s.Section.Length, kw.Offset + kw.Length));
-                            }
-                        }
-                    }
-                }
-                foldingManager.UpdateFoldings(foldings.OrderBy(f => f.StartOffset), -1);
-                //FoldingManager.Uninstall(fManager);
-            }
+            var foldings = ((_TextFolding != null) ? _TextFolding.BuildFoldings(foldingManager, teEditor.Document) : Enumerable.Empty<NewFolding>())
+                .OrderBy(f => f.StartOffset)
+                .ToList();
+            foldingManager.UpdateFoldings(foldings, -1);
+            //FoldingManager.Uninstall(foldingManager);
         }
 
         public TextDocument Document
