@@ -31,5 +31,15 @@ namespace LuaStudio.Services
             TextEditors.ITextDefinition definition = null,
             bool acceptAllFileTypes = true
             );
+
+        /// <summary>
+        /// Open a confirm dialog box
+        /// </summary>
+        Task<IDialogButton> Confirm(
+            String message,
+            String title,
+            params IDialogButton[] buttons
+            );
+
     }
 }

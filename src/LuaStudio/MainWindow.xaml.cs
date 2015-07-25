@@ -26,6 +26,17 @@ namespace LuaStudio
             DataContext = new ViewModels.AppViewModel();
         }
 
+        private void RibbonWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (ViewModel != null)
+            {
+                if (!ViewModel.CloseAllDocuments())
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
         public ViewModels.AppViewModel ViewModel { get { return (ViewModels.AppViewModel)DataContext; } }
 
     }

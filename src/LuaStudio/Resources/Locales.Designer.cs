@@ -61,6 +61,42 @@ namespace LuaStudio.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Cancel.
+        /// </summary>
+        internal static string DialogButton_Cancel_Caption {
+            get {
+                return ResourceManager.GetString("DialogButton_Cancel_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à No.
+        /// </summary>
+        internal static string DialogButton_No_Caption {
+            get {
+                return ResourceManager.GetString("DialogButton_No_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à OK.
+        /// </summary>
+        internal static string DialogButton_Ok_Caption {
+            get {
+                return ResourceManager.GetString("DialogButton_Ok_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Yes.
+        /// </summary>
+        internal static string DialogButton_Yes_Caption {
+            get {
+                return ResourceManager.GetString("DialogButton_Yes_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à All files.
         /// </summary>
         internal static string OpenFileDialog_AllTypesFiles_Caption {

@@ -7,5 +7,16 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Converters.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <Style x:Key="DialogForm" TargetType="Window">
+        <Setter Property="ShowInTaskbar" Value="False" />
+        <Setter Property="ResizeMode" Value="NoResize" />
+    </Style>
+
+    <Style x:Key="DialogButton" TargetType="Button">
+        <Setter Property="Margin" Value="2,0,0,0"/>
+        <Setter Property="Padding" Value="6,1,6,1" />
+        <Setter Property="MinWidth" Value="60" />
+    </Style>
     
 </ResourceDictionary>

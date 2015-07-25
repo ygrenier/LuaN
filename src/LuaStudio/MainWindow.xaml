@@ -10,12 +10,14 @@
                      xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
                      mc:Ignorable="d"
                      d:DataContext="{d:DesignInstance Type=vm:AppViewModel, IsDesignTimeCreatable=True}"
+                     Closing="RibbonWindow_Closing"
                      Title="Lua Studio" Height="350" Width="525" WindowState="Maximized">
     <Fluent:RibbonWindow.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding NewEditorCommand}"/>
         <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenFileCommand}"/>
         <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveFileCommand}"/>
         <KeyBinding Modifiers="Ctrl+Shift" Key="S" Command="{Binding SaveAllFilesCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="F4" Command="{Binding CloseCurrentDocumentCommand}"/>
     </Fluent:RibbonWindow.InputBindings>
     <Grid>
         <DockPanel>
@@ -40,7 +42,7 @@
                         <Fluent:Button Header="Save" Size="Middle" Command="{Binding SaveFileCommand}"/>
                         <Fluent:Button Header="Save as..." Size="Middle" Command="{Binding SaveAsFileCommand}"/>
                         <Fluent:Button Header="Save all" Size="Middle" Command="{Binding SaveAllFilesCommand}"/>
-                        <!--<Fluent:Button Header="Close" Size="Middle"/>-->
+                        <Fluent:Button Header="Close" Size="Middle" Command="{Binding CloseCurrentDocumentCommand}"/>
                     </Fluent:RibbonGroupBox>
                     <Fluent:RibbonGroupBox Header="Run">
                         <Fluent:Button Header="Run" Size="Middle"/>
@@ -65,15 +67,6 @@
                 </dock:DockingManager.DocumentHeaderTemplate>
                 <dock:DockingManager.LayoutItemTemplateSelector>
                     <vw:DockLayoutTemplateSelector>
-                        <vw:DockLayoutTemplateSelector.DocumentTemplate>
-                            <DataTemplate DataType="vm:ScriptFileViewModel">
-                                <Grid>
-                                    <local:EditorControl 
-                                        Document="{Binding ScriptContent}"
-                                        />
-                                </Grid>
-                            </DataTemplate>
-                        </vw:DockLayoutTemplateSelector.DocumentTemplate>
                         <vw:DockLayoutTemplateSelector.TextEditorTemplate>
                             <DataTemplate DataType="vm:TextEditorViewModel">
                                 <Grid>
@@ -88,14 +81,11 @@
                 </dock:DockingManager.LayoutItemTemplateSelector>
                 <dock:DockingManager.LayoutItemContainerStyleSelector>
                     <vw:DockLayoutStyleSelector>
-                        <vw:DockLayoutStyleSelector.DocumentStyle>
-                            <Style TargetType="{x:Type dock:LayoutDocumentItem}">
-                                <Setter Property="Title" Value="{Binding Model.Filename}" />
-                            </Style>
-                        </vw:DockLayoutStyleSelector.DocumentStyle>
                         <vw:DockLayoutStyleSelector.TextEditorStyle>
                             <Style TargetType="{x:Type dock:LayoutDocumentItem}">
                                 <Setter Property="Title" Value="{Binding Model.Title}" />
+                                <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
+                                <Setter Property="CloseCommand" Value="{Binding Model.CloseDocumentCommand}" />
                             </Style>
                         </vw:DockLayoutStyleSelector.TextEditorStyle>
                     </vw:DockLayoutStyleSelector>

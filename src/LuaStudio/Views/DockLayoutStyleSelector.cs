@@ -11,14 +11,10 @@ namespace LuaStudio.Views
     {
         public override Style SelectStyle(object item, DependencyObject container)
         {
-            if (item is ViewModels.ScriptFileViewModel)
-                return DocumentStyle;
             if (item is ViewModels.TextEditorViewModel)
-                return DocumentStyle;
+                return TextEditorStyle;
             return base.SelectStyle(item, container);
         }
-
-        public Style DocumentStyle { get; set; }
 
         public Style TextEditorStyle { get; set; }
 

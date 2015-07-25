@@ -21,6 +21,7 @@ namespace LuaStudio.ViewModels
         public AppViewModel()
         {
             Documents = new ObservableCollection<DocumentViewModel>();
+            Documents.CollectionChanged += Documents_CollectionChanged;
             NewEditorCommand = new RelayCommand<TextEditors.ITextDefinition>(d =>
               {
                   d = d ?? TextDefinitions.FirstOrDefault();
@@ -43,6 +44,29 @@ namespace LuaStudio.ViewModels
                 () => SaveAllDocuments(),
                 () => Documents.Count > 0
                 );
+            CloseDocumentCommand = new RelayCommand<DocumentViewModel>(
+                doc => CloseDocument(doc),
+                doc => doc != null && doc.CanClose
+                );
+            CloseCurrentDocumentCommand = new RelayCommand(
+                () => CloseDocument(CurrentDocument),
+                () => CanCloseCurrentDocument
+                );
+            CloseAllDocumentsCommand = new RelayCommand(() => CloseAllDocuments());
+        }
+
+        private void Documents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if(e.NewItems!=null)
+            {
+                foreach (DocumentViewModel document in e.NewItems)
+                    document.AppViewModel = this;
+            }
+            if (e.OldItems != null)
+            {
+                foreach (DocumentViewModel document in e.OldItems)
+                    document.AppViewModel = this;
+            }
         }
 
         /// <summary>
@@ -100,6 +124,47 @@ namespace LuaStudio.ViewModels
         }
 
         /// <summary>
+        /// Close a document
+        /// </summary>
+        public bool CloseDocument(DocumentViewModel document)
+        {
+            if (document == null) return false;
+            var res = document.CanClose && document.Close();
+            if (res)
+            {
+                var idx = Documents.IndexOf(document);
+                bool isCurrent = CurrentDocument == document;
+                Documents.Remove(document);
+                if (isCurrent)
+                {
+                    idx = Math.Min(idx, Documents.Count - 1);
+                    if (idx < 0)
+                    {
+                        CurrentDocument = null;
+                    }
+                    else
+                    {
+                        CurrentDocument = Documents[idx];
+                    }
+                }
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// Close all documents
+        /// </summary>
+        /// <returns></returns>
+        public bool CloseAllDocuments()
+        {
+            foreach (var doc in Documents.Reverse().ToArray())
+            {
+                if (!CloseDocument(doc)) return false;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Text editor Definitions
         /// </summary>
         public ObservableCollection<TextEditors.ITextDefinition> TextDefinitions { get
@@ -145,6 +210,9 @@ namespace LuaStudio.ViewModels
                 {
                     if (_CurrentDocument != null)
                         _CurrentDocument.PropertyChanged += CurrentDocument_PropertyChanged;
+                    RaisePropertyChanged(() => CanSaveCurrentDocument);
+                    RaisePropertyChanged(() => CanSaveAsCurrentDocument);
+                    RaisePropertyChanged(() => CanCloseCurrentDocument);
                 }
             }
         }
@@ -184,6 +252,21 @@ namespace LuaStudio.ViewModels
         public RelayCommand SaveAllFilesCommand { get; private set; }
 
         /// <summary>
+        /// Command to close a document
+        /// </summary>
+        public RelayCommand<DocumentViewModel> CloseDocumentCommand { get; private set; }
+
+        /// <summary>
+        /// Command to close the current document
+        /// </summary>
+        public RelayCommand CloseCurrentDocumentCommand { get; private set; }
+
+        /// <summary>
+        /// Command to close all documents
+        /// </summary>
+        public RelayCommand CloseAllDocumentsCommand { get; private set; }
+
+        /// <summary>
         /// Indicate if we can save the current document
         /// </summary>
         public bool CanSaveCurrentDocument { get { return CurrentDocument != null && CurrentDocument.CanSave; } }
@@ -192,6 +275,11 @@ namespace LuaStudio.ViewModels
         /// Indicate if we can save as a new name the current document
         /// </summary>
         public bool CanSaveAsCurrentDocument { get { return CurrentDocument != null && CurrentDocument.CanSaveAs; } }
+
+        /// <summary>
+        /// Indicate if we can close the current document
+        /// </summary>
+        public bool CanCloseCurrentDocument { get { return CurrentDocument != null && CurrentDocument.CanClose; } }
 
     }
 }

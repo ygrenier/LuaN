@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace LuaStudio.Services
 {
@@ -121,6 +122,31 @@ namespace LuaStudio.Services
             {
                 result.SetResult(null);
             }
+            return result.Task;
+        }
+
+        /// <summary>
+        /// Open a confirm dialog box
+        /// </summary>
+        public Task<IDialogButton> Confirm(
+            String message,
+            String title,
+            params IDialogButton[] buttons
+            )
+        {
+            TaskCompletionSource<IDialogButton> result = new TaskCompletionSource<IDialogButton>();
+
+            var confirm = new Dialogs.ConfirmDialog();
+            var vm=new Dialogs.ConfirmDialogViewModel
+            {
+                Title = title,
+                Message = message,
+                Buttons = buttons
+            };
+            confirm.DataContext = vm;
+            confirm.ShowDialog();
+            result.SetResult(vm.LastClickedButton);
+
             return result.Task;
         }
 

@@ -1,5 +1,6 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
 using LuaStudio.Resources;
+using LuaStudio.Services;
 using LuaStudio.TextEditors;
 using System;
 using System.Collections.Generic;
@@ -74,6 +75,30 @@ namespace LuaStudio.ViewModels
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Ask to close this document
+        /// </summary>
+        public override bool Close()
+        {
+            if (IsDirty)
+            {
+                var dlg = AppContext.Current.GetService<Services.IDialogService>();
+                var res = dlg.Confirm(
+                    "Some changes are not save yet. Do you want to save it ?",
+                    String.Format("{0} : Text changed", Title),
+                    DialogButton.YesNoCancelButtons()
+                        .IsDefault(DialogButton.YesButtonId)
+                        .IsCancel(DialogButton.CancelButtonId)
+                    ).Result;
+                if (res != null && res.ButtonId == DialogButton.NoButtonId)
+                    return true;
+                else if (res != null && res.ButtonId == DialogButton.CancelButtonId)
+                    return false;
+                return Save();
+            }
+            return true;
         }
 
         /// <summary>
