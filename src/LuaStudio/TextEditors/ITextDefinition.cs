@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ICSharpCode.AvalonEdit.Highlighting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,15 @@ namespace LuaStudio.TextEditors
     /// </summary>
     public interface ITextDefinition
     {
+        /// <summary>
+        /// Indicates if a file name corresponding of this definition
+        /// </summary>
+        bool FileIsTypeOf(String filename);
+        /// <summary>
+        /// Get the highlighting definition for this texte
+        /// </summary>
+        /// <returns></returns>
+        IHighlightingDefinition GetHighlightDefinition();
         /// <summary>
         /// Name of the definition
         /// </summary>

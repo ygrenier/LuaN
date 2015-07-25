@@ -1,7 +1,9 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
 using LuaStudio.Resources;
+using LuaStudio.TextEditors;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -30,6 +32,16 @@ namespace LuaStudio.ViewModels
         }
 
         /// <summary>
+        /// Load the text
+        /// </summary>
+        public void Load(string filename)
+        {
+            TextContent = new TextDocument(File.ReadAllText(filename));
+            Filename = filename;
+            IsDirty = false;
+        }
+
+        /// <summary>
         /// Text content of the document
         /// </summary>
         public TextDocument TextContent
@@ -55,7 +67,12 @@ namespace LuaStudio.ViewModels
         public String Filename
         {
             get { return _Filename; }
-            protected set { SetProperty(ref _Filename, value, () => Filename); }
+            protected set {
+                if(SetProperty(ref _Filename, value, () => Filename))
+                {
+                    Title = Path.GetFileName(Filename);
+                }
+            }
         }
         private String _Filename;
 
@@ -68,6 +85,16 @@ namespace LuaStudio.ViewModels
             protected set { SetProperty(ref _IsDirty, value, () => IsDirty); }
         }
         private bool _IsDirty = false;
+
+        /// <summary>
+        /// Current text definition
+        /// </summary>
+        public ITextDefinition TextDefinition
+        {
+            get { return _TextDefinition; }
+            set { SetProperty(ref _TextDefinition, value, () => TextDefinition); }
+        }
+        private ITextDefinition _TextDefinition;
 
         /// <summary>
         /// Command for saving the document

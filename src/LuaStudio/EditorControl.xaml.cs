@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using LuaStudio.TextEditors;
 
 namespace LuaStudio
 {
@@ -31,18 +32,24 @@ namespace LuaStudio
 
             this.Loaded += EditorControl_Loaded;
 
-            var sh = HighlightingManager.Instance.LoadHighlighter("Lua", "Lua files", new String[] { ".lua", ".wlua" });
-            var sh2 = HighlightingManager.Instance.GetDefinition("Lua");
-            sh2 = HighlightingManager.Instance.GetDefinition("lua");
-
-            teEditor.SyntaxHighlighting = sh;
-
             teEditor.TextArea.TextEntered += TextArea_TextEntered;
             teEditor.TextArea.TextEntering += TextArea_TextEntering;
 
             _FocusTimer = new DispatcherTimer();
             _FocusTimer.Interval = TimeSpan.FromSeconds(1);
             _FocusTimer.Tick += _FocusTimer_Tick;
+        }
+
+        private void TextDefinitionChanged(ITextDefinition oldDef, ITextDefinition newDef)
+        {
+            if(newDef!= null)
+            {
+                teEditor.SyntaxHighlighting = newDef.GetHighlightDefinition();
+            }
+            else
+            {
+                teEditor.SyntaxHighlighting = null;
+            }
         }
 
         private void _FocusTimer_Tick(object sender, EventArgs e)
@@ -163,10 +170,21 @@ namespace LuaStudio
             set { SetValue(DocumentProperty, value); }
         }
         public static readonly DependencyProperty DocumentProperty =
-            DependencyProperty.Register("Document", typeof(TextDocument), typeof(EditorControl), new PropertyMetadata(new TextDocument(), TextDocumentChanged));
-        private static void TextDocumentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register("Document", typeof(TextDocument), typeof(EditorControl), new PropertyMetadata(new TextDocument()));
+
+
+        public TextEditors.ITextDefinition TextDefinition
         {
-            System.Diagnostics.Debug.WriteLine(e.NewValue);
+            get { return (TextEditors.ITextDefinition)GetValue(TextDefinitionProperty); }
+            set { SetValue(TextDefinitionProperty, value); }
         }
+        public static readonly DependencyProperty TextDefinitionProperty =
+            DependencyProperty.Register("TextDefinition", typeof(TextEditors.ITextDefinition), typeof(EditorControl), new PropertyMetadata(null, TextDefinitionPropertyChanged));
+        private static void TextDefinitionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((EditorControl)d).TextDefinitionChanged(e.OldValue as TextEditors.ITextDefinition, e.NewValue as TextEditors.ITextDefinition);
+        }
+
     }
+
 }

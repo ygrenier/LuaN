@@ -61,6 +61,24 @@ namespace LuaStudio.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à All files.
+        /// </summary>
+        internal static string OpenFileDialog_AllTypesFiles_Caption {
+            get {
+                return ResourceManager.GetString("OpenFileDialog_AllTypesFiles_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Open files.
+        /// </summary>
+        internal static string OpenFileTitle {
+            get {
+                return ResourceManager.GetString("OpenFileTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Lua Script.
         /// </summary>
         internal static string TextDefinition_Lua_Caption {

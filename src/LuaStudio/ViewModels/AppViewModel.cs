@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace LuaStudio.ViewModels
@@ -24,7 +25,11 @@ namespace LuaStudio.ViewModels
               {
                   d = d ?? TextDefinitions.FirstOrDefault();
                   if (d != null)
-                      OpenNewEditorCommand(d);
+                      OpenNewEditor(d);
+              });
+            OpenFileCommand = new RelayCommand(() =>
+              {
+                  OpenFile();
               });
         }
 
@@ -46,10 +51,37 @@ namespace LuaStudio.ViewModels
         /// <summary>
         /// Open a new text editor
         /// </summary>
-        public DocumentViewModel OpenNewEditorCommand(TextEditors.ITextDefinition definition)
+        public DocumentViewModel OpenNewEditor(TextEditors.ITextDefinition definition)
         {
-            if (definition == null) throw new ArgumentNullException("definition");
             var result = new TextEditorViewModel();
+            result.TextDefinition = definition;
+            Documents.Add(result);
+            CurrentDocument = result;
+            return result;
+        }
+
+        /// <summary>
+        /// Open files from file selector
+        /// </summary>
+        public IEnumerable<DocumentViewModel> OpenFile()
+        {
+            var dial = AppContext.Current.GetService<Services.IDialogService>();
+            var files = dial.FileOpen(Resources.Locales.OpenFileTitle, null, true, true).Result;
+            return files.Select(f =>
+            {
+                return OpenFile(f);
+            });
+        }
+
+        /// <summary>
+        /// Open file from a name
+        /// </summary>
+        public DocumentViewModel OpenFile(String filename)
+        {
+            var tdef = AppContext.Current.GetTextDefinitions().FirstOrDefault(td => td.FileIsTypeOf(filename));
+            var result = new TextEditorViewModel();
+            result.TextDefinition = tdef;
+            result.Load(filename);
             Documents.Add(result);
             CurrentDocument = result;
             return result;
@@ -74,6 +106,11 @@ namespace LuaStudio.ViewModels
         /// Command to create a new editor
         /// </summary>
         public RelayCommand<TextEditors.ITextDefinition> NewEditorCommand { get; private set; }
-        
+     
+        /// <summary>
+        /// Command to open a new file
+        /// </summary>
+        public RelayCommand OpenFileCommand { get; private set; }
+           
     }
 }

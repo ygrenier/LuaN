@@ -13,6 +13,7 @@
                      Title="Lua Studio" Height="350" Width="525" WindowState="Maximized">
     <Fluent:RibbonWindow.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding NewEditorCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenFileCommand}"/>
     </Fluent:RibbonWindow.InputBindings>
     <Grid>
         <DockPanel>
@@ -33,7 +34,7 @@
                                 </Style>
                             </Fluent:DropDownButton.ItemContainerStyle>
                         </Fluent:DropDownButton>
-                        <Fluent:Button Header="Open" Size="Middle" />
+                        <Fluent:Button Header="Open" Size="Middle" Command="{Binding OpenFileCommand}" />
                         <!--<Fluent:Button Header="Save" Size="Middle"/>
                         <Fluent:Button Header="Save as..." Size="Middle"/>
                         <Fluent:Button Header="Close" Size="Middle"/>-->
@@ -65,7 +66,8 @@
                             <DataTemplate DataType="vm:ScriptFileViewModel">
                                 <Grid>
                                     <local:EditorControl 
-                                        Document="{Binding ScriptContent}" />
+                                        Document="{Binding ScriptContent}"
+                                        />
                                 </Grid>
                             </DataTemplate>
                         </vw:DockLayoutTemplateSelector.DocumentTemplate>
@@ -73,7 +75,9 @@
                             <DataTemplate DataType="vm:TextEditorViewModel">
                                 <Grid>
                                     <local:EditorControl 
-                                        Document="{Binding TextContent}" />
+                                        Document="{Binding TextContent}" 
+                                        TextDefinition="{Binding TextDefinition}"
+                                        />
                                 </Grid>
                             </DataTemplate>
                         </vw:DockLayoutTemplateSelector.TextEditorTemplate>

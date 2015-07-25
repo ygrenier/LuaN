@@ -48,6 +48,14 @@ namespace LuaStudio
         }
 
         /// <summary>
+        /// Get a service
+        /// </summary>
+        public T GetService<T>()
+        {
+            return _Container.GetExportedValue<T>();
+        }
+
+        /// <summary>
         /// Current singleton instance
         /// </summary>
         public static AppContext Current
