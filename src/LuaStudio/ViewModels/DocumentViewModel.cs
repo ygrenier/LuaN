@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LuaStudio.EdiCommands;
 
 namespace LuaStudio.ViewModels
 {
@@ -9,7 +10,7 @@ namespace LuaStudio.ViewModels
     /// <summary>
     /// Base viewmodel for the document
     /// </summary>
-    public abstract class DocumentViewModel: ViewModel
+    public abstract class DocumentViewModel: DockContentViewModel
     {
         /// <summary>
         /// New document view model
@@ -31,6 +32,34 @@ namespace LuaStudio.ViewModels
                 () => CanClose
                 );
         }
+
+        /// <summary>
+        /// Call for accept an edi command
+        /// </summary>
+        protected virtual bool AcceptEdiCommand(EdiCommand command)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Create a new EdiCommandListener
+        /// </summary>
+        /// <returns></returns>
+        protected virtual EdiCommandListener CreateEdiCommandListener()
+        {
+            return new EdiCommands.EdiCommandListener(AcceptEdiCommand);
+        }
+
+        /// <summary>
+        /// Invoke an EDI command
+        /// </summary>
+        public virtual bool InvokeEdiCommand(EdiCommands.EdiCommand command)
+        {
+            if (!EdiCommandListener.AcceptCommand(command))
+                return false;
+            return EdiCommandListener.ReceiveCommand(command);
+        }
+
         /// <summary>
         /// Save the document
         /// </summary>
@@ -57,16 +86,6 @@ namespace LuaStudio.ViewModels
             RaisePropertyChanged(() => CanSave);
             RaisePropertyChanged(() => CanSaveAs);
         }
-
-        /// <summary>
-        /// Document title
-        /// </summary>
-        public String Title
-        {
-            get { return _Title; }
-            protected set { SetProperty(ref _Title, value, () => Title); }
-        }
-        private String _Title;
 
         /// <summary>
         /// AppViewModel
@@ -97,6 +116,16 @@ namespace LuaStudio.ViewModels
         /// Command to close this document
         /// </summary>
         public RelayCommand CloseDocumentCommand { get; private set; }
+
+        /// <summary>
+        /// EDI command listener
+        /// </summary>
+        public EdiCommandListener EdiCommandListener
+        {
+            get { return _EdiCommandListener ?? (_EdiCommandListener = CreateEdiCommandListener()); }
+        }
+
+        private EdiCommands.EdiCommandListener _EdiCommandListener;
     }
 
 }

@@ -133,6 +133,14 @@
     <value>Yes</value>
     <comment>Caption for the "Yes" button in a dialog</comment>
   </data>
+  <data name="EdiCommand_InsertSnippet_Caption" xml:space="preserve">
+    <value>Insert a snippet</value>
+    <comment>Caption of the InsertSnippet EDI command</comment>
+  </data>
+  <data name="EdiCommand_InsertSnippet_Description" xml:space="preserve">
+    <value>Insert a snippet in the current text editor</value>
+    <comment>Description of the InsertSnippet EDI command</comment>
+  </data>
   <data name="OpenFileDialog_AllTypesFiles_Caption" xml:space="preserve">
     <value>All files</value>
     <comment>Name of the filter "All files" in the open file dialog.</comment>

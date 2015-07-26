@@ -6,6 +6,7 @@
              xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
              xmlns:local="clr-namespace:LuaStudio" x:Class="LuaStudio.EditorControl"
              mc:Ignorable="d" 
+             FocusManager.FocusedElement="{Binding ElementName=teEditor}"
              d:DesignHeight="300" d:DesignWidth="478.47">
     <Grid>
         <avalonEdit:TextEditor

@@ -1,4 +1,5 @@
-﻿using LuaStudio.Services;
+﻿using LuaStudio.EdiCommands;
+using LuaStudio.Services;
 using LuaStudio.TextEditors;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,12 @@ namespace LuaStudio.ViewModels.Tools
         {
             this.Snippets = new ObservableCollection<SnippetDefinition>();
             Title = "Snippets";
-            _Subscription = AppContext.Current.Messenger.Subscribe<DocumentNotifyMessage>(OnDocumentNotify);
+            var messenger = AppContext.Current.Messenger;
+            _Subscription = messenger.Subscribe<DocumentNotifyMessage>(OnDocumentNotify);
+            InsertSnippetCommand = new RelayCommand<SnippetDefinition>(
+                    s => messenger.SendEdiMessage(this, Commands.InsertSnippet, s.Word),
+                    s => s != null
+                );
         }
 
         private void OnDocumentNotify(DocumentNotifyMessage message)
@@ -37,6 +43,9 @@ namespace LuaStudio.ViewModels.Tools
         }
 
         public ObservableCollection<SnippetDefinition> Snippets { get; private set; }
+
+        public RelayCommand<SnippetDefinition> InsertSnippetCommand { get; private set; }
+
     }
 
 }

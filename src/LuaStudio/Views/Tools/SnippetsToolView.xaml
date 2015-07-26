@@ -9,7 +9,7 @@
              d:DataContext="{d:DesignInstance Type=vm:SnippetsToolViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <ListBox ItemsSource="{Binding Snippets}">
+        <ListBox x:Name="listSnippets" ItemsSource="{Binding Snippets}" MouseDoubleClick="listSnippets_MouseDoubleClick">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>

@@ -53,7 +53,8 @@
 
             <dock:DockingManager DocumentsSource="{Binding Documents}" 
                                  AnchorablesSource="{Binding Tools}"
-                                 ActiveContent="{Binding CurrentDocument, Mode=TwoWay}"
+                                 ActiveContent="{Binding ActiveContent, Mode=TwoWay}"
+                                 Visibility="Visible"
                                  >
                 <dock:DockingManager.Theme>
                     <!--<dock:AeroTheme />-->
@@ -80,6 +81,7 @@
                                     <local:EditorControl 
                                         Document="{Binding TextContent}" 
                                         TextDefinition="{Binding TextDefinition}"
+                                        EdiCommandListener="{Binding EdiCommandListener}"
                                         />
                                 </Grid>
                             </DataTemplate>
@@ -93,12 +95,13 @@
                                 <Setter Property="Title" Value="{Binding Model.Title}" />
                                 <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
                                 <Setter Property="CloseCommand" Value="{Binding Model.CloseDocumentCommand}" />
+                                <Setter Property="IsActive" Value="{Binding Model.IsActive}" />
                             </Style>
                         </vw:DockLayoutStyleSelector.TextEditorStyle>
                         <vw:DockLayoutStyleSelector.ToolWindowStyle>
                             <Style TargetType="{x:Type dock:LayoutAnchorableItem}">
                                 <Setter Property="Title" Value="{Binding Model.Title}" />
-                                <Setter Property="IsActive" Value="False"/>
+                                <Setter Property="IsActive" Value="{Binding Model.IsActive}" />
                             </Style>
                         </vw:DockLayoutStyleSelector.ToolWindowStyle>
                     </vw:DockLayoutStyleSelector>

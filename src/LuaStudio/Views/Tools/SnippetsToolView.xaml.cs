@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LuaStudio.TextEditors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,18 @@ namespace LuaStudio.Views.Tools
         public SnippetsToolView()
         {
             InitializeComponent();
+        }
+
+        private void listSnippets_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var snippet = listSnippets.SelectedItem as SnippetDefinition;
+            if (snippet == null) return;
+            var vm = DataContext as ViewModels.Tools.SnippetsToolViewModel;
+            if (vm != null && vm.InsertSnippetCommand != null)
+            {
+                if (vm.InsertSnippetCommand.CanExecute(snippet))
+                    vm.InsertSnippetCommand.Execute(snippet);
+            }
         }
     }
 }

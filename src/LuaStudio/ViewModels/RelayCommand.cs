@@ -50,17 +50,27 @@ namespace LuaStudio.ViewModels
             this._Execute = execute;
             this._CanExecute = canExecute;
         }
-
-        public bool CanExecute(object parameter)
+        bool ICommand.CanExecute(object parameter)
         {
-            if (_CanExecute != null && parameter is T)
-                return _CanExecute((T)parameter);
+            T p = default(T);
+            if (parameter is T) p = (T)parameter;
+            return CanExecute(p);
+        }
+        public bool CanExecute(T parameter)
+        {
+            if (_CanExecute != null)
+                return _CanExecute(parameter);
             return true;
         }
-
-        public void Execute(object parameter)
+        void ICommand.Execute(object parameter)
         {
-            _Execute((T)parameter);
+            T p = default(T);
+            if (parameter is T) p = (T)parameter;
+            Execute(p);
+        }
+        public void Execute(T parameter)
+        {
+            _Execute(parameter);
         }
 
         public event EventHandler CanExecuteChanged

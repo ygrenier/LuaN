@@ -20,6 +20,7 @@ using System.Windows.Threading;
 using LuaStudio.TextEditors;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using System.Threading.Tasks;
+using LuaStudio.EdiCommands;
 
 namespace LuaStudio
 {
@@ -110,6 +111,7 @@ namespace LuaStudio
             public EditorControl Editor { get; private set; }
             public TextEditor TextEditor { get; private set; }
         }
+
         public EditorControl()
         {
             InitializeComponent();
@@ -297,6 +299,33 @@ namespace LuaStudio
             //FoldingManager.Uninstall(foldingManager);
         }
 
+        private void EdiCommandListenerChanged(EdiCommandListener oldValue, EdiCommandListener newValue)
+        {
+            if (oldValue != null)
+                oldValue.OnReceiveCommand -= EdiCommandListener_OnReceiveCommand;
+            if (newValue!= null)
+                newValue.OnReceiveCommand += EdiCommandListener_OnReceiveCommand;
+        }
+
+        private void EdiCommandListener_OnReceiveCommand(object sender, EdiCommandEventArgs e)
+        {
+            if (Commands.InsertSnippet.IsCommand(e.Command.Command))
+            {
+                if (TextDefinition != null)
+                {
+                    var snippet = TextDefinition.FindSnippet(e.Command.Parameter);
+                    if (snippet != null)
+                    {
+                        if (teEditor.SelectionLength > 0)
+                            teEditor.SelectedText = String.Empty;
+                        snippet.Insert(teEditor.TextArea);
+                        this.Focus();
+                        this.teEditor.Focus();
+                    }
+                }
+            }
+        }
+
         public TextDocument Document
         {
             get { return (TextDocument)GetValue(DocumentProperty); }
@@ -316,6 +345,20 @@ namespace LuaStudio
         private static void TextDefinitionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((EditorControl)d).TextDefinitionChanged(e.OldValue as TextEditors.ITextDefinition, e.NewValue as TextEditors.ITextDefinition);
+        }
+
+
+        public EdiCommandListener EdiCommandListener
+        {
+            get { return (EdiCommandListener)GetValue(EdiCommandListenerProperty); }
+            set { SetValue(EdiCommandListenerProperty, value); }
+        }
+        public static readonly DependencyProperty EdiCommandListenerProperty =
+            DependencyProperty.Register("EdiCommandListener", typeof(EdiCommandListener), typeof(EditorControl), new PropertyMetadata(null, EdiCommandListenerPropertyChanged));
+
+        private static void EdiCommandListenerPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((EditorControl)d).EdiCommandListenerChanged((EdiCommandListener)e.OldValue, (EdiCommandListener)e.NewValue);
         }
 
     }

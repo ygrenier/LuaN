@@ -1,4 +1,5 @@
-﻿using LuaStudio.Services;
+﻿using LuaStudio.EdiCommands;
+using LuaStudio.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,6 +17,7 @@ namespace LuaStudio.ViewModels
     {
         ObservableCollection<TextEditors.ITextDefinition> _TextDefinitions = null;
         Services.IMessengerService Messenger;
+        IMessageSubscription<EdiCommandMessage> _EdiCommandSub;
 
         /// <summary>
         /// Create a new ViewModel
@@ -58,6 +60,22 @@ namespace LuaStudio.ViewModels
                 );
             CloseAllDocumentsCommand = new RelayCommand(() => CloseAllDocuments());
             Messenger = AppContext.Current.Messenger;
+            _EdiCommandSub = Messenger.Subscribe<EdiCommandMessage>(OnEdiCommand);
+        }
+
+        private void OnEdiCommand(EdiCommandMessage message)
+        {
+            if (message == null) return;
+            var ediCommand = message.ToEdiCommand();
+
+            // Check if the command is for the EDI
+
+            // Check the command for the current document
+            if (CurrentDocument != null)
+            {
+                if (CurrentDocument.InvokeEdiCommand(ediCommand))
+                    return;
+            }
         }
 
         private void Documents_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -223,6 +241,28 @@ namespace LuaStudio.ViewModels
         public ObservableCollection<ToolViewModel> Tools { get; private set; }
 
         /// <summary>
+        /// Active content
+        /// </summary>
+        public DockContentViewModel ActiveContent
+        {
+            get { return _ActiveContent; }
+            set {
+                if (SetProperty(ref _ActiveContent, value, () => ActiveContent))
+                {
+                    if (ActiveContent == null)
+                    {
+                        CurrentDocument = null;
+                    }
+                    else if (!(ActiveContent is ToolViewModel))
+                    {
+                        CurrentDocument = ActiveContent as DocumentViewModel;
+                    }
+                }
+            }
+        }
+        private DockContentViewModel _ActiveContent;
+
+        /// <summary>
         /// Document actually in edition
         /// </summary>
         public DocumentViewModel CurrentDocument
@@ -230,20 +270,25 @@ namespace LuaStudio.ViewModels
             get { return _CurrentDocument; }
             set
             {
-                if (_CurrentDocument != null)
-                    _CurrentDocument.PropertyChanged -= CurrentDocument_PropertyChanged;
-                SetProperty(ref _CurrentDocument, value, () => CurrentDocument);
-                if (_CurrentDocument != null)
-                    _CurrentDocument.PropertyChanged += CurrentDocument_PropertyChanged;
-                RaisePropertyChanged(() => CanSaveCurrentDocument);
-                RaisePropertyChanged(() => CanSaveAsCurrentDocument);
-                RaisePropertyChanged(() => CanCloseCurrentDocument);
-                Messenger.SendMessage(new DocumentNotifyMessage
+                if (_CurrentDocument != value)
                 {
-                    Sender = this,
-                    Document = value,
-                    Notification = DocumentNotification.IsActive
-                });
+                    if (_CurrentDocument != null)
+                        _CurrentDocument.PropertyChanged -= CurrentDocument_PropertyChanged;
+                    _CurrentDocument = value;
+                    if (_CurrentDocument != null)
+                        _CurrentDocument.PropertyChanged += CurrentDocument_PropertyChanged;
+                    RaisePropertyChanged(() => CurrentDocument);
+                    RaisePropertyChanged(() => CanSaveCurrentDocument);
+                    RaisePropertyChanged(() => CanSaveAsCurrentDocument);
+                    RaisePropertyChanged(() => CanCloseCurrentDocument);
+                    Messenger.SendMessage(new DocumentNotifyMessage
+                    {
+                        Sender = this,
+                        Document = value,
+                        Notification = DocumentNotification.IsActive
+                    });
+                    ActiveContent = value;
+                }
             }
         }
         private DocumentViewModel _CurrentDocument;

@@ -97,6 +97,24 @@ namespace LuaStudio.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Insert a snippet.
+        /// </summary>
+        internal static string EdiCommand_InsertSnippet_Caption {
+            get {
+                return ResourceManager.GetString("EdiCommand_InsertSnippet_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Insert a snippet in the current text editor.
+        /// </summary>
+        internal static string EdiCommand_InsertSnippet_Description {
+            get {
+                return ResourceManager.GetString("EdiCommand_InsertSnippet_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à All files.
         /// </summary>
         internal static string OpenFileDialog_AllTypesFiles_Caption {
