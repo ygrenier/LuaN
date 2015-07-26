@@ -59,6 +59,10 @@ namespace LuaStudio.ViewModels
                 () => CanCloseCurrentDocument
                 );
             CloseAllDocumentsCommand = new RelayCommand(() => CloseAllDocuments());
+            RunCurrentDocumentCommand = new RelayCommand(
+                () => RunDocument(CurrentDocument),
+                () => CanRunCurrentDocument
+                );
             Messenger = AppContext.Current.Messenger;
             _EdiCommandSub = Messenger.Subscribe<EdiCommandMessage>(OnEdiCommand);
         }
@@ -204,6 +208,25 @@ namespace LuaStudio.ViewModels
         }
 
         /// <summary>
+        /// Run a document
+        /// </summary>
+        public Task<int> RunDocument(DocumentViewModel document)
+        {
+            InRunMode = true;
+            return Task.Factory.StartNew<int>(() =>
+            {
+                var tdoc = document as ViewModels.Documents.TextEditorViewModel;
+                if (tdoc == null || tdoc.TextDefinition == null) return -1;
+                var runner = tdoc.TextDefinition.GetCodeRunner();
+                return runner.Run(tdoc.TextContent.CreateReader(), tdoc.Filename);
+            }).ContinueWith(_ =>
+            {
+                InRunMode = false;
+                return _.Result;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        /// <summary>
         /// Text editor Definitions
         /// </summary>
         public ObservableCollection<TextEditors.ITextDefinition> TextDefinitions { get
@@ -281,6 +304,7 @@ namespace LuaStudio.ViewModels
                     RaisePropertyChanged(() => CanSaveCurrentDocument);
                     RaisePropertyChanged(() => CanSaveAsCurrentDocument);
                     RaisePropertyChanged(() => CanCloseCurrentDocument);
+                    RaisePropertyChanged(() => CanRunCurrentDocument);
                     Messenger.SendMessage(new DocumentNotifyMessage
                     {
                         Sender = this,
@@ -299,6 +323,10 @@ namespace LuaStudio.ViewModels
                 RaisePropertyChanged(() => CanSaveCurrentDocument);
             else if (String.Equals(e.PropertyName, "CanSaveAs", StringComparison.OrdinalIgnoreCase))
                 RaisePropertyChanged(() => CanSaveAsCurrentDocument);
+            if (String.Equals(e.PropertyName, "CanClose", StringComparison.OrdinalIgnoreCase))
+                RaisePropertyChanged(() => CanCloseCurrentDocument);
+            if (String.Equals(e.PropertyName, "CanRun", StringComparison.OrdinalIgnoreCase))
+                RaisePropertyChanged(() => CanRunCurrentDocument);
         }
 
         /// <summary>
@@ -355,6 +383,30 @@ namespace LuaStudio.ViewModels
         /// Indicate if we can close the current document
         /// </summary>
         public bool CanCloseCurrentDocument { get { return CurrentDocument != null && CurrentDocument.CanClose; } }
+
+        /// <summary>
+        /// Command to run the courrent document
+        /// </summary>
+        public RelayCommand RunCurrentDocumentCommand { get; private set; }
+        
+        /// <summary>
+        /// Indicate if wa can run the current document
+        /// </summary>
+        public bool CanRunCurrentDocument { get {
+                var tdoc = CurrentDocument as ViewModels.Documents.TextEditorViewModel;
+                return tdoc != null && tdoc.TextDefinition != null && tdoc.TextDefinition.GetCodeRunner() != null;
+            }
+        }
+
+        /// <summary>
+        /// Indicate the EDI is in run mode
+        /// </summary>
+        public bool InRunMode
+        {
+            get { return _InRunMode; }
+            protected set { SetProperty(ref _InRunMode, value, () => InRunMode); }
+        }
+        private bool _InRunMode = false;
 
     }
 

@@ -124,8 +124,8 @@ namespace LuaStudio.ViewModels
         {
             get { return _EdiCommandListener ?? (_EdiCommandListener = CreateEdiCommandListener()); }
         }
-
         private EdiCommands.EdiCommandListener _EdiCommandListener;
+
     }
 
 }

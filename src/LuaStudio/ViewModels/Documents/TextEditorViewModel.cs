@@ -156,7 +156,10 @@ namespace LuaStudio.ViewModels.Documents
         public ITextDefinition TextDefinition
         {
             get { return _TextDefinition; }
-            set { SetProperty(ref _TextDefinition, value, () => TextDefinition); }
+            set
+            {
+                SetProperty(ref _TextDefinition, value, () => TextDefinition);
+            }
         }
         private ITextDefinition _TextDefinition;
 
@@ -169,7 +172,6 @@ namespace LuaStudio.ViewModels.Documents
         /// Can save as new name
         /// </summary>
         public override bool CanSaveAs { get { return true; } }
-
     }
 
 }

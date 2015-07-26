@@ -10,6 +10,8 @@ using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Snippets;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Editing;
+using LuaStudio.Code;
+using LuaStudio.Code.Lua;
 
 namespace LuaStudio.TextEditors
 {
@@ -19,6 +21,8 @@ namespace LuaStudio.TextEditors
     [Export(typeof(ITextDefinition))]
     public class LuaDefinition : ITextDefinition, ITextFoldingStrategy
     {
+        ICodeCompiler _CodeCompiler;
+        ICodeRunner _CodeRunner;
         IHighlightingDefinition _HighlightingDefinition;
         List<SnippetDefinition> _Snippets;
         List<ICompletionData> _SnippetsCompletion;//, _KeywordsCompletion;
@@ -399,6 +403,22 @@ namespace LuaStudio.TextEditors
             }
             //return _SnippetsCompletion.Concat(_KeywordsCompletion);
             return _SnippetsCompletion;
+        }
+
+        /// <summary>
+        /// Get the code compiler
+        /// </summary>
+        public ICodeCompiler GetCodeCompiler()
+        {
+            return _CodeCompiler ?? (_CodeCompiler = new LuaCodeCompiler());
+        }
+
+        /// <summary>
+        /// Get the code runner
+        /// </summary>
+        public ICodeRunner GetCodeRunner()
+        {
+            return _CodeRunner ?? (_CodeRunner = new LuaCodeRunner());
         }
 
         /// <summary>

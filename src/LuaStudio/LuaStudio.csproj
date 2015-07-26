@@ -83,6 +83,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppContext.cs" />
+    <Compile Include="Code\ICodeCompiler.cs" />
+    <Compile Include="Code\ICodeRunner.cs" />
+    <Compile Include="Code\Lua\LuaCodeCompiler.cs" />
+    <Compile Include="Code\Lua\LuaCodeRunner.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Dialogs\ConfirmDialog.xaml.cs">
       <DependentUpon>ConfirmDialog.xaml</DependentUpon>
