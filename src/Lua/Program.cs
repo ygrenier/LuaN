@@ -10,6 +10,11 @@ namespace LuaProgram
 {
     //using LuaApi = LuaNet.LuaLib.Lua;
 
+    /// <summary>
+    /// $Id: lua.c,v 1.222 2014/11/11 19:41:27 roberto Exp $
+    /// Lua stand-alone interpreter
+    /// See Copyright Notice in lua.h
+    /// </summary>
     class Program
     {
         const int EXIT_SUCCESS = 0;

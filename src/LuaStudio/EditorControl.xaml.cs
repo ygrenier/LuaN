@@ -166,7 +166,7 @@ namespace LuaStudio
 
         private void EditorControl_Loaded(object sender, RoutedEventArgs e)
         {
-            teEditor.Focus();
+            //teEditor.Focus();
             _FocusTimer.Start();
         }
 
