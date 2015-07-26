@@ -14,7 +14,7 @@ namespace LuaStudio.Services
         /// <summary>
         /// Display a selector to open a file
         /// </summary>
-        Task<IEnumerable<String>> FileOpen(
+        IEnumerable<String> FileOpen(
             String title,
             String defaultPath = null,
             bool multiSelect = false,
@@ -24,7 +24,7 @@ namespace LuaStudio.Services
         /// <summary>
         /// Display a selector to save a file
         /// </summary>
-        Task<String> FileSave(
+        String FileSave(
             String title,
             String defaultFilename = null,
             String defaultPath = null,
@@ -35,11 +35,15 @@ namespace LuaStudio.Services
         /// <summary>
         /// Open a confirm dialog box
         /// </summary>
-        Task<IDialogButton> Confirm(
+        IDialogButton Confirm(
             String message,
             String title,
             params IDialogButton[] buttons
             );
 
+        /// <summary>
+        /// Display an error
+        /// </summary>
+        bool DisplayError(String tite, Exception error);
     }
 }

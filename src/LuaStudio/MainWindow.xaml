@@ -13,16 +13,16 @@
                      d:DataContext="{d:DesignInstance Type=vm:AppViewModel, IsDesignTimeCreatable=True}"
                      Closing="RibbonWindow_Closing"
                      Title="Lua Studio" Height="350" Width="525" WindowState="Maximized">
+    <Fluent:RibbonWindow.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding NewEditorCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenFileCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveFileCommand}"/>
+        <KeyBinding Modifiers="Ctrl+Shift" Key="S" Command="{Binding SaveAllFilesCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="F4" Command="{Binding CloseCurrentDocumentCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="F5" Command="{Binding RunCurrentDocumentCommand}"/>
+        <KeyBinding Key="F5" Command="{Binding RunCurrentDocumentCommand}"/>
+    </Fluent:RibbonWindow.InputBindings>
     <Grid>
-        <Grid.InputBindings>
-            <KeyBinding Modifiers="Ctrl" Key="N" Command="{Binding NewEditorCommand}"/>
-            <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenFileCommand}"/>
-            <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveFileCommand}"/>
-            <KeyBinding Modifiers="Ctrl+Shift" Key="S" Command="{Binding SaveAllFilesCommand}"/>
-            <KeyBinding Modifiers="Ctrl" Key="F4" Command="{Binding CloseCurrentDocumentCommand}"/>
-            <KeyBinding Modifiers="Ctrl" Key="F5" Command="{Binding RunCurrentDocumentCommand}"/>
-            <KeyBinding Key="F5" Command="{Binding RunCurrentDocumentCommand}"/>
-        </Grid.InputBindings>
         <DockPanel>
             <Fluent:Ribbon DockPanel.Dock="Top" KeyboardNavigation.IsTabStop="False" KeyboardNavigation.TabNavigation="None">
                 <!--<Fluent:Ribbon.Menu>

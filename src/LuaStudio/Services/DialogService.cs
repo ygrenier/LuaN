@@ -20,7 +20,7 @@ namespace LuaStudio.Services
         /// <summary>
         /// Display a selector to open a file
         /// </summary>
-        public Task<IEnumerable<String>> FileOpen(
+        public IEnumerable<String> FileOpen(
             String title,
             String defaultPath = null,
             bool multiSelect = false,
@@ -52,22 +52,20 @@ namespace LuaStudio.Services
             }
             dlg.Filter = sb.ToString();
 
-            TaskCompletionSource<IEnumerable<String>> result = new TaskCompletionSource<IEnumerable<String>>();
             if (dlg.ShowDialog().GetValueOrDefault())
             {
-                result.SetResult(dlg.FileNames);
+                return dlg.FileNames;
             }
             else
             {
-                result.SetResult(Enumerable.Empty<String>());
+                return Enumerable.Empty<String>();
             }
-            return result.Task;
         }
 
         /// <summary>
         /// Display a selector to save a file
         /// </summary>
-        public Task<String> FileSave(
+        public String FileSave(
             String title,
             String defaultFilename = null,
             String defaultPath = null,
@@ -113,41 +111,59 @@ namespace LuaStudio.Services
             }
             dlg.Filter = sb.ToString();
 
-            TaskCompletionSource<String> result = new TaskCompletionSource<String>();
             if (dlg.ShowDialog().GetValueOrDefault())
             {
-                result.SetResult(dlg.FileName);
+                return dlg.FileName;
             }
             else
             {
-                result.SetResult(null);
+                return null;
             }
-            return result.Task;
         }
 
         /// <summary>
         /// Open a confirm dialog box
         /// </summary>
-        public Task<IDialogButton> Confirm(
+        public IDialogButton Confirm(
             String message,
             String title,
             params IDialogButton[] buttons
             )
         {
-            TaskCompletionSource<IDialogButton> result = new TaskCompletionSource<IDialogButton>();
-
-            var confirm = new Dialogs.ConfirmDialog();
-            var vm=new Dialogs.ConfirmDialogViewModel
+            return (IDialogButton)App.Current.Dispatcher.Invoke((Func<IDialogButton>)delegate
             {
-                Title = title,
-                Message = message,
-                Buttons = buttons
-            };
-            confirm.DataContext = vm;
-            confirm.ShowDialog();
-            result.SetResult(vm.LastClickedButton);
+                var confirm = new Dialogs.ConfirmDialog();
+                var vm = new Dialogs.ConfirmDialogViewModel
+                {
+                    Title = title,
+                    Message = message,
+                    Buttons = buttons
+                };
+                confirm.DataContext = vm;
+                confirm.ShowDialog();
+                return vm.LastClickedButton;
+            });
+        }
 
-            return result.Task;
+        public bool DisplayError(String title, Exception error)
+        {
+            if (error != null)
+            {
+                App.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    var confirm = new Dialogs.ConfirmDialog();
+                    var vm = new Dialogs.ConfirmDialogViewModel
+                    {
+                        Title = title,
+                        Message = error.GetBaseException().Message,
+                        Buttons = new IDialogButton[] { DialogButton.OkButton() }
+                    };
+                    confirm.DataContext = vm;
+                    confirm.ShowDialog();
+                });
+                return true;
+            }
+            return false;
         }
 
     }

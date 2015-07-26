@@ -12,5 +12,16 @@ namespace LuaStudio
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            base.OnStartup(e);
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
+            AppContext.Current.GetService<Services.IDialogService>().DisplayError("Unhandled error", e.Exception);
+        }
     }
 }

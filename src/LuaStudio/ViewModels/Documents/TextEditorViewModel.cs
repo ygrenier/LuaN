@@ -68,7 +68,7 @@ namespace LuaStudio.ViewModels.Documents
         public override bool SaveAs()
         {
             var dial = AppContext.Current.GetService<Services.IDialogService>();
-            var filename = dial.FileSave(Locales.SaveFileTitle).Result;
+            var filename = dial.FileSave(Locales.SaveFileTitle);
             if (!String.IsNullOrWhiteSpace(filename))
             {
                 Save(filename);
@@ -91,7 +91,7 @@ namespace LuaStudio.ViewModels.Documents
                     DialogButton.YesNoCancelButtons()
                         .IsDefault(DialogButton.YesButtonId)
                         .IsCancel(DialogButton.CancelButtonId)
-                    ).Result;
+                    );
                 if (res != null && res.ButtonId == DialogButton.NoButtonId)
                     return true;
                 else if (res != null && res.ButtonId == DialogButton.CancelButtonId)

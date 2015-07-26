@@ -118,7 +118,7 @@ namespace LuaStudio.ViewModels
         public IEnumerable<DocumentViewModel> OpenFile()
         {
             var dial = AppContext.Current.GetService<Services.IDialogService>();
-            var files = dial.FileOpen(Resources.Locales.OpenFileTitle, null, true, true).Result;
+            var files = dial.FileOpen(Resources.Locales.OpenFileTitle, null, true, true);
             return files.Select(f =>
             {
                 return OpenFile(f);
@@ -212,7 +212,6 @@ namespace LuaStudio.ViewModels
         /// </summary>
         public Task<int> RunDocument(DocumentViewModel document)
         {
-            InRunMode = true;
             return Task.Factory.StartNew<int>(() =>
             {
                 var tdoc = document as ViewModels.Documents.TextEditorViewModel;
@@ -221,9 +220,16 @@ namespace LuaStudio.ViewModels
                 return runner.Run(tdoc.TextContent.CreateReader(), tdoc.Filename);
             }).ContinueWith(_ =>
             {
-                InRunMode = false;
-                return _.Result;
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                try
+                {
+                    return _.Result;
+                }
+                catch (Exception ex)
+                {
+                    AppContext.Current.GetService<IDialogService>().DisplayError("Run", ex);
+                    return -1;
+                }
+            });
         }
 
         /// <summary>
@@ -397,16 +403,6 @@ namespace LuaStudio.ViewModels
                 return tdoc != null && tdoc.TextDefinition != null && tdoc.TextDefinition.GetCodeRunner() != null;
             }
         }
-
-        /// <summary>
-        /// Indicate the EDI is in run mode
-        /// </summary>
-        public bool InRunMode
-        {
-            get { return _InRunMode; }
-            protected set { SetProperty(ref _InRunMode, value, () => InRunMode); }
-        }
-        private bool _InRunMode = false;
 
     }
 
