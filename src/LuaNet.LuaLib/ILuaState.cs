@@ -893,6 +893,11 @@ namespace LuaNet
         /// Assert
         /// </summary>
         void Assert(bool cond);
+
+        /// <summary>
+        /// Event raised when "print" is called
+        /// </summary>
+        event EventHandler<WriteEventArgs> OnPrint;
     }
 
     /// <summary>

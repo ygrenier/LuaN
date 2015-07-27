@@ -1019,25 +1019,104 @@ namespace LuaNet.LuaLib
         #endregion
 
         #region Acces to the "Abstraction Layer" for basic report of messages and errors
+
+        /// <summary>
+        /// Process write
+        /// </summary>
+        void ProcessWrite(String s, EventHandler<WriteEventArgs> h, Action write)
+        {
+            WriteEventArgs e = new WriteEventArgs(s);
+            if (h != null) h(null, e);
+            if (!e.Handled)
+                write();
+        }
+
         /// <summary>
         /// print a string
         /// </summary>
-        public ILuaState WriteString(String s) { Lua.lua_writestring(s); return this; }
+        public ILuaState WriteString(String s)
+        {
+            ProcessWrite(s, OnWriteString, () => Lua.lua_writestring(s));
+            return this;
+        }
+
         /// <summary>
         /// print a newline and flush the output
         /// </summary>
-        public ILuaState WriteLine() { Lua.lua_writeline(); return this; }
+        public ILuaState WriteLine() {
+            ProcessWrite(Environment.NewLine, OnWriteLine, () => Lua.lua_writeline());
+            return this;
+        }
+
         /// <summary>
         /// print an error message
         /// </summary>
-        public ILuaState WriteStringError(String s, String p) { Lua.lua_writestringerror(s, p); return this; }
+        public ILuaState WriteStringError(String s, String p) {
+            ProcessWrite(String.Format(s.Replace("%s", "{0}"), p), OnWriteStringError, () => Lua.lua_writestringerror(s, p));
+            return this;
+        }
+
         #endregion
 
         #endregion
 
         #region lualib
 
-        public int OpenBase() { return Lua.luaopen_base(NativeState); }
+        /// <summary>
+        /// Overrided 'print' function
+        /// </summary>
+        private int LuaPrint(ILuaState state)
+        {
+            // Get the event
+            LuaState L = state as LuaState;
+            EventHandler<WriteEventArgs> h = L != null ? L.OnPrint : null;
+
+            // Number of arguments
+            int n = state.GetTop();
+            // Get the 'tostring' function
+            state.GetGlobal("tostring");
+            // Loop on each argument
+            StringBuilder line = new StringBuilder();
+            for (int i = 1; i <= n; i++)
+            {
+                // Function to be called
+                state.PushValue(-1);
+                // Value to print
+                state.PushValue(i);
+                // Convert to string
+                state.Call(1, 1);
+                // Get the result
+                var s = state.ToString(-1);
+                if (s == null)
+                    state.Error("'tostring' must return a string to 'print'");
+
+                // Build the line
+                if (i > 1) line.Append('\t');
+                line.Append(s);
+
+                // Pop result
+                state.Pop(1);
+            }
+            // Call the event
+            WriteEventArgs pe = new WriteEventArgs(line.ToString()) { Handled = false };
+            if (h != null) h(L, pe);
+            // If the event is not handled, we print with the default behavior
+            if (!pe.Handled)
+            {
+                WriteString(pe.Text);
+                WriteLine();
+            }
+            // No result
+            return 0;
+        }
+
+        void OverridePrint()
+        {
+            PushFunction(LuaPrint);
+            SetGlobal("print");
+        }
+
+        public int OpenBase() { var res = Lua.luaopen_base(NativeState); OverridePrint(); return res; }
         public int OpenCoroutine() { return Lua.luaopen_coroutine(NativeState); }
         public int OpenTable() { return Lua.luaopen_table(NativeState); }
         public int OpenIo() { return Lua.luaopen_io(NativeState); }
@@ -1048,7 +1127,7 @@ namespace LuaNet.LuaLib
         public int OpenMath() { return Lua.luaopen_math(NativeState); }
         public int OpenDebug() { return Lua.luaopen_debug(NativeState); }
         public int OpenPackage() { return Lua.luaopen_package(NativeState); }
-        public ILuaState OpenLibs() { Lua.luaL_openlibs(NativeState); return this; }
+        public ILuaState OpenLibs() { Lua.luaL_openlibs(NativeState); OverridePrint(); return this; }
 
         #endregion
 
@@ -1056,6 +1135,26 @@ namespace LuaNet.LuaLib
         /// Assert
         /// </summary>
         public void Assert(bool cond) { Lua.lua_assert(cond); }
+
+        /// <summary>
+        /// Event raised when "print" is called
+        /// </summary>
+        public event EventHandler<WriteEventArgs> OnPrint;
+
+        /// <summary>
+        /// Event raised when lua_writestring is called
+        /// </summary>
+        public static event EventHandler<WriteEventArgs> OnWriteString;
+
+        /// <summary>
+        /// Event raised when lua_writeline is called
+        /// </summary>
+        public static event EventHandler<WriteEventArgs> OnWriteLine;
+
+        /// <summary>
+        /// Event raised when lua_writestringerror is called
+        /// </summary>
+        public static event EventHandler<WriteEventArgs> OnWriteStringError;
 
         /// <summary>
         /// Access to the native state

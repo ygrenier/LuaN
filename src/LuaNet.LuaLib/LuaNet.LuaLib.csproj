@@ -73,6 +73,7 @@
     <Compile Include="StateExtensions.cs" />
     <Compile Include="UserDataRef.cs" />
     <Compile Include="[Enums].cs" />
+    <Compile Include="[Events].cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\external\lua-5.3.0\lua-5.3_Win32_dll9_lib\lua53.dll">
