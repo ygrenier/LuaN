@@ -12,14 +12,19 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
           <TextBox
+              x:Name="tOutput"
+              Text="{Binding Output, Mode=OneWay}"
               IsReadOnly="True"
               FontFamily="Consolas"
               FontSize="12px"
               />
         <TextBox 
+            x:Name="tInput"
             Grid.Row="1" 
             FontFamily="Consolas" 
             FontSize="12px"
+            Padding="2"
+            KeyDown="tInput_KeyDown"
             >
         </TextBox>
     </Grid>

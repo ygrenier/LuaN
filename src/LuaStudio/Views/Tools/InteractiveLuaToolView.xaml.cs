@@ -22,6 +22,28 @@ namespace LuaStudio.Views.Tools
         public InteractiveLuaToolView()
         {
             InitializeComponent();
+            this.Loaded += InteractiveLuaToolView_Loaded;
         }
+
+        private void InteractiveLuaToolView_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel == null) DataContext = new ViewModels.Tools.InteractiveLuaToolViewModel();
+            ViewModel.Start();
+        }
+
+        private void tInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Return)
+            {
+                if (ViewModel != null && ViewModel.IsStarted)
+                {
+                    ViewModel.DoString(tInput.Text);
+                }
+                tInput.Clear();
+            }
+        }
+
+        public ViewModels.Tools.InteractiveLuaToolViewModel ViewModel { get { return DataContext as ViewModels.Tools.InteractiveLuaToolViewModel; } }
+
     }
 }

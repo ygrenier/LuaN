@@ -113,6 +113,22 @@ namespace LuaStudio.ViewModels
             }
         }
 
+        internal void Shutdown()
+        {
+            foreach (var doc in Documents)
+            {
+                if (doc is IDisposable)
+                    ((IDisposable)doc).Dispose();
+            }
+            Documents.Clear();
+            foreach (var tool in Tools)
+            {
+                if (tool is IDisposable)
+                    ((IDisposable)tool).Dispose();
+            }
+            Tools.Clear();
+        }
+
         /// <summary>
         /// Open files from file selector
         /// </summary>

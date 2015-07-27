@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace LuaStudio
 {
@@ -26,8 +27,18 @@ namespace LuaStudio
             DataContext = new ViewModels.AppViewModel();
         }
 
-        private void RibbonWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        protected override void OnClosed(EventArgs e)
         {
+            base.OnClosed(e);
+            if (ViewModel != null)
+            {
+                ViewModel.Shutdown();
+            }
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
             if (ViewModel != null)
             {
                 if (!ViewModel.CloseAllDocuments())
