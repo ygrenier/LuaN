@@ -28,6 +28,7 @@ namespace LuaStudio.ViewModels
             Documents.CollectionChanged += Documents_CollectionChanged;
             Tools = new ObservableCollection<ToolViewModel>();
             Tools.Add(new ViewModels.Tools.SnippetsToolViewModel());
+            Tools.Add(new ViewModels.Tools.InteractiveLuaToolViewModel());
             NewEditorCommand = new RelayCommand<TextEditors.ITextDefinition>(d =>
               {
                   d = d ?? TextDefinitions.FirstOrDefault();

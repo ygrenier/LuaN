@@ -128,11 +128,15 @@
     <Compile Include="ViewModels\DocumentViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="ViewModels\Documents\TextEditorViewModel.cs" />
+    <Compile Include="ViewModels\Tools\InteractiveLuaToolViewModel.cs" />
     <Compile Include="ViewModels\Tools\SnippetsToolViewModel.cs" />
     <Compile Include="ViewModels\ToolViewModel.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
     <Compile Include="Views\DockLayoutStyleSelector.cs" />
     <Compile Include="Views\DockLayoutTemplateSelector.cs" />
+    <Compile Include="Views\Tools\InteractiveLuaToolView.xaml.cs">
+      <DependentUpon>InteractiveLuaToolView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Tools\SnippetsToolView.xaml.cs">
       <DependentUpon>SnippetsToolView.xaml</DependentUpon>
     </Compile>
@@ -169,6 +173,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Tools\InteractiveLuaToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

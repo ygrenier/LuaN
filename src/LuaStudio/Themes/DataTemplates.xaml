@@ -8,7 +8,11 @@
                     >
 
     <DataTemplate DataType="{x:Type vm_tools:SnippetsToolViewModel}">
-        <vw_tools:SnippetsToolView/>
+        <vw_tools:SnippetsToolView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm_tools:InteractiveLuaToolViewModel}">
+        <vw_tools:InteractiveLuaToolView />
     </DataTemplate>
     
 </ResourceDictionary>
