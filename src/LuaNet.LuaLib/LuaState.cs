@@ -1144,17 +1144,17 @@ namespace LuaNet.LuaLib
         /// <summary>
         /// Event raised when lua_writestring is called
         /// </summary>
-        public static event EventHandler<WriteEventArgs> OnWriteString;
+        public event EventHandler<WriteEventArgs> OnWriteString;
 
         /// <summary>
         /// Event raised when lua_writeline is called
         /// </summary>
-        public static event EventHandler<WriteEventArgs> OnWriteLine;
+        public event EventHandler<WriteEventArgs> OnWriteLine;
 
         /// <summary>
         /// Event raised when lua_writestringerror is called
         /// </summary>
-        public static event EventHandler<WriteEventArgs> OnWriteStringError;
+        public event EventHandler<WriteEventArgs> OnWriteStringError;
 
         /// <summary>
         /// Access to the native state

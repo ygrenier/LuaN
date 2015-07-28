@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LuaNet.LuaLib
+namespace LuaNet
 {
     /// <summary>
     /// State extensions

@@ -898,6 +898,22 @@ namespace LuaNet
         /// Event raised when "print" is called
         /// </summary>
         event EventHandler<WriteEventArgs> OnPrint;
+
+        /// <summary>
+        /// Event raised when lua_writestring is called
+        /// </summary>
+        event EventHandler<WriteEventArgs> OnWriteString;
+
+        /// <summary>
+        /// Event raised when lua_writeline is called
+        /// </summary>
+        event EventHandler<WriteEventArgs> OnWriteLine;
+
+        /// <summary>
+        /// Event raised when lua_writestringerror is called
+        /// </summary>
+        event EventHandler<WriteEventArgs> OnWriteStringError;
+
     }
 
     /// <summary>
