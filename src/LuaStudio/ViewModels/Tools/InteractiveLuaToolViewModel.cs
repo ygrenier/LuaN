@@ -13,6 +13,7 @@ namespace LuaStudio.ViewModels.Tools
         public InteractiveLuaToolViewModel()
         {
             Title = "Lua Interactive";
+            Console = new ConsoleViewModel();
         }
 
         public void Dispose()
@@ -36,19 +37,22 @@ namespace LuaStudio.ViewModels.Tools
 
         private void State_OnWriteStringError(object sender, WriteEventArgs e)
         {
-            Write(e.Text);
+            //Write(e.Text);
+            Console.InsertError(e.Text);
             e.Handled = true;
         }
 
         private void State_OnWriteString(object sender, WriteEventArgs e)
         {
-            Write(e.Text);
+            //Write(e.Text);
+            Console.InsertOutput(e.Text);
             e.Handled = true;
         }
 
         private void State_OnWriteLine(object sender, WriteEventArgs e)
         {
-            Write(Environment.NewLine);
+            //Write(Environment.NewLine);
+            Console.InsertOutput(Environment.NewLine);
             e.Handled = true;
         }
 
@@ -60,7 +64,8 @@ namespace LuaStudio.ViewModels.Tools
 
         private void Write(String s)
         {
-            Output += s;
+            //Output += s;
+            Console.InsertOutput(s);
         }
 
         /// <summary>
@@ -108,7 +113,8 @@ namespace LuaStudio.ViewModels.Tools
         public void DoString(String chunk)
         {
             if (String.IsNullOrWhiteSpace(chunk) && !IsStarted) return;
-            Output += String.Format("> {0}\n", chunk);
+            //Output += String.Format("> {0}\n", chunk);
+            Console.InsertInput(chunk);
             if (chunk.StartsWith("="))
             {
                 chunk = String.Format("return {0}", chunk.Substring(1));
@@ -149,12 +155,18 @@ namespace LuaStudio.ViewModels.Tools
         }
         private bool _IsStarted;
 
-        public String Output
-        {
-            get { return _Output; }
-            private set { SetProperty(ref _Output, value, () => Output); }
-        }
-        private String _Output;
+        //public String Output
+        //{
+        //    get { return _Output; }
+        //    private set { SetProperty(ref _Output, value, () => Output); }
+        //}
+        //private String _Output;
+
+        /// <summary>
+        /// Content of the console
+        /// </summary>
+        public ConsoleViewModel Console { get; private set; }
 
     }
+
 }

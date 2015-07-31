@@ -11,13 +11,15 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-          <TextBox
-              x:Name="tOutput"
-              Text="{Binding Output, Mode=OneWay}"
-              IsReadOnly="True"
-              FontFamily="Consolas"
-              FontSize="12px"
-              />
+        <RichTextBox x:Name="consoleView" FontFamily="Consolas" FontSize="12px" IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
+            <RichTextBox.Resources>
+                <Style TargetType="Paragraph">
+                    <Setter Property="Margin" Value="0" />
+                </Style>
+            </RichTextBox.Resources>
+            <FlowDocument PageWidth="960">
+            </FlowDocument>
+        </RichTextBox>
         <TextBox 
             x:Name="tInput"
             Grid.Row="1" 

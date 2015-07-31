@@ -125,6 +125,7 @@
     <Compile Include="TextEditors\KeywordCompletionData.cs" />
     <Compile Include="Util\ConsoleRedirector.cs" />
     <Compile Include="ViewModels\AppViewModel.cs" />
+    <Compile Include="ViewModels\ConsoleViewModel.cs" />
     <Compile Include="ViewModels\DockContentViewModel.cs" />
     <Compile Include="ViewModels\DocumentViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
