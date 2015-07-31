@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xceed.Wpf.AvalonDock.Layout;
 
 namespace LuaStudio.ViewModels.Tools
 {
@@ -166,6 +167,11 @@ namespace LuaStudio.ViewModels.Tools
         /// Content of the console
         /// </summary>
         public ConsoleViewModel Console { get; private set; }
+
+        /// <summary>
+        /// Preferred bottom
+        /// </summary>
+        public override AnchorSide PreferredSide { get { return AnchorSide.Bottom; } }
 
     }
 

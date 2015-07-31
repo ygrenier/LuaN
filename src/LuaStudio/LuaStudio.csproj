@@ -103,6 +103,7 @@
     <Compile Include="Extensions\EdiCommandExtensions.cs" />
     <Compile Include="Extensions\MessengerExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
+    <Compile Include="Layout\LayoutManager.cs" />
     <Compile Include="Resources\Locales.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

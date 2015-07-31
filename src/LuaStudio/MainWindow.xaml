@@ -6,6 +6,7 @@
                      xmlns:vm="clr-namespace:LuaStudio.ViewModels"
                      xmlns:vw="clr-namespace:LuaStudio.Views"
                      xmlns:local="clr-namespace:LuaStudio"
+                     xmlns:localLayout="clr-namespace:LuaStudio.Layout"
                      xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
                      xmlns:rs="clr-namespace:LuaStudio.Resources"
                      xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
@@ -62,6 +63,9 @@
                     <!--<dock:AeroTheme />-->
                     <dock:MetroTheme />
                 </dock:DockingManager.Theme>
+                <dock:DockingManager.LayoutUpdateStrategy>
+                    <localLayout:LayoutManager />
+                </dock:DockingManager.LayoutUpdateStrategy>
                 <dock:DockingManager.AnchorableHeaderTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Content.Title}" />

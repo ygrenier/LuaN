@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Xceed.Wpf.AvalonDock.Layout;
 
 namespace LuaStudio.ViewModels
 {
@@ -14,6 +15,9 @@ namespace LuaStudio.ViewModels
             set { SetProperty(ref _IsVisible, value, () => IsVisible); }
         }
         private bool _IsVisible;
+
+        public virtual AnchorSide PreferredSide { get { return AnchorSide.Right; } }
+
     }
 
 }
