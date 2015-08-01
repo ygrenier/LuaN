@@ -24,6 +24,7 @@ namespace LuaNet.LuaLib
         public static LuaCFunctionProxy FindProxy(LuaFunction function)
         {
             if (function == null) return null;
+            lock (_Proxies)
             return _Proxies.FirstOrDefault(p => p.ManagedFunction == function);
         }
 
@@ -33,6 +34,7 @@ namespace LuaNet.LuaLib
         public static LuaCFunctionProxy FindProxy(Lua.lua_CFunction function)
         {
             if (function == null) return null;
+            lock (_Proxies)
             return _Proxies.FirstOrDefault(p => p.UnmanagedFunction == function);
         }
 
@@ -42,14 +44,17 @@ namespace LuaNet.LuaLib
         public static LuaCFunctionProxy GetProxy(LuaFunction function)
         {
             if (function == null) return null;
-            var result = FindProxy(function);
+            LuaCFunctionProxy result = null;
+            result = FindProxy(function);
             if (result == null)
             {
-                result = new LuaCFunctionProxy() {
+                result = new LuaCFunctionProxy()
+                {
                     ManagedFunction = function
                 };
                 result.UnmanagedFunction = result.InvokeManagementFunction;
-                _Proxies.Add(result);
+                lock (_Proxies)
+                    _Proxies.Add(result);
             }
             return result;
         }
@@ -60,14 +65,17 @@ namespace LuaNet.LuaLib
         public static LuaCFunctionProxy GetProxy(Lua.lua_CFunction function)
         {
             if (function == null) return null;
-            var result = FindProxy(function);
+            LuaCFunctionProxy result = null;
+            result = FindProxy(function);
             if (result == null)
             {
-                result = new LuaCFunctionProxy() {
+                result = new LuaCFunctionProxy()
+                {
                     UnmanagedFunction = function
                 };
                 result.ManagedFunction = result.InvokeUnmanagedFunction;
-                _Proxies.Add(result);
+                lock (_Proxies)
+                    _Proxies.Add(result);
             }
             return result;
         }

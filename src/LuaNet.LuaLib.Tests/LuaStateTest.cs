@@ -8,7 +8,7 @@ using Xunit;
 
 namespace LuaNet.LuaLib.Tests
 {
-    public class LuaStateTest
+    public partial class LuaStateTest
     {
         [Fact]
         public void TestCreateAndDispose()

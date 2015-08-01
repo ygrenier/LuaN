@@ -26,6 +26,7 @@ namespace LuaNet.LuaLib
             _NativeState = Lua.luaL_newstate();
             if (_NativeState == IntPtr.Zero)
                 throw new OutOfMemoryException("Cannot create state: not enough memory");
+            lock (_RegisteredStates)
             _RegisteredStates[_NativeState] = this;
             _OwnNativeState = true;
             SetDefaultAtPanic();
@@ -37,6 +38,7 @@ namespace LuaNet.LuaLib
         private LuaState(IntPtr ptr, bool ownState)
         {
             _NativeState = ptr;
+            lock (_RegisteredStates)
             _RegisteredStates[_NativeState] = this;
             _OwnNativeState = ownState;
             SetDefaultAtPanic();
@@ -54,6 +56,7 @@ namespace LuaNet.LuaLib
                 {
                     Lua.lua_close(_NativeState);
                 }
+                lock (_RegisteredStates)
                 _RegisteredStates.Remove(_NativeState);
                 _NativeState = IntPtr.Zero;
             }
@@ -395,7 +398,7 @@ namespace LuaNet.LuaLib
         /// <summary>
         /// Push a formatted string value
         /// </summary>
-        public String PushFString(String fmt, Double arg0, Double arg1) { return Lua.lua_pushfstring(NativeState, fmt, arg0, arg1);  }
+        public String PushFString(String fmt, Double arg0, Double arg1) { return Lua.lua_pushfstring(NativeState, fmt, arg0, arg1); }
         /// <summary>
         /// Push a formatted string value
         /// </summary>
@@ -423,11 +426,12 @@ namespace LuaNet.LuaLib
         /// <summary>
         /// Push a light user data
         /// </summary>
-        public ILuaState PushLightUserData(Object userData) {
+        public ILuaState PushLightUserData(Object userData)
+        {
             if (userData == null) throw new ArgumentNullException("userData");
             IntPtr ptr = UserDataRef.GetRef(userData);
             Lua.lua_pushlightuserdata(NativeState, ptr);
-            return this;            
+            return this;
         }
         /// <summary>
         /// Push a thread
@@ -945,7 +949,8 @@ namespace LuaNet.LuaLib
         /// </summary>
         public ILuaState SetFuncs(IEnumerable<Tuple<String, LuaFunction>> l, int nup)
         {
-            Lua.luaL_Reg[] regs = l.Select(t => new Lua.luaL_Reg {
+            Lua.luaL_Reg[] regs = l.Select(t => new Lua.luaL_Reg
+            {
                 func = t.Item2.ToCFunction(),
                 name = t.Item1
             }).ToArray();
@@ -975,7 +980,8 @@ namespace LuaNet.LuaLib
         /// </summary>
         public ILuaState NewLibTable(Tuple<String, LuaFunction>[] l)
         {
-            Lua.luaL_newlibtable(NativeState, l.Select(t => new Lua.luaL_Reg {
+            Lua.luaL_newlibtable(NativeState, l.Select(t => new Lua.luaL_Reg
+            {
                 func = t.Item2.ToCFunction(),
                 name = t.Item1
             }).ToArray());
@@ -986,7 +992,8 @@ namespace LuaNet.LuaLib
         /// </summary>
         public ILuaState NewLib(Tuple<String, LuaFunction>[] l)
         {
-            Lua.luaL_newlib(NativeState, l.Select(t => new Lua.luaL_Reg {
+            Lua.luaL_newlib(NativeState, l.Select(t => new Lua.luaL_Reg
+            {
                 func = t.Item2.ToCFunction(),
                 name = t.Item1
             }).ToArray());
@@ -1043,7 +1050,8 @@ namespace LuaNet.LuaLib
         /// <summary>
         /// print a newline and flush the output
         /// </summary>
-        public ILuaState WriteLine() {
+        public ILuaState WriteLine()
+        {
             ProcessWrite(Environment.NewLine, OnWriteLine, () => Lua.lua_writeline());
             return this;
         }
@@ -1051,7 +1059,8 @@ namespace LuaNet.LuaLib
         /// <summary>
         /// print an error message
         /// </summary>
-        public ILuaState WriteStringError(String s, String p) {
+        public ILuaState WriteStringError(String s, String p)
+        {
             ProcessWrite(String.Format(s.Replace("%s", "{0}"), p), OnWriteStringError, () => Lua.lua_writestringerror(s, p));
             return this;
         }

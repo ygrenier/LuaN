@@ -25,6 +25,7 @@ namespace LuaNet.LuaLib
         public static LuaWriterProxy FindProxy(LuaWriter writer)
         {
             if (writer == null) return null;
+            lock (_Proxies)
             return _Proxies.FirstOrDefault(p => p.ManagedWriter == writer);
         }
 
@@ -34,6 +35,7 @@ namespace LuaNet.LuaLib
         public static LuaWriterProxy FindProxy(Lua.lua_Writer writer)
         {
             if (writer == null) return null;
+            lock (_Proxies)
             return _Proxies.FirstOrDefault(p => p.UnmanagedWriter == writer);
         }
 
@@ -50,7 +52,8 @@ namespace LuaNet.LuaLib
                     ManagedWriter = writer
                 };
                 result.UnmanagedWriter = result.InvokeManagementWriter;
-                _Proxies.Add(result);
+                lock (_Proxies)
+                    _Proxies.Add(result);
             }
             return result;
         }
@@ -68,7 +71,8 @@ namespace LuaNet.LuaLib
                     UnmanagedWriter = writer
                 };
                 result.ManagedWriter = result.InvokeUnmanagedWriter;
-                _Proxies.Add(result);
+                lock (_Proxies)
+                    _Proxies.Add(result);
             }
             return result;
         }

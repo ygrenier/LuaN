@@ -25,6 +25,7 @@ namespace LuaNet.LuaLib
         public static LuaReaderProxy FindProxy(LuaReader reader)
         {
             if (reader == null) return null;
+            lock (_Proxies)
             return _Proxies.FirstOrDefault(p => p.ManagedReader == reader);
         }
 
@@ -34,6 +35,7 @@ namespace LuaNet.LuaLib
         public static LuaReaderProxy FindProxy(Lua.lua_Reader reader)
         {
             if (reader == null) return null;
+            lock (_Proxies)
             return _Proxies.FirstOrDefault(p => p.UnmanagedReader == reader);
         }
 
@@ -50,6 +52,7 @@ namespace LuaNet.LuaLib
                     ManagedReader = reader
                 };
                 result.UnmanagedReader = result.InvokeManagementReader;
+                lock (_Proxies)
                 _Proxies.Add(result);
             }
             return result;
@@ -68,7 +71,8 @@ namespace LuaNet.LuaLib
                     UnmanagedReader = reader
                 };
                 result.ManagedReader = result.InvokeUnmanagedReader;
-                _Proxies.Add(result);
+                lock (_Proxies)
+                    _Proxies.Add(result);
             }
             return result;
         }

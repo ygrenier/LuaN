@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using static LuaNet.LuaLib.Lua;
 
 namespace LuaNet.LuaLib.Tests
 {
@@ -48,24 +49,28 @@ namespace LuaNet.LuaLib.Tests
         [Fact]
         public void TestWriteString()
         {
+            StringBuilder sb = new StringBuilder();
+            EventHandler<LuaWriteEventArgs> evtWriteString= (s, e) => {
+                sb.Append(e.Text);
+                e.Handled = true;
+            };
+            EventHandler<LuaWriteEventArgs> evtWriteLine = (s, e) => {
+                sb.Append(e.Text);
+                e.Handled = true;
+            };
+            EventHandler<LuaWriteEventArgs> evtWriteStringError = (s, e) => {
+                sb.AppendFormat("ERR: {0}", e.Text).AppendLine();
+                e.Handled = false;
+            };
+
             StringBuilder serr = new StringBuilder();
             var oldErr = Console.Error;
             Console.SetError(new System.IO.StringWriter(serr));
             try
             {
-                StringBuilder sb = new StringBuilder();
-                Lua.OnWriteString += (s, e) => {
-                    sb.Append(e.Text);
-                    e.Handled = true;
-                };
-                Lua.OnWriteLine += (s, e) => {
-                    sb.Append(e.Text);
-                    e.Handled = true;
-                };
-                Lua.OnWriteStringError += (s, e) => {
-                    sb.AppendFormat("ERR: {0}", e.Text).AppendLine();
-                    e.Handled = false;
-                };
+                Lua.OnWriteString += evtWriteString;
+                Lua.OnWriteLine += evtWriteLine;
+                Lua.OnWriteStringError += evtWriteStringError;
                 Lua.lua_writestring("First");
                 Lua.lua_writestring(" test");
                 Lua.lua_writeline();
@@ -80,6 +85,9 @@ namespace LuaNet.LuaLib.Tests
             }
             finally
             {
+                Lua.OnWriteString -= evtWriteString;
+                Lua.OnWriteLine -= evtWriteLine;
+                Lua.OnWriteStringError -= evtWriteStringError;
                 Console.SetError(oldErr);
             }
         }
