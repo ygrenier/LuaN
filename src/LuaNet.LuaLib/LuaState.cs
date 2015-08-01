@@ -15,6 +15,7 @@ namespace LuaNet.LuaLib
         IntPtr _NativeState;
         bool _OwnNativeState = true;
         LuaFunction _OriginalAtPanic = null;
+        LuaState _MainState;
 
         #region Ctor and Dispose
 
@@ -23,13 +24,10 @@ namespace LuaNet.LuaLib
         /// </summary>
         public LuaState()
         {
-            _NativeState = Lua.luaL_newstate();
-            if (_NativeState == IntPtr.Zero)
+            var ptr = Lua.luaL_newstate();
+            if (ptr == IntPtr.Zero)
                 throw new OutOfMemoryException("Cannot create state: not enough memory");
-            lock (_RegisteredStates)
-            _RegisteredStates[_NativeState] = this;
-            _OwnNativeState = true;
-            SetDefaultAtPanic();
+            InitState(ptr, true);
         }
 
         /// <summary>
@@ -37,11 +35,28 @@ namespace LuaNet.LuaLib
         /// </summary>
         private LuaState(IntPtr ptr, bool ownState)
         {
-            _NativeState = ptr;
+            InitState(ptr, ownState);
+        }
+
+        /// <summary>
+        /// Initialize the state
+        /// </summary>
+        private void InitState(IntPtr nativeState, bool ownState)
+        {
+            _NativeState = nativeState;
             lock (_RegisteredStates)
             _RegisteredStates[_NativeState] = this;
             _OwnNativeState = ownState;
             SetDefaultAtPanic();
+            _MainState = null;
+            if (!ownState)
+            {
+                // Retreive the main thread
+                Lua.lua_geti(nativeState, Lua.LUA_REGISTRYINDEX, Lua.LUA_RIDX_MAINTHREAD);
+                var mt = Lua.lua_tothread(nativeState, -1);
+                Lua.lua_pop(nativeState, 1);
+                _MainState = FindState(mt, false);
+            }
         }
 
         /// <summary>
@@ -54,10 +69,16 @@ namespace LuaNet.LuaLib
                 RestoreOriginalAtPanic();
                 if (_OwnNativeState)
                 {
+                    // Unregister all 'child' states
+                    List<LuaState> childs = null;
+                    lock(_RegisteredStates)
+                        childs = _RegisteredStates.Values.Where(c => c._MainState == this).ToList();
+                    foreach (var child in childs)
+                        child.Dispose();
                     Lua.lua_close(_NativeState);
                 }
                 lock (_RegisteredStates)
-                _RegisteredStates.Remove(_NativeState);
+                    _RegisteredStates.Remove(_NativeState);
                 _NativeState = IntPtr.Zero;
             }
         }
@@ -65,11 +86,18 @@ namespace LuaNet.LuaLib
         /// <summary>
         /// Recherche un état lua enregistré
         /// </summary>
-        internal static LuaState FindState(IntPtr l)
+        internal static LuaState FindState(IntPtr l, bool creatIfNotExists)
         {
             LuaState result;
             if (!_RegisteredStates.TryGetValue(l, out result))
-                return null;
+            {
+                if (creatIfNotExists && l != IntPtr.Zero)
+                {
+                    result = new LuaState(l, false);
+                }
+                else
+                    return null;
+            }
             return result;
         }
 
@@ -179,6 +207,16 @@ namespace LuaNet.LuaLib
                 return true;
             }
             return false;
+        }
+
+
+        /// <summary>
+        /// Creates a new thread, pushes it on the stack.
+        /// </summary>
+        public ILuaState NewThread()
+        {
+            var thread = Lua.lua_newthread(NativeState);
+            return new LuaState(thread, false);
         }
 
         #endregion
@@ -346,7 +384,7 @@ namespace LuaNet.LuaLib
         {
             IntPtr st = Lua.lua_tothread(NativeState, idx);
             if (st == IntPtr.Zero) return null;
-            return LuaState.FindState(st) ?? new LuaState(st, false);
+            return LuaState.FindState(st, true);
         }
         #endregion
 
@@ -1077,8 +1115,9 @@ namespace LuaNet.LuaLib
         private int LuaPrint(ILuaState state)
         {
             // Get the event
-            LuaState L = state as LuaState;
-            EventHandler<WriteEventArgs> h = L != null ? L.OnPrint : null;
+            //LuaState L = state as LuaState;
+            //EventHandler<WriteEventArgs> h = L != null ? L.OnPrint : null;
+            EventHandler<WriteEventArgs> h = this.OnPrint;
 
             // Number of arguments
             int n = state.GetTop();
@@ -1108,7 +1147,8 @@ namespace LuaNet.LuaLib
             }
             // Call the event
             WriteEventArgs pe = new WriteEventArgs(line.ToString()) { Handled = false };
-            if (h != null) h(L, pe);
+            //if (h != null) h(L, pe);
+            if (h != null) h(this, pe);
             // If the event is not handled, we print with the default behavior
             if (!pe.Handled)
             {

@@ -109,7 +109,7 @@ namespace LuaNet.LuaLib
                 _LastReadBuffer = IntPtr.Zero;
                 _LastReadBufferSize = 0;
             }
-            LuaState ls = LuaState.FindState(state);
+            LuaState ls = LuaState.FindState(state, true);
             if (ManagedReader != null && ls != null)
             {
                 var res = ManagedReader(ls, UserDataRef.GetData(ud));

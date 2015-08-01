@@ -98,7 +98,7 @@ namespace LuaNet.LuaLib
         /// </summary>
         int InvokeManagementFunction(IntPtr state)
         {
-            LuaState ls = LuaState.FindState(state);
+            LuaState ls = LuaState.FindState(state, true);
             if (ManagedFunction != null && ls != null)
             {
                 return ManagedFunction(ls);

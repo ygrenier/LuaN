@@ -89,6 +89,11 @@ namespace LuaNet
         /// </summary>
         LuaFunction AtPanic(LuaFunction panicf);
 
+        /// <summary>
+        /// Creates a new thread, pushes it on the stack.
+        /// </summary>
+        ILuaState NewThread();
+
         #endregion
 
         #region Stack management

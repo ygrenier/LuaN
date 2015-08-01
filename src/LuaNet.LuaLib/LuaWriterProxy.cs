@@ -107,7 +107,7 @@ namespace LuaNet.LuaLib
         /// </summary>
         int InvokeManagementWriter(IntPtr state, IntPtr ptr, UInt32 sz, IntPtr ud)
         {
-            LuaState ls = LuaState.FindState(state);
+            LuaState ls = LuaState.FindState(state, true);
             if (ManagedWriter != null && ls != null)
             {
                 Byte[] buffer = ptr != IntPtr.Zero ? new Byte[sz] : null;
