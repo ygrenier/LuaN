@@ -1828,7 +1828,41 @@ return c..'!!'
             LuaState L = null;
             using (L = new LuaState())
             {
-                Assert.Throws<NotImplementedException>(() => L.YieldK(0, 0, null));
+                List<String> output = new List<string>();
+                L.OnPrint += (s, e) => output.Add(e.Text);
+                L.OpenLibs();
+                LuaKFunction testK = (state, status, ctx)=>
+                {
+                    Assert.Equal(2, state.GetTop());
+                    state.PushValue(1);
+                    state.PushValue(2);
+                    state.Arith(LuaArithOperator.Add);
+                    Assert.Equal(3, state.GetTop());
+                    return 3;
+                };
+                L.Register("test", (state) =>
+                {
+                    Assert.Equal(2, state.GetTop());
+                    state.PushValue(1);
+                    state.PushValue(2);
+                    state.Arith(LuaArithOperator.Add);
+                    Assert.Equal(3, state.GetTop());
+                    state.YieldK(3, 0, testK);
+                    return 0;
+                });
+
+                Assert.Equal(LuaStatus.OK, L.DoString(@"
+co = coroutine.create(test)
+print('1:', coroutine.resume(co, 1, 2))
+print('2:', coroutine.resume(co, 5, 8))
+print('3:', coroutine.resume(co, 10, 12))
+"));
+
+                Assert.Equal(new String[] {
+                    "1:	true	1	2	3",
+                    "2:	true	5	8",
+                    "3:	false	cannot resume dead coroutine"
+                }, output);
             }
         }
 
@@ -1838,8 +1872,32 @@ return c..'!!'
             LuaState L = null;
             using (L = new LuaState())
             {
-                var ex = Assert.Throws<LuaAtPanicException>(() => L.Yield(0));
-                Assert.Equal("attempt to yield from outside a coroutine", ex.Message);
+                List<String> output = new List<string>();
+                L.OnPrint += (s, e) => output.Add(e.Text);
+                L.OpenLibs();
+                L.Register("test", (state) =>
+                {
+                    Assert.Equal(2, state.GetTop());
+                    state.PushValue(1);
+                    state.PushValue(2);
+                    state.Arith(LuaArithOperator.Add);
+                    Assert.Equal(3, state.GetTop());
+                    state.Yield(3);
+                    return 0;
+                });
+
+                Assert.Equal(LuaStatus.OK, L.DoString(@"
+co = coroutine.create(test)
+print('1:', coroutine.resume(co, 1, 2))
+print('2:', coroutine.resume(co, 5, 8))
+print('3:', coroutine.resume(co, 10, 12))
+"));
+
+                Assert.Equal(new String[] {
+                    "1:	true	1	2	3",
+                    "2:	true	5	8",
+                    "3:	false	cannot resume dead coroutine"
+                }, output);
             }
         }
 

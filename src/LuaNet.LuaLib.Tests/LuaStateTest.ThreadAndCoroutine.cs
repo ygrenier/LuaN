@@ -57,7 +57,7 @@ namespace LuaNet.LuaLib.Tests
         }
 
         [Fact]
-        public void TestCoroutine()
+        public void TestCoroutineFromLuaLib()
         {
             List<String> output = new List<string>();
 
@@ -102,12 +102,6 @@ print('main', coroutine.resume(co, 'x', 'y'))
             }, output);
         }
 
-        /*
-        
-        
-        
-        
-        */
-
     }
+
 }

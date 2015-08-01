@@ -651,7 +651,8 @@ namespace LuaNet.LuaLib
         /// <summary>
         /// Yields a coroutine (thread). 
         /// </summary>
-        public LuaStatus YieldK(int nresults, int ctx, LuaKFunction k) { throw new NotImplementedException(); }
+        public LuaStatus YieldK(int nresults, int ctx, LuaKFunction k)
+        { return (LuaStatus)Lua.lua_yieldk(NativeState, nresults, ctx, k.ToLuaFunction()); }
         /// <summary>
         /// Starts and resumes a coroutine in the given thread
         /// </summary>

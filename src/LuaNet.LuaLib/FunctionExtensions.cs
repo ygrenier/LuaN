@@ -31,6 +31,16 @@ namespace LuaNet.LuaLib
         }
 
         /// <summary>
+        /// Convert a LuaKFunction to a lua_KFunction
+        /// </summary>
+        public static Lua.lua_KFunction ToLuaFunction(this LuaKFunction function)
+        {
+            if (function == null) return null;
+            var proxy = LuaKFunctionProxy.GetProxy(function);
+            return proxy != null ? proxy.UnmanagedFunction : null;
+        }
+
+        /// <summary>
         /// Convert a reader to lua reader
         /// </summary>
         public static Lua.lua_Reader ToLuaReader(this LuaReader reader)

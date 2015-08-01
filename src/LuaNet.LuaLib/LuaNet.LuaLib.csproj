@@ -65,6 +65,7 @@
     <Compile Include="Lua.luaconf.h.cs" />
     <Compile Include="Lua.lualib.h.cs" />
     <Compile Include="LuaAtPanicException.cs" />
+    <Compile Include="LuaKFunctionProxy.cs" />
     <Compile Include="LuaCFunctionProxy.cs" />
     <Compile Include="LuaWriterProxy.cs" />
     <Compile Include="LuaReaderProxy.cs" />
