@@ -139,4 +139,54 @@ namespace LuaNet
         All = MaskCall | MaskRet | MaskLine | MaskCount
     }
 
+    /// <summary>
+    /// What information to extract from GetInfo()
+    /// </summary>
+    [Flags]
+    public enum LuaGetInfoWhat
+    {
+        /// <summary>
+        /// None
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// '>' : GetInfo from the function pushed on the top of the stack, instead of the current function invoked
+        /// </summary>
+        FromTopOfStack = 1,
+        /// <summary>
+        /// 'n' : fills in the field name and namewhat
+        /// </summary>
+        Name = 2,
+        /// <summary>
+        /// 'S':  fills in the fields source, short_src, linedefined, lastlinedefined, and what
+        /// </summary>
+        Source = 4,
+        /// <summary>
+        /// 'l':  fills in the field currentline 
+        /// </summary>
+        CurrentLine = 8,
+        /// <summary>
+        /// 't':  fills in the field istailcall
+        /// </summary>
+        IsTailCall = 16,
+        /// <summary>
+        /// 'u':  fills in the fields nups, nparams, and isvararg
+        /// </summary>
+        ParamsUps = 32,
+        /// <summary>
+        /// 'f':  pushes onto the stack the function that is running at the given level
+        /// </summary>
+        PushFunction = 64,
+        /// <summary>
+        /// 'L':  pushes onto the stack a table whose indices are the numbers of the lines that are valid on the function. 
+        /// (A valid line is a line with some associated code, that is, a line where you can put a break point. Non-valid lines include 
+        /// empty lines and comments.) 
+        /// </summary>
+        PushLines = 128,
+        /// <summary>
+        /// All fills : Name | Source | CurrentLine | IsTailCall | ParamsUps
+        /// </summary>
+        AllFills = Name | Source | CurrentLine | IsTailCall | ParamsUps
+    }
+
 }

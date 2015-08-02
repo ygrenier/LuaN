@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="LuaFunctionTest.cs" />
     <Compile Include="LuaStateTest.cs" />
+    <Compile Include="LuaStateTest.Debug.cs" />
     <Compile Include="LuaStateTest.ThreadAndCoroutine.cs" />
     <Compile Include="LuaStateTest.WriteAndPrint.cs" />
     <Compile Include="LuaTest.cs" />

@@ -2190,12 +2190,18 @@ print('3:', coroutine.resume(co, 10, 12))
             LuaState L = null;
             using (L = new LuaState())
             {
-                L.PushNumber(23);
                 L.PushFunction(l => {
-                    var ar = new LuaDebug();
-                    Assert.Throws<NotImplementedException>(() => l.GetStack(0, ar));
-                    //Assert.Equal(0, l.GetStack(0, ar));
-                    //Assert.Equal(0, ar.currentline);
+                    using (var ar = l.NewLuaDebug())
+                    {
+                        Assert.True(l.GetStack(0, ar));
+                        Assert.True(l.GetInfo(LuaGetInfoWhat.Source | LuaGetInfoWhat.Name, ar));
+                        Assert.Equal(null, ar.Name);
+                        Assert.Equal("C", ar.What);
+                        Assert.Equal("", ar.NameWhat);
+                        Assert.Equal("[C]", ar.ShortSource);
+
+                        Assert.False(l.GetStack(1, ar));
+                    }
                     return 0;
                 });
                 L.PCall(0, 0, 0);
@@ -2208,12 +2214,16 @@ print('3:', coroutine.resume(co, 10, 12))
             LuaState L = null;
             using (L = new LuaState())
             {
-                L.PushNumber(23);
                 L.PushFunction(l => {
-                    var ar = new LuaDebug();
-                    Assert.Throws<NotImplementedException>(() => l.GetInfo("f", ar));
-                    //Assert.Equal(0, l.GetStack(0, ar));
-                    //Assert.Equal(0, ar.currentline);
+                    using (var ar = l.NewLuaDebug())
+                    {
+                        Assert.True(l.GetStack(0, ar));
+                        Assert.True(l.GetInfo(LuaGetInfoWhat.Source | LuaGetInfoWhat.Name, ar));
+                        Assert.Equal(null, ar.Name);
+                        Assert.Equal("C", ar.What);
+                        Assert.Equal("", ar.NameWhat);
+                        Assert.Equal("[C]", ar.ShortSource);
+                    }
                     return 0;
                 });
                 L.PCall(0, 0, 0);
@@ -2226,15 +2236,31 @@ print('3:', coroutine.resume(co, 10, 12))
             LuaState L = null;
             using (L = new LuaState())
             {
-                L.PushNumber(23);
                 L.PushFunction(l => {
-                    var ar = new LuaDebug();
-                    Assert.Throws<NotImplementedException>(() => l.GetLocal(ar, 0));
-                    //Assert.Equal(0, l.GetStack(0, ar));
-                    //Assert.Equal(0, ar.currentline);
+                    using (var ar = l.NewLuaDebug())
+                    {
+                        L.GetStack(0, ar);
+                        Assert.Equal(null, l.GetLocal(ar, 1));
+                    }
                     return 0;
                 });
                 L.PCall(0, 0, 0);
+
+                L.DoString(@"
+function test(a,b)
+ local c = a + b
+ print('test ', a, b, c)
+end
+");
+                // Local names
+                L.GetGlobal("test");
+                Assert.Equal(1, L.GetTop());
+                Assert.Equal(null, L.GetLocal(null, 0));
+                Assert.Equal("a", L.GetLocal(null, 1));
+                Assert.Equal("b", L.GetLocal(null, 2));
+                Assert.Equal(null, L.GetLocal(null, 3));
+                Assert.Equal(null, L.GetLocal(null, 4));
+                Assert.Equal(1, L.GetTop());
             }
         }
 
@@ -2244,12 +2270,13 @@ print('3:', coroutine.resume(co, 10, 12))
             LuaState L = null;
             using (L = new LuaState())
             {
-                L.PushNumber(23);
                 L.PushFunction(l => {
-                    var ar = new LuaDebug();
-                    Assert.Throws<NotImplementedException>(() => l.SetLocal(ar, 0));
-                    //Assert.Equal(0, l.GetStack(0, ar));
-                    //Assert.Equal(0, ar.currentline);
+                    using (var ar = l.NewLuaDebug())
+                    {
+                        L.GetStack(0, ar);
+                        L.PushNumber(123);
+                        Assert.Equal("(*temporary)", l.SetLocal(ar, 1));
+                    }
                     return 0;
                 });
                 L.PCall(0, 0, 0);
@@ -2318,63 +2345,24 @@ print('3:', coroutine.resume(co, 10, 12))
         }
 
         [Fact]
-        public void TestSetHook()
+        public void TestGetSetHook()
         {
             LuaState L = null;
             using (L = new LuaState())
             {
-                LuaHook hook = (ILuaState l, LuaDebug ar) => {
-
+                LuaHook hook = (ILuaState l, ILuaDebug ar) => {
                 };
-                Assert.Throws<NotImplementedException>(() => L.SetHook(hook, LuaHookMask.MaskCall | LuaHookMask.MaskLine | LuaHookMask.MaskCount, 1));
-                L.PushNumber(23);
-                L.PushFunction(l => {
-                    return 0;
-                });
-                L.PCall(0, 0, 0);
-            }
-        }
 
-        [Fact]
-        public void TestGetHook()
-        {
-            LuaState L = null;
-            using (L = new LuaState())
-            {
-                Assert.Throws<NotImplementedException>(() => Assert.Null(L.GetHook()));
-                LuaHook hook = (ILuaState l, LuaDebug ar) => {
+                L.SetHook(hook, LuaHookMask.MaskCall | LuaHookMask.MaskLine | LuaHookMask.MaskCount, 1);
+                Assert.Same(hook, L.GetHook());
+                Assert.Equal(LuaHookMask.MaskCall | LuaHookMask.MaskLine | LuaHookMask.MaskCount, L.GetHookMask());
+                Assert.Equal(1, L.GetHookCount());
 
-                };
-                Assert.Throws<NotImplementedException>(() => L.SetHook(hook, LuaHookMask.MaskCall | LuaHookMask.MaskLine | LuaHookMask.MaskCount, 1));
-                Assert.Throws<NotImplementedException>(() => Assert.Null(L.GetHook()));
-            }
-        }
-
-        [Fact]
-        public void TestGetHookMask()
-        {
-            LuaState L = null;
-            using (L = new LuaState())
-            {
+                L.SetHook(hook, LuaHookMask.None, 1);
+                Assert.Same(null, L.GetHook());
                 Assert.Equal(LuaHookMask.None, L.GetHookMask());
-                LuaHook hook = (ILuaState l, LuaDebug ar) => {
-                };
-                Assert.Throws<NotImplementedException>(() => L.SetHook(hook, LuaHookMask.MaskCall | LuaHookMask.MaskLine | LuaHookMask.MaskCount, 1));
-                Assert.Equal(LuaHookMask.None, L.GetHookMask());
-            }
-        }
+                Assert.Equal(1, L.GetHookCount());
 
-        [Fact]
-        public void TestGetHookCount()
-        {
-            LuaState L = null;
-            using (L = new LuaState())
-            {
-                Assert.Equal(0, L.GetHookCount());
-                LuaHook hook = (ILuaState l, LuaDebug ar) => {
-                };
-                Assert.Throws<NotImplementedException>(() => L.SetHook(hook, LuaHookMask.MaskCall | LuaHookMask.MaskLine | LuaHookMask.MaskCount, 1));
-                Assert.Equal(0, L.GetHookCount());
             }
         }
 

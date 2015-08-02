@@ -603,21 +603,25 @@ namespace LuaNet
 
         #region Debug API
         /// <summary>
+        /// Create a new debug info struct
+        /// </summary>
+        ILuaDebug NewLuaDebug();
+        /// <summary>
         /// Gets information about the interpreter runtime stack. 
         /// </summary>
-        int GetStack(int level, LuaDebug ar);
+        bool GetStack(int level, ILuaDebug ar);
         /// <summary>
         /// Gets information about a specific function or function invocation. 
         /// </summary>
-        int GetInfo(String what, LuaDebug ar);
+        bool GetInfo(LuaGetInfoWhat what, ILuaDebug ar);
         /// <summary>
         /// Gets information about a local variable of a given activation record or a given function. 
         /// </summary>
-        String GetLocal(LuaDebug ar, int n);
+        String GetLocal(ILuaDebug ar, int n);
         /// <summary>
         /// Sets the value of a local variable of a given activation record. 
         /// </summary>
-        String SetLocal(LuaDebug ar, int n);
+        String SetLocal(ILuaDebug ar, int n);
         /// <summary>
         /// Gets information about the n-th upvalue of the closure at index funcindex. 
         /// </summary>
@@ -944,26 +948,78 @@ namespace LuaNet
     /// <summary>
     /// Managed Hook function
     /// </summary>
-    public delegate void LuaHook(ILuaState L, LuaDebug ar);
+    public delegate void LuaHook(ILuaState L, ILuaDebug ar);
 
     /// <summary>
-    /// Debug infos
+    /// Interface to the Lua debug informations
     /// </summary>
-    public class LuaDebug
+    public interface ILuaDebug : IDisposable
     {
-        public LuaHookEvent evnt { get; set; }
-        public String name { get; set; }	/* (n) */
-        public String namewhat { get; set; }	/* (n) 'global', 'local', 'field', 'method' */
-        public String what { get; set; }	/* (S) 'Lua', 'C', 'main', 'tail' */
-        public String source { get; set; }	/* (S) */
-        public int currentline { get; set; }	/* (l) */
-        public int linedefined { get; set; }	/* (S) */
-        public int lastlinedefined { get; set; }	/* (S) */
-        public byte nups { get; set; }	/* (u) number of upvalues */
-        public byte nparams { get; set; }/* (u) number of parameters */
-        public char isvararg { get; set; }        /* (u) */
-        public char istailcall { get; set; }	/* (t) */
-        public string short_src { get; set; } /* (S) */
-    };
+        /// <summary>
+        /// Event 
+        /// </summary>
+        LuaHookEvent Event { get; }
+
+        /// <summary>
+        /// Name (n)
+        /// </summary>
+        String Name { get; }
+
+        /// <summary>
+        /// 'global', 'local', 'field', 'method' (n)
+        /// </summary>
+        String NameWhat { get; }
+
+        /// <summary>
+        /// 'Lua', 'C', 'main', 'tail' (S)
+        /// </summary>
+        String What { get; }
+
+        /// <summary>
+        /// Source (S)
+        /// </summary>
+        String Source { get; }
+
+        /// <summary>
+        /// Current line (l)
+        /// </summary>
+        int CurrentLine { get; }
+
+        /// <summary>
+        /// Line where of definition (S)
+        /// </summary>
+        int LineDefined { get; }
+
+        /// <summary>
+        /// Last line of definition (S)
+        /// </summary>
+        int LastLineDefined { get; }
+
+        /// <summary>
+        /// number of upvalues (u)
+        /// </summary>
+        byte NUps { get; }
+
+        /// <summary>
+        /// number of parameters (u)
+        /// </summary>
+        byte NParams { get; }
+
+        /// <summary>
+        /// (u)
+        /// </summary>
+        bool IsVarArg { get; }
+
+        /// <summary>
+        /// (t)
+        /// </summary>
+        bool IsTailCall { get; }   
+
+        /// <summary>
+        /// Short source (S)
+        /// </summary>
+        string ShortSource { get; }
+
+    }
 
 }

@@ -821,21 +821,63 @@ namespace LuaNet.LuaLib
 
         #region Debug API
         /// <summary>
+        /// Create a new debug info struct
+        /// </summary>
+        public ILuaDebug NewLuaDebug() { return new LuaDebugProxy(); }
+        /// <summary>
         /// Gets information about the interpreter runtime stack. 
         /// </summary>
-        public int GetStack(int level, LuaDebug ar) { throw new NotImplementedException(); }
+        public bool GetStack(int level, ILuaDebug ar) {
+            if (ar == null) throw new ArgumentNullException("ar");
+            LuaDebugProxy arp = ar as LuaDebugProxy;
+            if (arp == null) throw new ArgumentException("Invalid ILuaDebug", "ar");
+            var result = Lua.lua_getstack(NativeState, level, arp.NativePointer);
+            arp.NativeContentUpdated(LuaGetInfoWhat.None);
+            return result != 0;
+        }
         /// <summary>
         /// Gets information about a specific function or function invocation. 
         /// </summary>
-        public int GetInfo(String what, LuaDebug ar) { throw new NotImplementedException(); }
+        public bool GetInfo(LuaGetInfoWhat what, ILuaDebug ar)
+        {
+            if (ar == null) throw new ArgumentNullException("ar");
+            LuaDebugProxy arp = ar as LuaDebugProxy;
+            if (arp == null) throw new ArgumentException("Invalid ILuaDebug", "ar");
+            StringBuilder buildWhat = new StringBuilder();
+            if ((what & LuaGetInfoWhat.FromTopOfStack) != 0) buildWhat.Append('>');
+            if ((what & LuaGetInfoWhat.Name) != 0) buildWhat.Append('n');
+            if ((what & LuaGetInfoWhat.Source) != 0) buildWhat.Append('S');
+            if ((what & LuaGetInfoWhat.CurrentLine) != 0) buildWhat.Append('l');
+            if ((what & LuaGetInfoWhat.IsTailCall) != 0) buildWhat.Append('t');
+            if ((what & LuaGetInfoWhat.ParamsUps) != 0) buildWhat.Append('u');
+            if ((what & LuaGetInfoWhat.PushFunction) != 0) buildWhat.Append('f');
+            if ((what & LuaGetInfoWhat.PushLines) != 0) buildWhat.Append('L');
+            var result = Lua.lua_getinfo(NativeState, buildWhat.ToString(), arp.NativePointer);
+            arp.NativeContentUpdated(what);
+            return result != 0;
+        }
         /// <summary>
         /// Gets information about a local variable of a given activation record or a given function. 
         /// </summary>
-        public String GetLocal(LuaDebug ar, int n) { throw new NotImplementedException(); }
+        public String GetLocal(ILuaDebug ar, int n)
+        {
+            LuaDebugProxy arp = null;
+            if (ar != null)
+            {
+                arp = ar as LuaDebugProxy;
+                if (arp == null) throw new ArgumentException("Invalid ILuaDebug", "ar");
+            }
+            return Lua.lua_getlocal(NativeState, arp != null ? arp.NativePointer : IntPtr.Zero, n);
+        }
         /// <summary>
         /// Sets the value of a local variable of a given activation record. 
         /// </summary>
-        public String SetLocal(LuaDebug ar, int n) { throw new NotImplementedException(); }
+        public String SetLocal(ILuaDebug ar, int n) {
+            if (ar == null) throw new ArgumentNullException("ar");
+            LuaDebugProxy arp = ar as LuaDebugProxy;
+            if (arp == null) throw new ArgumentException("Invalid ILuaDebug", "ar");
+            return Lua.lua_setlocal(NativeState, arp.NativePointer, n);
+        }
         /// <summary>
         /// Gets information about the n-th upvalue of the closure at index funcindex. 
         /// </summary>
@@ -855,11 +897,11 @@ namespace LuaNet.LuaLib
         /// <summary>
         /// Sets the debugging hook function. 
         /// </summary>
-        public void SetHook(LuaHook func, LuaHookMask mask, int count) { throw new NotImplementedException(); }
+        public void SetHook(LuaHook func, LuaHookMask mask, int count) { Lua.lua_sethook(NativeState, func.ToLuaHook(), (int)mask, count); }
         /// <summary>
         /// Returns the current hook function. 
         /// </summary>
-        public LuaHook GetHook() { throw new NotImplementedException(); }
+        public LuaHook GetHook() { return Lua.lua_gethook(NativeState).ToHook(); }
         /// <summary>
         /// Returns the current hook mask. 
         /// </summary>

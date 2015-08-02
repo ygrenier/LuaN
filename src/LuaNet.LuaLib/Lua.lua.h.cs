@@ -531,20 +531,22 @@ namespace LuaNet.LuaLib
 
         /* Functions to be called by the debugger in specific events */
         [UnmanagedFunctionPointer(System.Runtime.InteropServices.CallingConvention.Cdecl)]
-        public delegate void lua_Hook(lua_State L, lua_Debug ar);
+        //public delegate void lua_Hook(lua_State L, lua_Debug ar);
+        public delegate void lua_Hook(lua_State L, IntPtr ar);
         //typedef void (*lua_Hook) (lua_State *L, lua_Debug *ar);
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        public extern static int lua_getstack(lua_State L, int level, lua_Debug ar);
+        public extern static int lua_getstack(lua_State L, int level, IntPtr ar);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        public extern static int lua_getinfo(lua_State L, String what, lua_Debug ar);
+        //public extern static int lua_getinfo(lua_State L, String what, lua_Debug ar);
+        public extern static int lua_getinfo(lua_State L, String what, IntPtr ar);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_getlocal")]
-        extern static IntPtr _lua_getlocal(lua_State L, lua_Debug ar, int n);
-        public static String lua_getlocal(lua_State L, lua_Debug ar, int n)
+        extern static IntPtr _lua_getlocal(lua_State L, IntPtr ar, int n);
+        public static String lua_getlocal(lua_State L, IntPtr ar, int n)
         { return Marshal.PtrToStringAnsi(_lua_getlocal(L, ar, n)); }
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_setlocal")]
-        extern static IntPtr _lua_setlocal(lua_State L, lua_Debug ar, int n);
-        public static String lua_setlocal(lua_State L, lua_Debug ar, int n)
+        extern static IntPtr _lua_setlocal(lua_State L, IntPtr ar, int n);
+        public static String lua_setlocal(lua_State L, IntPtr ar, int n)
         { return Marshal.PtrToStringAnsi(_lua_setlocal(L, ar, n)); }
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_getupvalue")]
         extern static IntPtr _lua_getupvalue(lua_State L, int funcindex, int n);
@@ -569,28 +571,61 @@ namespace LuaNet.LuaLib
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public extern static int lua_gethookcount(lua_State L);
 
+        //[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        //public class lua_Debug
+        //{
+        //    public int evnt;
+        //    //[MarshalAs(UnmanagedType.LPStr)]
+        //    //public String name;	/* (n) */
+        //    //[MarshalAs(UnmanagedType.LPStr)]
+        //    //public String namewhat;	/* (n) 'global', 'local', 'field', 'method' */
+        //    //[MarshalAs(UnmanagedType.LPStr)]
+        //    //public String what;	/* (S) 'Lua', 'C', 'main', 'tail' */
+        //    //[MarshalAs(UnmanagedType.LPStr)]
+        //    //public String source;	/* (S) */
+
+        //    IntPtr pname;
+        //    IntPtr pnamewhat;
+        //    IntPtr pwhat;
+        //    IntPtr psource;
+
+        //    public int currentline;	/* (l) */
+        //    public int linedefined;	/* (S) */
+        //    public int lastlinedefined;	/* (S) */
+        //    public byte nups;	/* (u) number of upvalues */
+        //    public byte nparams;/* (u) number of parameters */
+        //    public sbyte isvararg;        /* (u) */
+        //    public sbyte istailcall; /* (t) */
+        //    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Lua.LUA_IDSIZE)] 
+        //    public string short_src; /* (S) */
+        //    /* private part */
+        //    //public struct CallInfo *i_ci;  /* active function */
+        //    public IntPtr i_ci;  /* active function */
+
+        //    public String name { get { return Marshal.PtrToStringAnsi(pname); } }	/* (n) */
+        //    public String namewhat { get { return Marshal.PtrToStringAnsi(pnamewhat); } }	/* (n) 'global', 'local', 'field', 'method' */
+        //    public String what { get { return Marshal.PtrToStringAnsi(pwhat); } }	/* (S) 'Lua', 'C', 'main', 'tail' */
+        //    public String source { get { return Marshal.PtrToStringAnsi(psource); } }	/* (S) */
+        //};
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public class lua_Debug
         {
             public int evnt;
-            [MarshalAs(UnmanagedType.LPStr)]
-            public String name;	/* (n) */
-            [MarshalAs(UnmanagedType.LPStr)]
-            public String namewhat;	/* (n) 'global', 'local', 'field', 'method' */
-            [MarshalAs(UnmanagedType.LPStr)]
-            public String what;	/* (S) 'Lua', 'C', 'main', 'tail' */
-            [MarshalAs(UnmanagedType.LPStr)]
-            public String source;	/* (S) */
-            public int currentline;	/* (l) */
-            public int linedefined;	/* (S) */
-            public int lastlinedefined;	/* (S) */
-            public byte nups;	/* (u) number of upvalues */
+            public IntPtr name; /* (n) */
+            public IntPtr namewhat;   /* (n) 'global', 'local', 'field', 'method' */
+            public IntPtr what;   /* (S) 'Lua', 'C', 'main', 'tail' */
+            public IntPtr source; /* (S) */
+            public int currentline;    /* (l) */
+            public int linedefined;    /* (S) */
+            public int lastlinedefined;    /* (S) */
+            public byte nups; /* (u) number of upvalues */
             public byte nparams;/* (u) number of parameters */
-            public char isvararg;        /* (u) */
-            public char istailcall;	/* (t) */
+            public sbyte isvararg;        /* (u) */
+            public sbyte istailcall;    /* (t) */
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Lua.LUA_IDSIZE)]
             public string short_src; /* (S) */
             /* private part */
-            //public struct CallInfo *i_ci;  /* active function */
             public IntPtr i_ci;  /* active function */
         };
 

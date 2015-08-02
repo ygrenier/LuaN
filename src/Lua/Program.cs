@@ -109,7 +109,7 @@ namespace LuaProgram
         /*
         ** Hook set by signal function to stop the interpreter.
         */
-        static void lstop(ILuaState L, LuaDebug ar) {
+        static void lstop(ILuaState L, ILuaDebug ar) {
           //(void)ar;  /* unused arg. */
           L.SetHook(null, 0, 0);  /* reset hook */
           L.Error("interrupted!");

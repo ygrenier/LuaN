@@ -41,6 +41,26 @@ namespace LuaNet.LuaLib
         }
 
         /// <summary>
+        /// Convert a hook to lua hook
+        /// </summary>
+        public static Lua.lua_Hook ToLuaHook(this LuaHook hook)
+        {
+            if (hook == null) return null;
+            var proxy = LuaHookProxy.GetProxy(hook);
+            return proxy != null ? proxy.UnmanagedHook : null;
+        }
+
+        /// <summary>
+        /// Convert a lua hook to hook
+        /// </summary>
+        public static LuaHook ToHook(this Lua.lua_Hook hook)
+        {
+            if (hook == null) return null;
+            var proxy = LuaHookProxy.GetProxy(hook);
+            return proxy != null ? proxy.ManagedHook : null;
+        }
+
+        /// <summary>
         /// Convert a reader to lua reader
         /// </summary>
         public static Lua.lua_Reader ToLuaReader(this LuaReader reader)
