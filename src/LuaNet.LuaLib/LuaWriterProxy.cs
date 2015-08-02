@@ -29,83 +29,83 @@ namespace LuaNet.LuaLib
             return _Proxies.FirstOrDefault(p => p.ManagedWriter == writer);
         }
 
-        /// <summary>
-        /// Find the proxy for a lua writer
-        /// </summary>
-        public static LuaWriterProxy FindProxy(Lua.lua_Writer writer)
-        {
-            if (writer == null) return null;
-            lock (_Proxies)
-            return _Proxies.FirstOrDefault(p => p.UnmanagedWriter == writer);
-        }
+        ///// <summary>
+        ///// Find the proxy for a lua writer
+        ///// </summary>
+        //public static LuaWriterProxy FindProxy(Lua.lua_Writer writer)
+        //{
+        //    if (writer == null) return null;
+        //    lock (_Proxies)
+        //    return _Proxies.FirstOrDefault(p => p.UnmanagedWriter == writer);
+        //}
 
         /// <summary>
         /// Find or create a proxy for a writer
         /// </summary>
         public static LuaWriterProxy GetProxy(LuaWriter writer)
         {
-            if (writer == null) return null;
             var result = FindProxy(writer);
-            if (result == null)
+            if (result == null && writer != null)
             {
-                result = new LuaWriterProxy() {
+                result = new LuaWriterProxy()
+                {
                     ManagedWriter = writer
                 };
-                result.UnmanagedWriter = result.InvokeManagementWriter;
+                result.UnmanagedWriter = result.InvokeManagedWriter;
                 lock (_Proxies)
                     _Proxies.Add(result);
             }
             return result;
         }
 
-        /// <summary>
-        /// Find or create a proxy for a lua writer
-        /// </summary>
-        public static LuaWriterProxy GetProxy(Lua.lua_Writer writer)
-        {
-            if (writer == null) return null;
-            var result = FindProxy(writer);
-            if (result == null)
-            {
-                result = new LuaWriterProxy() {
-                    UnmanagedWriter = writer
-                };
-                result.ManagedWriter = result.InvokeUnmanagedWriter;
-                lock (_Proxies)
-                    _Proxies.Add(result);
-            }
-            return result;
-        }
+        ///// <summary>
+        ///// Find or create a proxy for a lua writer
+        ///// </summary>
+        //public static LuaWriterProxy GetProxy(Lua.lua_Writer writer)
+        //{
+        //    if (writer == null) return null;
+        //    var result = FindProxy(writer);
+        //    if (result == null)
+        //    {
+        //        result = new LuaWriterProxy() {
+        //            UnmanagedWriter = writer
+        //        };
+        //        result.ManagedWriter = result.InvokeUnmanagedWriter;
+        //        lock (_Proxies)
+        //            _Proxies.Add(result);
+        //    }
+        //    return result;
+        //}
 
-        /// <summary>
-        /// Reader to invoke the lua Writer
-        /// </summary>
-        int InvokeUnmanagedWriter(ILuaState state, Byte[] p, Object ud)
-        {
-            LuaState ls = state as LuaState;
-            if (UnmanagedWriter != null && ls != null)
-            {
-                int res = 0;
-                if (p != null)
-                {
-                    var ptr = Marshal.AllocHGlobal(p.Length);
-                    Marshal.Copy(p, 0, ptr, p.Length);
-                    res = UnmanagedWriter(ls.NativeState, ptr, (UInt32)p.Length, UserDataRef.GetRef(ud));
-                    Marshal.FreeHGlobal(ptr);
-                }
-                else
-                {
-                    res = UnmanagedWriter(ls.NativeState, IntPtr.Zero, 0, UserDataRef.GetRef(ud));
-                }
-                return res;
-            }
-            return 0;
-        }
+        ///// <summary>
+        ///// Reader to invoke the lua Writer
+        ///// </summary>
+        //int InvokeUnmanagedWriter(ILuaState state, Byte[] p, Object ud)
+        //{
+        //    LuaState ls = state as LuaState;
+        //    if (UnmanagedWriter != null && ls != null)
+        //    {
+        //        int res = 0;
+        //        if (p != null)
+        //        {
+        //            var ptr = Marshal.AllocHGlobal(p.Length);
+        //            Marshal.Copy(p, 0, ptr, p.Length);
+        //            res = UnmanagedWriter(ls.NativeState, ptr, (UInt32)p.Length, UserDataRef.GetRef(ud));
+        //            Marshal.FreeHGlobal(ptr);
+        //        }
+        //        else
+        //        {
+        //            res = UnmanagedWriter(ls.NativeState, IntPtr.Zero, 0, UserDataRef.GetRef(ud));
+        //        }
+        //        return res;
+        //    }
+        //    return 0;
+        //}
 
         /// <summary>
         /// Lua writer to invoke the Writer
         /// </summary>
-        int InvokeManagementWriter(IntPtr state, IntPtr ptr, UInt32 sz, IntPtr ud)
+        int InvokeManagedWriter(IntPtr state, IntPtr ptr, UInt32 sz, IntPtr ud)
         {
             LuaState ls = LuaState.FindState(state, true);
             if (ManagedWriter != null && ls != null)

@@ -28,9 +28,8 @@ namespace LuaNet.LuaLib
         /// </summary>
         public static IntPtr GetRef(Object data)
         {
-            if (data == null) return IntPtr.Zero;
             IntPtr res = FindRef(data);
-            if (res == IntPtr.Zero)
+            if (res == IntPtr.Zero && data!= null)
             {
                 _DataRefs.Add(data);
                 res = new IntPtr(_DataRefs.Count);

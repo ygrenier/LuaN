@@ -466,7 +466,7 @@ namespace LuaNet.LuaLib
         /// </summary>
         public ILuaState PushLightUserData(Object userData)
         {
-            if (userData == null) throw new ArgumentNullException("userData");
+            //if (userData == null) throw new ArgumentNullException("userData");
             IntPtr ptr = UserDataRef.GetRef(userData);
             Lua.lua_pushlightuserdata(NativeState, ptr);
             return this;

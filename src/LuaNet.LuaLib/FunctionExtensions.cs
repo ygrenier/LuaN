@@ -15,7 +15,7 @@ namespace LuaNet.LuaLib
         /// </summary>
         public static Lua.lua_CFunction ToCFunction(this LuaFunction function)
         {
-            if (function == null) return null;
+            //if (function == null) return null;
             var proxy = LuaCFunctionProxy.GetProxy(function);
             return proxy != null ? proxy.UnmanagedFunction : null;
         }
@@ -25,7 +25,7 @@ namespace LuaNet.LuaLib
         /// </summary>
         public static LuaFunction ToFunction(this Lua.lua_CFunction function)
         {
-            if (function == null) return null;
+            //if (function == null) return null;
             var proxy = LuaCFunctionProxy.GetProxy(function);
             return proxy != null ? proxy.ManagedFunction : null;
         }
@@ -35,7 +35,7 @@ namespace LuaNet.LuaLib
         /// </summary>
         public static Lua.lua_KFunction ToLuaFunction(this LuaKFunction function)
         {
-            if (function == null) return null;
+            //if (function == null) return null;
             var proxy = LuaKFunctionProxy.GetProxy(function);
             return proxy != null ? proxy.UnmanagedFunction : null;
         }
@@ -45,7 +45,7 @@ namespace LuaNet.LuaLib
         /// </summary>
         public static Lua.lua_Hook ToLuaHook(this LuaHook hook)
         {
-            if (hook == null) return null;
+            //if (hook == null) return null;
             var proxy = LuaHookProxy.GetProxy(hook);
             return proxy != null ? proxy.UnmanagedHook : null;
         }
@@ -55,7 +55,7 @@ namespace LuaNet.LuaLib
         /// </summary>
         public static LuaHook ToHook(this Lua.lua_Hook hook)
         {
-            if (hook == null) return null;
+            //if (hook == null) return null;
             var proxy = LuaHookProxy.GetProxy(hook);
             return proxy != null ? proxy.ManagedHook : null;
         }
@@ -65,39 +65,39 @@ namespace LuaNet.LuaLib
         /// </summary>
         public static Lua.lua_Reader ToLuaReader(this LuaReader reader)
         {
-            if (reader == null) return null;
+            //if (reader == null) return null;
             var proxy = LuaReaderProxy.GetProxy(reader);
             return proxy != null ? proxy.UnmanagedReader : null;
         }
 
-        /// <summary>
-        /// Convert a lua reader to reader
-        /// </summary>
-        public static LuaReader ToReader(this Lua.lua_Reader reader)
-        {
-            if (reader == null) return null;
-            var proxy = LuaReaderProxy.GetProxy(reader);
-            return proxy != null ? proxy.ManagedReader : null;
-        }
+        ///// <summary>
+        ///// Convert a lua reader to reader
+        ///// </summary>
+        //public static LuaReader ToReader(this Lua.lua_Reader reader)
+        //{
+        //    if (reader == null) return null;
+        //    var proxy = LuaReaderProxy.GetProxy(reader);
+        //    return proxy != null ? proxy.ManagedReader : null;
+        //}
 
         /// <summary>
         /// Convert a writer to lua writer
         /// </summary>
         public static Lua.lua_Writer ToLuaWriter(this LuaWriter writer)
         {
-            if (writer == null) return null;
+            //if (writer == null) return null;
             var proxy = LuaWriterProxy.GetProxy(writer);
             return proxy != null ? proxy.UnmanagedWriter : null;
         }
 
-        /// <summary>
-        /// Convert a lua writer to writer
-        /// </summary>
-        public static LuaWriter ToWriter(this Lua.lua_Writer writer)
-        {
-            if (writer == null) return null;
-            var proxy = LuaWriterProxy.GetProxy(writer);
-            return proxy != null ? proxy.ManagedWriter : null;
-        }
+        ///// <summary>
+        ///// Convert a lua writer to writer
+        ///// </summary>
+        //public static LuaWriter ToWriter(this Lua.lua_Writer writer)
+        //{
+        //    if (writer == null) return null;
+        //    var proxy = LuaWriterProxy.GetProxy(writer);
+        //    return proxy != null ? proxy.ManagedWriter : null;
+        //}
     }
 }

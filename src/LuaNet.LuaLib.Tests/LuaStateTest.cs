@@ -1102,6 +1102,17 @@ namespace LuaNet.LuaLib.Tests
                 Assert.Equal(dt, L.ToUserData(10));
                 Assert.Equal(null, L.ToUserData(11));
                 Assert.Equal(null, L.ToUserData(12));
+
+                L.SetTop(0)
+                    .PushLightUserData(this)
+                    .PushLightUserData(dt)
+                    .PushLightUserData(null)
+                    .PushLightUserData(this);
+                Assert.Same(this, L.ToUserData(1));
+                Assert.Equal(dt, L.ToUserData(2));
+                Assert.Equal(null, L.ToUserData(3));
+                Assert.Same(this, L.ToUserData(4));
+
             }
         }
 
@@ -1301,6 +1312,17 @@ namespace LuaNet.LuaLib.Tests
                 L.PushLightUserData(DateTime.Now);
                 Assert.Equal(1, L.GetTop());
                 Assert.Equal(LuaType.LightUserData, L.Type(-1));
+
+                var dt = DateTime.Now;
+                L.SetTop(0)
+                    .PushLightUserData(this)
+                    .PushLightUserData(dt)
+                    .PushLightUserData(null)
+                    .PushLightUserData(this);
+                Assert.Same(this, L.ToUserData(1));
+                Assert.Equal(dt, L.ToUserData(2));
+                Assert.Equal(null, L.ToUserData(3));
+                Assert.Same(this, L.ToUserData(4));
             }
         }
 
@@ -1751,7 +1773,8 @@ return c..'!!'
 ";
                 Byte[] chunkBytes = Encoding.ASCII.GetBytes(chunk);
                 int curr = 0;
-                var st = L.Load((l, ud) => {
+                LuaReader reader = (l, ud) =>
+                {
                     Byte[] res = null;
                     if (curr < chunkBytes.Length)
                     {
@@ -1761,11 +1784,17 @@ return c..'!!'
                         curr += c;
                     }
                     return res;
-                }, null, "main", null);
+                };
+                var st = L.Load(reader, null, "main", null);
                 Assert.Equal(LuaStatus.OK, st);
                 st = L.PCall(0, 1, 0);
                 Assert.Equal(LuaStatus.OK, st);
                 Assert.Equal("Lua rocks!!", L.ToString(-1));
+
+                Assert.Null(FunctionExtensions.ToLuaReader(null));
+                var lf = reader.ToLuaReader();
+                uint dummy = 0;
+                Assert.Equal(IntPtr.Zero, lf(IntPtr.Zero, IntPtr.Zero, ref dummy));
             }
         }
 
@@ -1798,10 +1827,11 @@ return c..'!!'
                 Assert.Equal(LuaStatus.OK, st);
 
                 List<Byte[]> dump = new List<byte[]>();
-                var r = L.Dump((l, b, ud) => {
+                LuaWriter fDump = (l, b, ud) => {
                     dump.Add(b);
                     return 0;
-                }, null, 0);
+                };
+                var r = L.Dump(fDump, null, 0);
                 Assert.Equal(0, r);
                 Byte[] dumpBytes = dump.SelectMany(d => d).ToArray();
                 Assert.Equal(199, dumpBytes.Length);
@@ -1819,6 +1849,9 @@ return c..'!!'
                 Assert.Equal(LuaStatus.OK, st);
                 Assert.Equal("Lua rocks!!", L.ToString(-1));
 
+                Assert.Null(FunctionExtensions.ToLuaWriter(null));
+                var lf = fDump.ToLuaWriter();
+                Assert.Equal(0, lf(IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero));
             }
         }
 
