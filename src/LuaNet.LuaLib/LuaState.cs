@@ -12,6 +12,7 @@ namespace LuaNet.LuaLib
     public sealed class LuaState : ILuaState
     {
         static Dictionary<IntPtr, LuaState> _RegisteredStates = new Dictionary<IntPtr, LuaState>();
+        Dictionary<IntPtr, UserDataRef> _UserDataRefs = new Dictionary<IntPtr, UserDataRef>();
         IntPtr _NativeState;
         bool _OwnNativeState = true;
         LuaFunction _OriginalAtPanic = null;
@@ -66,6 +67,11 @@ namespace LuaNet.LuaLib
         {
             if (_NativeState != IntPtr.Zero)
             {
+                // Release UserDataRef
+                foreach (var ud in _UserDataRefs.Values)
+                    ud.DecRef();
+                _UserDataRefs.Clear();
+
                 RestoreOriginalAtPanic();
                 if (_OwnNativeState)
                 {
@@ -375,7 +381,7 @@ namespace LuaNet.LuaLib
         public Object ToUserData(int idx)
         {
             var ptr = Lua.lua_touserdata(NativeState, idx);
-            return UserDataRef.GetData(ptr);
+            return GetUserData(ptr);
         }
         /// <summary>
         /// Converts the value at the given index to a Lua thread
@@ -467,7 +473,7 @@ namespace LuaNet.LuaLib
         public ILuaState PushLightUserData(Object userData)
         {
             //if (userData == null) throw new ArgumentNullException("userData");
-            IntPtr ptr = UserDataRef.GetRef(userData);
+            IntPtr ptr = GetUserDataRef(userData);
             Lua.lua_pushlightuserdata(NativeState, ptr);
             return this;
         }
@@ -637,14 +643,12 @@ namespace LuaNet.LuaLib
         /// Loads a Lua chunk without running it.
         /// </summary>
         public LuaStatus Load(LuaReader reader, Object dt, String chunkname, String mode)
-        { return (LuaStatus)Lua.lua_load(NativeState, reader.ToLuaReader(), UserDataRef.GetRef(dt), chunkname, mode); }
+        { return (LuaStatus)Lua.lua_load(NativeState, reader.ToLuaReader(), GetUserDataRef(dt), chunkname, mode); }
         /// <summary>
         /// Dumps a function as a binary chunk.
         /// </summary>
         public int Dump(LuaWriter writer, Object data, int strip)
-        {
-            return Lua.lua_dump(NativeState, writer.ToLuaWriter(), UserDataRef.GetRef(data), strip);
-        }
+        { return Lua.lua_dump(NativeState, writer.ToLuaWriter(), GetUserDataRef(data), strip); }
         #endregion
 
         #region coroutine functions
@@ -983,11 +987,11 @@ namespace LuaNet.LuaLib
         /// <summary>
         /// Checks whether the function argument arg is a userdata of the type tname and returns the userdata address. 
         /// </summary>
-        public Object Checkudata(int arg, String tname) { return UserDataRef.GetData(Lua.luaL_checkudata(NativeState, arg, tname)); }
+        public Object Checkudata(int arg, String tname) { return GetUserData(Lua.luaL_checkudata(NativeState, arg, tname)); }
         /// <summary>
         /// This function works like CheckUData, except that, when the test fails, it returns null instead of raising an error. 
         /// </summary>
-        public Object TestUData(int arg, String tname) { return UserDataRef.GetData(Lua.luaL_testudata(NativeState, arg, tname)); }
+        public Object TestUData(int arg, String tname) { return GetUserData(Lua.luaL_testudata(NativeState, arg, tname)); }
         /// <summary>
         /// Pushes onto the stack a string identifying the current position of the control at level lvl in the call stack
         /// </summary>
@@ -1227,6 +1231,56 @@ namespace LuaNet.LuaLib
         /// Assert
         /// </summary>
         public void Assert(bool cond) { Lua.lua_assert(cond); }
+
+        #region User data management
+
+        /// <summary>
+        /// Get a reference from a data
+        /// </summary>
+        public IntPtr GetUserDataRef(object data)
+        {
+            if (data == null) return IntPtr.Zero;
+            UserDataRef udr = _UserDataRefs.Values.FirstOrDefault(u => u.Data == data);
+            if (udr == null)
+            {
+                udr = UserDataRef.GetUserData(data);
+                if (udr != null)
+                {
+                    udr.IncRef();
+                    _UserDataRefs[udr.Ref] = udr;
+                }
+            }
+            return udr != null ? udr.Ref : IntPtr.Zero;
+        }
+
+        /// <summary>
+        /// Get a user data from a reference
+        /// </summary>
+        public object GetUserData(IntPtr udRef)
+        {
+            UserDataRef udr;
+            if (!_UserDataRefs.TryGetValue(udRef, out udr))
+            {
+                udr = UserDataRef.GetUserDataFromRef(udRef);
+                if (udr != null)
+                {
+                    udr.IncRef();
+                    _UserDataRefs[udr.Ref] = udr;
+                }
+            }
+            return udr != null ? udr.Data : null;
+        }
+
+        /// <summary>
+        /// Get a typed user data from a reference
+        /// </summary>
+        public T GetUserData<T>(IntPtr udRef)
+        {
+            var obj = GetUserData(udRef);
+            return obj is T ? (T)obj : default(T);
+        }
+
+        #endregion
 
         /// <summary>
         /// Event raised when "print" is called

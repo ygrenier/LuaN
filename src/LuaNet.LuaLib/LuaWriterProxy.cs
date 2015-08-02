@@ -115,7 +115,7 @@ namespace LuaNet.LuaLib
                 {
                     Marshal.Copy(ptr, buffer, 0, (int)sz);
                 }
-                var res = ManagedWriter(ls, buffer, UserDataRef.GetData(ud));
+                var res = ManagedWriter(ls, buffer, ls.GetUserData(ud));
                 buffer = null;
                 return res;
             }

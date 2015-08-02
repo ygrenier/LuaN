@@ -112,7 +112,7 @@ namespace LuaNet.LuaLib
             LuaState ls = LuaState.FindState(state, true);
             if (ManagedReader != null && ls != null)
             {
-                var res = ManagedReader(ls, UserDataRef.GetData(ud));
+                var res = ManagedReader(ls, ls.GetUserData(ud));
                 if (res != null && res.Length > 0)
                 {
                     sz = (UInt32)res.Length;
