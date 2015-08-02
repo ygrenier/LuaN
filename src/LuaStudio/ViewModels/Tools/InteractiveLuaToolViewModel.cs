@@ -1,6 +1,7 @@
 ﻿using LuaNet;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using Xceed.Wpf.AvalonDock.Layout;
@@ -15,6 +16,8 @@ namespace LuaStudio.ViewModels.Tools
         {
             Title = "Lua Interactive";
             Console = new ConsoleViewModel();
+            InputHistory = new ObservableCollection<string>();
+            HistoryIndex = 0;
         }
 
         public void Dispose()
@@ -116,6 +119,8 @@ namespace LuaStudio.ViewModels.Tools
             if (String.IsNullOrWhiteSpace(chunk) && !IsStarted) return;
             //Output += String.Format("> {0}\n", chunk);
             Console.InsertInput(chunk);
+            InputHistory.Add(chunk);
+            HistoryIndex = InputHistory.Count;
             if (chunk.StartsWith("="))
             {
                 chunk = String.Format("return {0}", chunk.Substring(1));
@@ -147,6 +152,59 @@ namespace LuaStudio.ViewModels.Tools
         }
 
         /// <summary>
+        /// Clear the history
+        /// </summary>
+        public bool ClearHistory()
+        {
+            if (InputHistory.Count > 0)
+            {
+                InputHistory.Clear();
+                HistoryIndex = 0;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Select the previous history
+        /// </summary>
+        public bool PrevHistory()
+        {
+            if (HistoryIndex > 0)
+            {
+                HistoryIndex--;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Select the next history
+        /// </summary>
+        public bool NextHistory()
+        {
+            if (HistoryIndex < InputHistory.Count)
+            {
+                HistoryIndex++;
+                return true; 
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Select the last entry in the history
+        /// </summary>
+        public bool SelectEndHistory()
+        {
+            if (HistoryIndex < InputHistory.Count)
+            {
+                HistoryIndex = InputHistory.Count;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Indicate if the session is started
         /// </summary>
         public bool IsStarted
@@ -156,12 +214,28 @@ namespace LuaStudio.ViewModels.Tools
         }
         private bool _IsStarted;
 
-        //public String Output
-        //{
-        //    get { return _Output; }
-        //    private set { SetProperty(ref _Output, value, () => Output); }
-        //}
-        //private String _Output;
+        /// <summary>
+        /// Input history
+        /// </summary>
+        public ObservableCollection<String> InputHistory { get; private set; }
+
+        /// <summary>
+        /// Current selected history index
+        /// </summary>
+        public int HistoryIndex
+        {
+            get { return _HistoryIndex; }
+            private set {
+                if (SetProperty(ref _HistoryIndex, value, () => HistoryIndex))
+                    RaisePropertyChanged(() => CurrentHistory);
+            }
+        }
+        private int _HistoryIndex;
+
+        /// <summary>
+        /// Current history
+        /// </summary>
+        public String CurrentHistory { get { return HistoryIndex < 0 || HistoryIndex >= InputHistory.Count ? String.Empty : InputHistory[HistoryIndex]; } }
 
         /// <summary>
         /// Content of the console

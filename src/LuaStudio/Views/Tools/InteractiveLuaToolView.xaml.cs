@@ -103,6 +103,28 @@ namespace LuaStudio.Views.Tools
                     ViewModel.DoString(tInput.Text);
                 }
                 tInput.Clear();
+                tInput.Text = ViewModel.CurrentHistory;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                if (ViewModel.SelectEndHistory())
+                {
+                    tInput.Text = ViewModel.CurrentHistory;
+                }
+            }
+        }
+
+        private void tInput_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Up)
+            {
+                if (ViewModel.PrevHistory())
+                    tInput.Text = ViewModel.CurrentHistory;
+            }
+            else if (e.Key == Key.Down)
+            {
+                if (ViewModel.NextHistory())
+                    tInput.Text = ViewModel.CurrentHistory;
             }
         }
 

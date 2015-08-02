@@ -27,6 +27,7 @@
             FontSize="12px"
             Padding="2"
             KeyDown="tInput_KeyDown"
+            PreviewKeyDown="tInput_PreviewKeyDown"
             >
         </TextBox>
     </Grid>
