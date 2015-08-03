@@ -57,14 +57,14 @@ namespace LuaNet
     /// </summary>
     public enum LuaStatus
     {
-        OK = 0,
+        Ok = 0,
         Yield = 1,
-        ErrRun = 2,
-        ErrSyntax = 3,
-        ErrMem = 4,
-        ErrGcMm = 5,
-        ErrErr = 6,
-        ErrFile = ErrErr + 1
+        ErrorRun = 2,
+        ErrorSyntax = 3,
+        ErrorMemory = 4,
+        ErrorGC = 5,
+        ErrorError = 6,
+        ErrorFile = ErrorError + 1
     }
 
     /// <summary>

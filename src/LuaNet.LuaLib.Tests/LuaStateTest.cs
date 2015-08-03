@@ -1713,7 +1713,7 @@ end
                 });
                 L.PushNumber(12);
                 L.PushNumber(4);
-                Assert.Equal(LuaStatus.OK, L.PCall(2, 1, 0));
+                Assert.Equal(LuaStatus.Ok, L.PCall(2, 1, 0));
                 Assert.Equal(1, L.GetTop());
                 Assert.Equal(48, L.ToNumber(-1));
 
@@ -1729,14 +1729,14 @@ end
                 L.GetGlobal("testA");
                 L.PushNumber(12);
                 L.PushNumber(4);
-                Assert.Equal(LuaStatus.OK, L.PCall(2, 1, 0));
+                Assert.Equal(LuaStatus.Ok, L.PCall(2, 1, 0));
                 Assert.Equal(2, L.GetTop());
                 Assert.Equal(8, L.ToNumber(-1));
 
                 L.GetGlobal("testB");
                 L.PushNumber(12);
                 L.PushNumber(4);
-                Assert.Equal(LuaStatus.ErrRun, L.PCall(2, 1, 0));
+                Assert.Equal(LuaStatus.ErrorRun, L.PCall(2, 1, 0));
                 Assert.Equal("[string \"\r...\"]:6: attempt to call a nil value (global 'DoAnError')", L.ToString(-1));
             }
         }
@@ -1786,9 +1786,9 @@ return c..'!!'
                     return res;
                 };
                 var st = L.Load(reader, null, "main", null);
-                Assert.Equal(LuaStatus.OK, st);
+                Assert.Equal(LuaStatus.Ok, st);
                 st = L.PCall(0, 1, 0);
-                Assert.Equal(LuaStatus.OK, st);
+                Assert.Equal(LuaStatus.Ok, st);
                 Assert.Equal("Lua rocks!!", L.ToString(-1));
 
                 Assert.Null(FunctionExtensions.ToLuaReader(null));
@@ -1824,7 +1824,7 @@ return c..'!!'
                     return res;
                 };
                 var st = L.Load(loadChunk, null, "main", null);
-                Assert.Equal(LuaStatus.OK, st);
+                Assert.Equal(LuaStatus.Ok, st);
 
                 List<Byte[]> dump = new List<byte[]>();
                 LuaWriter fDump = (l, b, ud) => {
@@ -1844,9 +1844,9 @@ return c..'!!'
                 chunkBytes = dumpBytes;
                 curr = 0;
                 st = L.Load(loadChunk, null, "main", "b");
-                Assert.Equal(LuaStatus.OK, st);
+                Assert.Equal(LuaStatus.Ok, st);
                 st = L.PCall(0, 1, 0);
-                Assert.Equal(LuaStatus.OK, st);
+                Assert.Equal(LuaStatus.Ok, st);
                 Assert.Equal("Lua rocks!!", L.ToString(-1));
 
                 Assert.Null(FunctionExtensions.ToLuaWriter(null));
@@ -1884,7 +1884,7 @@ return c..'!!'
                     return 0;
                 });
 
-                Assert.Equal(LuaStatus.OK, L.DoString(@"
+                Assert.Equal(LuaStatus.Ok, L.DoString(@"
 co = coroutine.create(test)
 print('1:', coroutine.resume(co, 1, 2))
 print('2:', coroutine.resume(co, 5, 8))
@@ -1919,7 +1919,7 @@ print('3:', coroutine.resume(co, 10, 12))
                     return 0;
                 });
 
-                Assert.Equal(LuaStatus.OK, L.DoString(@"
+                Assert.Equal(LuaStatus.Ok, L.DoString(@"
 co = coroutine.create(test)
 print('1:', coroutine.resume(co, 1, 2))
 print('2:', coroutine.resume(co, 5, 8))
@@ -1940,9 +1940,9 @@ print('3:', coroutine.resume(co, 10, 12))
             LuaState L = null;
             using (L = new LuaState())
             {
-                Assert.Equal(LuaStatus.ErrRun, L.Resume(null, 0));
+                Assert.Equal(LuaStatus.ErrorRun, L.Resume(null, 0));
 
-                Assert.Equal(LuaStatus.ErrRun, L.Resume(L, 0));
+                Assert.Equal(LuaStatus.ErrorRun, L.Resume(L, 0));
             }
         }
 
@@ -1952,7 +1952,7 @@ print('3:', coroutine.resume(co, 10, 12))
             LuaState L = null;
             using (L = new LuaState())
             {
-                Assert.Equal(LuaStatus.OK, L.Status());
+                Assert.Equal(LuaStatus.Ok, L.Status());
             }
         }
 

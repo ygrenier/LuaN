@@ -185,7 +185,7 @@ namespace Luac
             {
                 Func<String, bool> IS = s => String.Equals(argv[i], s);
                 string filename = IS("-") ? null : argv[i];
-                if (L.LoadFile(filename) != LuaStatus.OK) fatal(L.ToString(-1));
+                if (L.LoadFile(filename) != LuaStatus.Ok) fatal(L.ToString(-1));
             }
             //    f = combine(L, argc);
             //    if (listing) luaU_print(f, listing > 1);
@@ -219,7 +219,7 @@ namespace Luac
                     L.PushFunction(pmain);
                     L.PushInteger(argc);
                     L.PushLightUserData(argv);
-                    if (L.PCall(2, 0, 0) != LuaStatus.OK) fatal(L.ToString(-1));
+                    if (L.PCall(2, 0, 0) != LuaStatus.Ok) fatal(L.ToString(-1));
                 }
             }
             catch (Exception ex)

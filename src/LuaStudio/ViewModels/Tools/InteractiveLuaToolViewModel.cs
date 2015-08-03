@@ -127,10 +127,10 @@ namespace LuaStudio.ViewModels.Tools
             }
             _CurrentState.SetTop(0);
             // Try the command as "return <chunk>"
-            if (_CurrentState.LoadBuffer("return " + chunk, "InteractiveLua") != LuaStatus.OK)
+            if (_CurrentState.LoadBuffer("return " + chunk, "InteractiveLua") != LuaStatus.Ok)
             {
                 _CurrentState.SetTop(0);
-                if (_CurrentState.LoadBuffer(chunk, "InteractiveLua") != LuaStatus.OK)
+                if (_CurrentState.LoadBuffer(chunk, "InteractiveLua") != LuaStatus.Ok)
                 {
                     _CurrentState.WriteStringError("error loading chunk : %s\n", _CurrentState.ToString(-1));
                     return;
@@ -144,7 +144,7 @@ namespace LuaStudio.ViewModels.Tools
                 _CurrentState.CheckStack(_CurrentState.MinStack, "too many results to print");
                 _CurrentState.GetGlobal("print");
                 _CurrentState.Insert(1);
-                if (_CurrentState.PCall(n, 0, 0) != LuaStatus.OK)
+                if (_CurrentState.PCall(n, 0, 0) != LuaStatus.Ok)
                     //l_message(L, progname, L.PushFString("error calling 'print' (%s)", L.ToString(-1)));
                     _CurrentState.WriteStringError("error calling 'print' (%s)\n", _CurrentState.ToString(-1));
             }

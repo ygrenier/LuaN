@@ -170,7 +170,7 @@ namespace LuaProgram
         */
         static LuaStatus report(ILuaState L, LuaStatus status)
         {
-            if (status != LuaStatus.OK)
+            if (status != LuaStatus.Ok)
             {
                 String msg = L.ToString(-1);
                 l_message(L, progname, msg);
@@ -257,7 +257,7 @@ namespace LuaProgram
 
         static LuaStatus dochunk(ILuaState L, LuaStatus status)
         {
-            if (status == LuaStatus.OK) status = docall(L, 0, 0);
+            if (status == LuaStatus.Ok) status = docall(L, 0, 0);
             return report(L, status);
         }
 
@@ -284,7 +284,7 @@ namespace LuaProgram
             L.GetGlobal("require");
             L.PushString(name);
             status = docall(L, 1, 1);  /* call 'require(name)' */
-            if (status == LuaStatus.OK)
+            if (status == LuaStatus.Ok)
                 L.SetGlobal(name);  /* global[name] = require return */
             return report(L, status);
         }
@@ -315,7 +315,7 @@ namespace LuaProgram
         */
         static int incomplete(ILuaState L, LuaStatus status)
         {
-            if (status == LuaStatus.ErrSyntax)
+            if (status == LuaStatus.ErrorSyntax)
             {
                 int lmsg;
                 String msg = L.ToLString(-1, out lmsg);
@@ -368,7 +368,7 @@ namespace LuaProgram
             L.PushValue(-2);  /* duplicate line */
             L.Concat(2);  /* new line is "return ..." */
             line = L.ToLString(-1, out len);
-            if ((status = L.LoadBuffer(line, len, "=stdin")) == LuaStatus.OK)
+            if ((status = L.LoadBuffer(line, len, "=stdin")) == LuaStatus.Ok)
             {
                 L.Remove(-3);  /* remove original line */
                 //line += sizeof("return")/sizeof(char);  /* remove 'return' for history */
@@ -416,7 +416,7 @@ namespace LuaProgram
             L.SetTop(0);
             if (0 == pushline(L, true))
                 return (LuaStatus)(-1);  /* no input */
-            if ((status = addreturn(L)) != LuaStatus.OK)  /* 'return ...' did not work? */
+            if ((status = addreturn(L)) != LuaStatus.Ok)  /* 'return ...' did not work? */
                 status = multiline(L);  /* try as command, maybe with continuation lines */
             L.Remove(1);  /* remove line from the stack */
             L.Assert(L.GetTop() == 1);
@@ -435,7 +435,7 @@ namespace LuaProgram
                 L.CheckStack(L.MinStack, "too many results to print");
                 L.GetGlobal("print");
                 L.Insert(1);
-                if (L.PCall(n, 0, 0) != LuaStatus.OK)
+                if (L.PCall(n, 0, 0) != LuaStatus.Ok)
                     l_message(L, progname, L.PushFString("error calling 'print' (%s)", L.ToString(-1)));
             }
         }
@@ -452,9 +452,9 @@ namespace LuaProgram
             progname = null;  /* no 'progname' on errors in interactive mode */
             while ((status = loadline(L)) != (LuaStatus) (-1))
             {
-                if (status == LuaStatus.OK)
+                if (status == LuaStatus.Ok)
                     status = docall(L, 0, L.MultiReturns);
-                if (status == LuaStatus.OK) l_print(L);
+                if (status == LuaStatus.Ok) l_print(L);
                 else report(L, (LuaStatus)status);
             }
             L.SetTop(0);  /* clear stack */
@@ -487,7 +487,7 @@ namespace LuaProgram
             if (String.Compare(fname, "-") == 0 && String.Compare(argv[idx - 1], "--") != 0)
                 fname = null;  /* stdin */
             status = L.LoadFile(fname);
-            if (status == LuaStatus.OK)
+            if (status == LuaStatus.Ok)
             {
                 int n = pushargs(L);  /* push arguments to script */
                 status = docall(L, n, L.MultiReturns);
@@ -581,7 +581,7 @@ namespace LuaProgram
                     status = (option == 'e')
                              ? dostring(L, extra, "=(command line)")
                              : dolibrary(L, extra);
-                    if (status != LuaStatus.OK) return 0;
+                    if (status != LuaStatus.Ok) return 0;
                 }
             }
             return 1;
@@ -609,7 +609,7 @@ namespace LuaProgram
                 name = "=" + LUA_INIT_VAR;
                 init = Environment.GetEnvironmentVariable(name.Substring(1));   /* try alternative name */
             }
-            if (init == null) return LuaStatus.OK;
+            if (init == null) return LuaStatus.Ok;
             else if (init.StartsWith("@"))
                 return dofile(L, init.Substring(1));
             else
@@ -645,13 +645,13 @@ namespace LuaProgram
             createargtable(L, argv, argc, script);  /* create table 'arg' */
             if (0 == (args & has_E))
             {  /* no option '-E'? */
-                if (handle_luainit(L) != LuaStatus.OK)  /* run LUA_INIT */
+                if (handle_luainit(L) != LuaStatus.Ok)  /* run LUA_INIT */
                     return 0;  /* error running LUA_INIT */
             }
             if (runargs(L, argv, script) == 0)  /* execute arguments -e and -l */
                 return 0;  /* something failed */
             if (script < argc &&  /* execute main script (if there is one) */
-                handle_script(L, argv, script) != LuaStatus.OK)
+                handle_script(L, argv, script) != LuaStatus.Ok)
                 return 0;
             if ((args & has_i) != 0)  /* -i option? */
                 doREPL(L);  /* do read-eval-print loop */
@@ -692,7 +692,7 @@ namespace LuaProgram
             {
                 l_message(null, args[0], String.Format("cannot create state: {0}", ex.GetBaseException().Message));
                 result = false;
-                status = LuaStatus.ErrRun;
+                status = LuaStatus.ErrorRun;
             }
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
@@ -701,7 +701,7 @@ namespace LuaProgram
                 Console.Read();
             }
 #endif
-            return (result && status == LuaStatus.OK) ? EXIT_SUCCESS : EXIT_FAILURE;
+            return (result && status == LuaStatus.Ok) ? EXIT_SUCCESS : EXIT_FAILURE;
         }
 
     }
