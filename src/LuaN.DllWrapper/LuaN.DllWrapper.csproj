@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LuaDll.lauxlib.h.cs" />
     <Compile Include="LuaDll.lua.h.cs" />
     <Compile Include="LuaDll.luaconf.h.cs" />
     <Compile Include="LuaDll.cs" />
