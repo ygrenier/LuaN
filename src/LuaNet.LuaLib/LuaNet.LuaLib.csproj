@@ -58,13 +58,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FunctionExtensions.cs" />
-    <Compile Include="ILuaState.cs" />
+    <Compile Include="LuaNet\ILuaState.cs" />
     <Compile Include="Lua.cs" />
     <Compile Include="Lua.lauxlib.h.cs" />
     <Compile Include="Lua.lua.h.cs" />
     <Compile Include="Lua.luaconf.h.cs" />
     <Compile Include="Lua.lualib.h.cs" />
-    <Compile Include="LuaAtPanicException.cs" />
+    <Compile Include="LuaNet\LuaAtPanicException.cs" />
     <Compile Include="LuaDebugProxy.cs" />
     <Compile Include="LuaKFunctionProxy.cs" />
     <Compile Include="LuaCFunctionProxy.cs" />
@@ -73,10 +73,10 @@
     <Compile Include="LuaReaderProxy.cs" />
     <Compile Include="LuaState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StateExtensions.cs" />
+    <Compile Include="LuaNet\StateExtensions.cs" />
     <Compile Include="UserDataRef.cs" />
-    <Compile Include="[Enums].cs" />
-    <Compile Include="[Events].cs" />
+    <Compile Include="LuaNet\[Enums].cs" />
+    <Compile Include="LuaNet\[Events].cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\external\lua-5.3.0\lua-5.3_Win32_dll9_lib\lua53.dll">
