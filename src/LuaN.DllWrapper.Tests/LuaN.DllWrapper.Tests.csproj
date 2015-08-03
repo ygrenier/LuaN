@@ -60,6 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LuaDllTest.cs" />
+    <Compile Include="LuaEngineTest.cs" />
+    <Compile Include="LuaStateTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
