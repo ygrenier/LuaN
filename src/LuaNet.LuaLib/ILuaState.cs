@@ -760,10 +760,17 @@ namespace LuaNet
         //    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         //    public extern static int luaL_execresult(lua_State L, int stat);
 
-        //    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        //    public extern static int luaL_ref(lua_State L, int t);
-        //    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        //    public extern static void luaL_unref(lua_State L, int t, int r);
+        /// <summary>
+        /// Creates and returns a reference, in the table at index 'table', for the object at the top of the stack (and pops the object). 
+        /// </summary>
+        int LRef(int table);
+        /// <summary>
+        /// Releases reference reference from the table at index table.
+        /// </summary>
+        /// <remarks>
+        /// The entry is removed from the table, so that the referred object can be collected. The reference reference is also freed to be used again. 
+        /// </remarks>
+        void LUnref(int table, int reference);
 
         /// <summary>
         /// Loads a file as a Lua chunk. 

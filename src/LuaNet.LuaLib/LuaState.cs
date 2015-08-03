@@ -1009,6 +1009,17 @@ namespace LuaNet.LuaLib
         /// </summary>
         public void Error(String fmt, String arg0, String arg1) { Lua.luaL_error(NativeState, fmt, __arglist(arg0, arg1)); }
         /// <summary>
+        /// Creates and returns a reference, in the table at index 'table', for the object at the top of the stack (and pops the object). 
+        /// </summary>
+        public int LRef(int table) { return Lua.luaL_ref(NativeState, table); }
+        /// <summary>
+        /// Releases reference reference from the table at index table.
+        /// </summary>
+        /// <remarks>
+        /// The entry is removed from the table, so that the referred object can be collected. The reference reference is also freed to be used again. 
+        /// </remarks>
+        public void LUnref(int table, int reference) { Lua.luaL_unref(NativeState, table, reference); }
+        /// <summary>
         /// Loads a file as a Lua chunk. 
         /// </summary>
         public LuaStatus LoadFile(String filename, String mode) { return (LuaStatus)Lua.luaL_loadfilex(NativeState, filename, mode); }

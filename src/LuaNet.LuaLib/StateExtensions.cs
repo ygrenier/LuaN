@@ -55,6 +55,21 @@ namespace LuaNet
             return o is T ? (T)o : default(T);
         }
 
+        public static int Ref(this ILuaState state)
+        {
+            return state.LRef(state.RegistryIndex);
+        }
+
+        public static LuaType GetRef(this ILuaState state, int reference)
+        {
+            return state.RawGetI(state.RegistryIndex, reference);
+        }
+
+        public static ILuaState Unref(this ILuaState state, int reference)
+        {
+            state.LUnref(state.RegistryIndex, reference);
+            return state;
+        }
 
     }
 }
