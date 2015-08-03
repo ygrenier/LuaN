@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LuaCFunctionWrapperTest.cs" />
     <Compile Include="LuaDllTest.cs" />
     <Compile Include="LuaEngineTest.cs" />
     <Compile Include="LuaStateTest.cs" />

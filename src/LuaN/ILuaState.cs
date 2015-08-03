@@ -46,10 +46,10 @@ namespace LuaN
         /// </summary>
         Double LuaVersion();
 
-        ///// <summary>
-        ///// Define the panic function
-        ///// </summary>
-        //LuaFunction LuaAtPanic(LuaFunction panicf);
+        /// <summary>
+        /// Define the panic function
+        /// </summary>
+        LuaCFunction LuaAtPanic(LuaCFunction panicf);
 
         /// <summary>
         /// Creates a new thread, pushes it on the stack.
@@ -58,17 +58,17 @@ namespace LuaN
 
         #endregion
 
-        //#region Stack management
+        #region Stack management
 
-        //#region basic stack manipulation
+        #region basic stack manipulation
         ///// <summary>
         ///// Get the absolute stack index
         ///// </summary>
         //int AbsIndex(int idx);
-        ///// <summary>
-        ///// Get the top of the stack
-        ///// </summary>
-        //int GetTop();
+        /// <summary>
+        /// Get the top of the stack
+        /// </summary>
+        int LuaGetTop();
         ///// <summary>
         ///// Set the top of the stack
         ///// </summary>
@@ -93,9 +93,9 @@ namespace LuaN
         ///// Exchange values between different threads of the same state
         ///// </summary>
         //ILuaState XMove(ILuaState to, int n);
-        //#endregion
+        #endregion
 
-        //#region access functions (stack -> C)
+        #region access functions (stack -> C)
         ///// <summary>
         ///// Returns true if the value at the given index is a number or a string convertible to a number, and false otherwise.
         ///// </summary>
@@ -137,6 +137,10 @@ namespace LuaN
         ///// Converts the Lua value at the given index to a C boolean value
         ///// </summary>
         //Boolean ToBoolean(int idx);
+        /// <summary>
+        /// Converts the Lua value at the given index to a string.
+        /// </summary>
+        String LuaToString(int idx);
         ///// <summary>
         ///// Returns the raw "length" of the value at the given index
         ///// </summary>
@@ -158,9 +162,9 @@ namespace LuaN
         ///// Converts the value at the given index to a Lua thread
         ///// </summary>
         //ILuaState ToThread(int idx);
-        //#endregion
+        #endregion
 
-        //#region push functions (C -> stack)
+        #region push functions (C -> stack)
         ///// <summary>
         ///// Push a nil value
         ///// </summary>
@@ -173,10 +177,10 @@ namespace LuaN
         ///// Push a integer value
         ///// </summary>
         //ILuaState PushInteger(int n);
-        ///// <summary>
-        ///// Push a String value
-        ///// </summary>
-        //ILuaState PushString(String s);
+        /// <summary>
+        /// Push a String value
+        /// </summary>
+        void LuaPushString(String s);
         ///// <summary>
         ///// Push a formatted string value
         ///// </summary>
@@ -241,9 +245,9 @@ namespace LuaN
         ///// Push a thread
         ///// </summary>
         //int PushThread();
-        //#endregion
+        #endregion
 
-        //#region get functions (Lua -> stack)
+        #region get functions (Lua -> stack)
         ///// <summary>
         ///// Pushes onto the stack the value of the global name. 
         ///// </summary>
@@ -309,9 +313,9 @@ namespace LuaN
         ///// </summary>
         ///// <returns>Returns the type of the pushed value.</returns>
         //LuaType GetUserValue(int idx);
-        //#endregion
+        #endregion
 
-        //#region set functions (stack -> Lua)
+        #region set functions (stack -> Lua)
         ///// <summary>
         ///// Pops a value from the stack and sets it as the new value of global name.
         ///// </summary>
@@ -363,9 +367,9 @@ namespace LuaN
         ///// Pops a value from the stack and sets it as the new value associated to the userdata at the given index.
         ///// </summary>
         //ILuaState SetUserValue(int idx);
-        //#endregion
+        #endregion
 
-        //#endregion
+        #endregion
 
         //#region Comparison and arithmetic functions
         ///// <summary>
@@ -439,11 +443,11 @@ namespace LuaN
         //int GC(LuaGcFunction what, int data);
         //#endregion
 
-        //#region miscellaneous functions
-        ///// <summary>
-        ///// Generates a Lua error, using the value at the top of the stack as the error object.
-        ///// </summary>
-        //int Error();
+        #region miscellaneous functions
+        /// <summary>
+        /// Generates a Lua error, using the value at the top of the stack as the error object.
+        /// </summary>
+        void LuaError();
         ///// <summary>
         ///// Pops a key from the stack, and pushes a key–value pair from the table at the given index (the "next" pair after the given key).
         ///// </summary>
@@ -462,7 +466,7 @@ namespace LuaN
         //int StringToNumber(String s);
         ////lua_Alloc lua_getallocf(lua_State L, IntPtr ud);
         ////void lua_setallocf(lua_State L, lua_Alloc f, IntPtr ud);
-        //#endregion
+        #endregion
 
         //#region some useful macros
         ///// <summary>

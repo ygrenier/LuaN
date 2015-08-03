@@ -39,12 +39,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\LuaN\Delegates.cs">
+      <Link>LuaN\Delegates.cs</Link>
+    </Compile>
     <Compile Include="..\LuaN\ILuaEngine.cs">
       <Link>LuaN\ILuaEngine.cs</Link>
     </Compile>
     <Compile Include="..\LuaN\ILuaState.cs">
       <Link>LuaN\ILuaState.cs</Link>
     </Compile>
+    <Compile Include="..\LuaN\LuaException.cs">
+      <Link>LuaN\LuaException.cs</Link>
+    </Compile>
+    <Compile Include="LuaCFunctionWrapper.cs" />
     <Compile Include="LuaDll.lauxlib.h.cs" />
     <Compile Include="LuaDll.lua.h.cs" />
     <Compile Include="LuaDll.luaconf.h.cs" />

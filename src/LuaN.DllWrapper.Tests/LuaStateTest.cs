@@ -47,5 +47,96 @@ namespace LuaN.DllWrapper.Tests
             Assert.Throws<ObjectDisposedException>(() => C.NativeState);
         }
 
+        [Fact]
+        public void TestLuaAtPanic()
+        {
+            using (var L = new LuaState())
+            {
+                // Test default atpanic
+                var lex = Assert.Throws<LuaException>(() => L.LuaError());
+                Assert.Equal("Une exception de type 'LuaN.LuaException' a été levée.", lex.Message);
+                L.LuaPushString("Test error");
+                lex = Assert.Throws<LuaException>(() => L.LuaError());
+                Assert.Equal("Test error", lex.Message);
+
+                // Custom atpanic
+                var oldAtPanic = L.LuaAtPanic(state =>
+                {
+                    throw new ApplicationException("Custom at panic");
+                });
+                Assert.NotNull(oldAtPanic);
+                var aex = Assert.Throws<ApplicationException>(() => L.LuaError());
+                Assert.Equal("Custom at panic", aex.Message);
+
+                // Test oldPanic function
+                lex = Assert.Throws<LuaException>(() => oldAtPanic(null));
+                Assert.Equal("Une exception de type 'LuaN.LuaException' a été levée.", lex.Message);
+
+                // Restore the original old panic
+                Assert.True(L.RestoreOriginalAtPanic());
+                Assert.False(L.RestoreOriginalAtPanic());
+                L.SetDefaultAtPanic();
+
+
+                Assert.Throws<ArgumentNullException>(() => L.LuaAtPanic(null));
+
+            }
+        }
+
+        [Fact]
+        public void TestWrapCFunction()
+        {
+            using (var L = new LuaState())
+            {
+                LuaDll.lua_CFunction nativeFunction = null;
+                LuaCFunction cfunction = null;
+
+                Assert.Null(L.WrapFunction(nativeFunction));
+                Assert.Null(L.WrapFunction(cfunction));
+
+                cfunction = s => 0;
+                nativeFunction = L.WrapFunction(cfunction);
+
+                Assert.Same(nativeFunction, L.WrapFunction(cfunction));
+                Assert.Same(cfunction, L.WrapFunction(nativeFunction));
+
+                nativeFunction = s => 0;
+                cfunction = L.WrapFunction(nativeFunction);
+
+                Assert.Same(nativeFunction, L.WrapFunction(cfunction));
+                Assert.Same(cfunction, L.WrapFunction(nativeFunction));
+            }
+        }
+
+        [Fact]
+        public void TestFindInstance()
+        {
+            using (var L = new LuaState())
+            {
+                LuaState C = (LuaState)L.LuaNewThread();
+                IntPtr cPtr = C.NativeState;
+                C.Dispose();
+
+                LuaCFunction cfunction = state =>
+                {
+                    Assert.Same(state, L);
+                    return 123;
+                };
+                LuaDll.lua_CFunction nativeFunc = L.WrapFunction(cfunction);
+                Assert.Equal(123, nativeFunc(L.NativeState));
+
+                cfunction = state =>
+                {
+                    Assert.Equal(cPtr, ((LuaState)state).NativeState);
+                    return 321;
+                };
+                nativeFunc = L.WrapFunction(cfunction);
+                Assert.Equal(321, nativeFunc(cPtr));
+
+                Assert.Equal(0, nativeFunc(IntPtr.Zero));
+
+            }
+        }
+
     }
 }
