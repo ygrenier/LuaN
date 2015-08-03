@@ -156,6 +156,11 @@ namespace LuaNet.LuaLib
         public int MultiReturns { get { return Lua.LUA_MULTRET; } }
 
         /// <summary>
+        /// First pseudo index
+        /// </summary>
+        public int FirstPseudoIndex { get { return Lua.LUAI_FIRSTPSEUDOIDX; } }
+
+        /// <summary>
         /// Index of the registry
         /// </summary>
         public int RegistryIndex { get { return Lua.LUA_REGISTRYINDEX; } }

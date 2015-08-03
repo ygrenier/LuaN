@@ -18,43 +18,41 @@ namespace LuaNet
         /// </summary>
         String LuaEngine { get; }
 
-        //public const String LUA_VERSION_MAJOR = "5";
         /// <summary>
         /// Major Version part
         /// </summary>
         String LuaVersionMajor { get; }
-        //public const String LUA_VERSION_MINOR = "3";
+
         /// <summary>
         /// Minor Version part
         /// </summary>
         String LuaVersionMinor { get; }
-        //public const String LUA_VERSION_RELEASE = "0";
+
         /// <summary>
         /// Release Version part
         /// </summary>
         String LuaVersionRelease { get; }
-        //public const Double LUA_VERSION_NUM = 503;
+
         /// <summary>
         /// Version number
         /// </summary>
         Double LuaVersionNum { get; }
 
-        //public const String LUA_VERSION = "Lua " + LUA_VERSION_MAJOR + "." + LUA_VERSION_MINOR;
         /// <summary>
         /// Lua Version
         /// </summary>
         String LuaVersion { get; }
-        //public const String LUA_RELEASE = LUA_VERSION + "." + LUA_VERSION_RELEASE;
+
         /// <summary>
         /// Lua Release
         /// </summary>
         String LuaRelease { get; }
-        //public const String LUA_COPYRIGHT = LUA_RELEASE + "  Copyright (C) 1994-2015 Lua.org, PUC-Rio";
+
         /// <summary>
         /// Lua Copyright
         /// </summary>
         String LuaCopyright { get; }
-        //public const String LUA_AUTHORS = "R. Ierusalimschy, L. H. de Figueiredo, W. Celes";
+
         /// <summary>
         /// Lua Authors
         /// </summary>
@@ -64,6 +62,11 @@ namespace LuaNet
         /// Option for multiple returns in 'PCall' and 'Call' 
         /// </summary>
         int MultiReturns { get; }
+
+        /// <summary>
+        /// First pseudo index
+        /// </summary>
+        int FirstPseudoIndex { get; }
 
         /// <summary>
         /// Index of the registry
