@@ -270,10 +270,13 @@ namespace LuaN.DllWrapper
         #region Stack management
 
         #region basic stack manipulation
-        ///// <summary>
-        ///// Get the absolute stack index
-        ///// </summary>
-        //int AbsIndex(int idx);
+        /// <summary>
+        /// Get the absolute stack index
+        /// </summary>
+        public int LuaAbsIndex(int idx)
+        {
+            return LuaDll.lua_absindex(NativeState, idx);
+        }
         /// <summary>
         /// Get the top of the stack
         /// </summary>

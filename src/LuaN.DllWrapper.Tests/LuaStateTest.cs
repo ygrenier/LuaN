@@ -138,5 +138,29 @@ namespace LuaN.DllWrapper.Tests
             }
         }
 
+        [Fact]
+        public void TestLuaAbsIndex()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushString("a");
+                L.LuaPushString("b");
+                L.LuaPushString("c");
+
+                Assert.Equal(4, L.LuaAbsIndex(0));
+                Assert.Equal(1, L.LuaAbsIndex(1));
+                Assert.Equal(2, L.LuaAbsIndex(2));
+                Assert.Equal(3, L.LuaAbsIndex(3));
+                Assert.Equal(4, L.LuaAbsIndex(4));
+                Assert.Equal(3, L.LuaAbsIndex(-1));
+                Assert.Equal(2, L.LuaAbsIndex(-2));
+                Assert.Equal(1, L.LuaAbsIndex(-3));
+                Assert.Equal(0, L.LuaAbsIndex(-4));
+
+                Assert.Equal(-1001000, L.LuaAbsIndex(L.RegistryIndex));
+            }
+        }
+
     }
 }
