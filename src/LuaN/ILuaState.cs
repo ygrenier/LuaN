@@ -96,87 +96,87 @@ namespace LuaN
         #endregion
 
         #region access functions (stack -> C)
-        ///// <summary>
-        ///// Returns true if the value at the given index is a number or a string convertible to a number, and false otherwise.
-        ///// </summary>
-        //Boolean IsNumber(int idx);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a string or a number (which is always convertible to a string), and false otherwise.
-        ///// </summary>
-        //Boolean IsString(int idx);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a C function, and false otherwise.
-        ///// </summary>
-        //Boolean IsCFunction(int idx);
-        ///// <summary>
-        ///// Returns true if the value at the given index is an integer (that is, the value is a number and is represented as an integer), and false otherwise.
-        ///// </summary>
-        //Boolean IsInteger(int idx);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a userdata (either full or light), and false otherwise.
-        ///// </summary>
-        //Boolean IsUserData(int idx);
-        ///// <summary>
-        ///// Returns the type of the value in the given valid index, or LUA_TNONE for a non-valid (but acceptable) index
-        ///// </summary>
-        //LuaType Type(int idx);
-        ///// <summary>
-        ///// Returns the name of the type encoded by the value tp, which must be one the values returned by Type.
-        ///// </summary>
-        //String TypeName(LuaType tp);
+        /// <summary>
+        /// Returns true if the value at the given index is a number or a string convertible to a number, and false otherwise.
+        /// </summary>
+        Boolean LuaIsNumber(int idx);
+        /// <summary>
+        /// Returns true if the value at the given index is a string or a number (which is always convertible to a string), and false otherwise.
+        /// </summary>
+        Boolean LuaIsString(int idx);
+        /// <summary>
+        /// Returns true if the value at the given index is a C function, and false otherwise.
+        /// </summary>
+        Boolean LuaIsCFunction(int idx);
+        /// <summary>
+        /// Returns true if the value at the given index is an integer (that is, the value is a number and is represented as an integer), and false otherwise.
+        /// </summary>
+        Boolean LuaIsInteger(int idx);
+        /// <summary>
+        /// Returns true if the value at the given index is a userdata (either full or light), and false otherwise.
+        /// </summary>
+        Boolean LuaIsUserData(int idx);
+        /// <summary>
+        /// Returns the type of the value in the given valid index, or LUA_TNONE for a non-valid (but acceptable) index
+        /// </summary>
+        LuaType LuaType(int idx);
+        /// <summary>
+        /// Returns the name of the type encoded by the value tp, which must be one the values returned by Type.
+        /// </summary>
+        String LuaTypeName(LuaType tp);
 
-        ///// <summary>
-        ///// Converts the Lua value at the given index to the C type lua_Number
-        ///// </summary>
-        //Double ToNumber(int idx, out bool isnum);
-        ///// <summary>
-        ///// Converts the Lua value at the given index to the C type lua_Integer
-        ///// </summary>
-        //int ToInteger(int idx, out bool isnum);
-        ///// <summary>
-        ///// Converts the Lua value at the given index to a C boolean value
-        ///// </summary>
-        //Boolean ToBoolean(int idx);
+        /// <summary>
+        /// Converts the Lua value at the given index to the C type lua_Number
+        /// </summary>
+        Double LuaToNumberX(int idx, out bool isnum);
+        /// <summary>
+        /// Converts the Lua value at the given index to the C type lua_Integer
+        /// </summary>
+        Int64 LuaToIntegerX(int idx, out bool isnum);
+        /// <summary>
+        /// Converts the Lua value at the given index to a C boolean value
+        /// </summary>
+        Boolean LuaToBoolean(int idx);
         /// <summary>
         /// Converts the Lua value at the given index to a string.
         /// </summary>
         String LuaToString(int idx);
-        ///// <summary>
-        ///// Returns the raw "length" of the value at the given index
-        ///// </summary>
-        ///// <remarks>
-        ///// Returns the raw "length" of the value at the given index: for strings, this is the string length; 
-        ///// for tables, this is the result of the length operator ('#') with no metamethods; for userdata, this is the size 
-        ///// of the block of memory allocated for the userdata; for other values, it is 0.
-        ///// </remarks>
-        //UInt32 RawLen(int idx);
-        ///// <summary>
-        ///// Converts a value at the given index to a C function
-        ///// </summary>
-        //LuaFunction ToCFunction(int idx);
-        ///// <summary>
-        ///// If the value at the given index is a full userdata, returns its block address. If the value is a light userdata, returns its pointer. Otherwise, returns NULL.
-        ///// </summary>
-        //Object ToUserData(int idx);
-        ///// <summary>
-        ///// Converts the value at the given index to a Lua thread
-        ///// </summary>
-        //ILuaState ToThread(int idx);
+        /// <summary>
+        /// Returns the raw "length" of the value at the given index
+        /// </summary>
+        /// <remarks>
+        /// Returns the raw "length" of the value at the given index: for strings, this is the string length; 
+        /// for tables, this is the result of the length operator ('#') with no metamethods; for userdata, this is the size 
+        /// of the block of memory allocated for the userdata; for other values, it is 0.
+        /// </remarks>
+        UInt32 LuaRawLen(int idx);
+        /// <summary>
+        /// Converts a value at the given index to a C function
+        /// </summary>
+        LuaCFunction LuaToCFunction(int idx);
+        /// <summary>
+        /// If the value at the given index is a full userdata, returns its block address. If the value is a light userdata, returns its pointer. Otherwise, returns NULL.
+        /// </summary>
+        Object LuaToUserData(int idx);
+        /// <summary>
+        /// Converts the value at the given index to a Lua thread
+        /// </summary>
+        ILuaState LuaToThread(int idx);
         #endregion
 
         #region push functions (C -> stack)
-        ///// <summary>
-        ///// Push a nil value
-        ///// </summary>
-        //ILuaState PushNil();
+        /// <summary>
+        /// Push a nil value
+        /// </summary>
+        void LuaPushNil();
         /// <summary>
         /// Push a number value
         /// </summary>
         void LuaPushNumber(Double n);
-        ///// <summary>
-        ///// Push a integer value
-        ///// </summary>
-        //ILuaState PushInteger(int n);
+        /// <summary>
+        /// Push a integer value
+        /// </summary>
+        void LuaPushInteger(Int64 n);
         /// <summary>
         /// Push a String value
         /// </summary>
@@ -229,14 +229,14 @@ namespace LuaN
         ///// Push a formatted string value
         ///// </summary>
         //String PushFString(String fmt, int arg0, int arg1);
-        ///// <summary>
-        ///// Push a C closure
-        ///// </summary>
-        //ILuaState PushCClosure(LuaFunction fn, int n);
-        ///// <summary>
-        ///// Push a boolean value
-        ///// </summary>
-        //ILuaState PushBoolean(Boolean b);
+        /// <summary>
+        /// Push a C closure
+        /// </summary>
+        void LuaPushCClosure(LuaCFunction fn, int n);
+        /// <summary>
+        /// Push a boolean value
+        /// </summary>
+        void LuaPushBoolean(Boolean b);
         ///// <summary>
         ///// Push a light user data
         ///// </summary>
@@ -473,10 +473,10 @@ namespace LuaN
         /// Converts the Lua value at the given index to the C type Number 
         /// </summary>
         Double LuaToNumber(int idx);
-        ///// <summary>
-        ///// Converts the Lua value at the given index to the C type integer
-        ///// </summary>
-        //int ToInteger(int idx);
+        /// <summary>
+        /// Converts the Lua value at the given index to the C type integer
+        /// </summary>
+        Int64 LuaToInteger(int idx);
         /// <summary>
         /// Pops n elements from the stack. 
         /// </summary>

@@ -68,40 +68,6 @@ namespace LuaN.DllWrapper
 
         #endregion
 
-        #region Objects binding between Lua and .Net
-
-        /// <summary>
-        /// Wrap a native C function
-        /// </summary>
-        public LuaCFunction WrapFunction(LuaDll.lua_CFunction function)
-        {
-            if (function == null) return null;
-            var wrapper = _CFunctionWrappers.FirstOrDefault(w => w.NativeFunction == function);
-            if(wrapper== null)
-            {
-                wrapper = new LuaCFunctionWrapper(function);
-                _CFunctionWrappers.Add(wrapper);
-            }
-            return wrapper.CFunction;
-        }
-
-        /// <summary>
-        /// Wrap a .Net C function
-        /// </summary>
-        public LuaDll.lua_CFunction WrapFunction(LuaCFunction function)
-        {
-            if (function == null) return null;
-            var wrapper = _CFunctionWrappers.FirstOrDefault(w => w.CFunction == function);
-            if (wrapper == null)
-            {
-                wrapper = new LuaCFunctionWrapper(function);
-                _CFunctionWrappers.Add(wrapper);
-            }
-            return wrapper.NativeFunction;
-        }
-
-        #endregion
-
         #region State management
 
         /// <summary>
@@ -109,6 +75,7 @@ namespace LuaN.DllWrapper
         /// </summary>
         private void InitState(IntPtr nativeState, bool ownState)
         {
+            UserDataIndex = new UserDataIndex();
             _NativeState = nativeState;
             lock (_RegisteredStates)
             _RegisteredStates[_NativeState] = this;
@@ -146,6 +113,8 @@ namespace LuaN.DllWrapper
                 lock (_RegisteredStates)
                     _RegisteredStates.Remove(_NativeState);
                 _CFunctionWrappers.Clear();
+                UserDataIndex.Reset();
+                UserDataIndex = null;
                 _NativeState = IntPtr.Zero;
             }
         }
@@ -179,6 +148,60 @@ namespace LuaN.DllWrapper
                     throw new LuaException(state.LuaToString(-1));
             }
             throw new LuaException();
+        }
+
+        #endregion
+
+        #region Objects binding between Lua and .Net
+
+        /// <summary>
+        /// Wrap a native C function
+        /// </summary>
+        public LuaCFunction WrapFunction(LuaDll.lua_CFunction function)
+        {
+            if (function == null) return null;
+            var wrapper = _CFunctionWrappers.FirstOrDefault(w => w.NativeFunction == function);
+            if(wrapper== null)
+            {
+                wrapper = new LuaCFunctionWrapper(function);
+                _CFunctionWrappers.Add(wrapper);
+            }
+            return wrapper.CFunction;
+        }
+
+        /// <summary>
+        /// Wrap a .Net C function
+        /// </summary>
+        public LuaDll.lua_CFunction WrapFunction(LuaCFunction function)
+        {
+            if (function == null) return null;
+            var wrapper = _CFunctionWrappers.FirstOrDefault(w => w.CFunction == function);
+            if (wrapper == null)
+            {
+                wrapper = new LuaCFunctionWrapper(function);
+                _CFunctionWrappers.Add(wrapper);
+            }
+            return wrapper.NativeFunction;
+        }
+
+        /// <summary>
+        /// Get the user data from a pseudo-pointer
+        /// </summary>
+        public Object GetUserData(IntPtr ptr)
+        {
+            return UserDataIndex.FindPointer(ptr);
+        }
+
+        /// <summary>
+        /// Get the pseudo-pointer for an object
+        /// </summary>
+        public IntPtr GetUserDataPtr(Object uData)
+        {
+            if (uData == null) return IntPtr.Zero;
+            var rud = UserDataIndex.FindData(uData);
+            if (rud == null)
+                rud = UserDataIndex.Add(uData);
+            return rud.Pointer;
         }
 
         #endregion
@@ -343,47 +366,83 @@ namespace LuaN.DllWrapper
         #endregion
 
         #region access functions (stack -> C)
-        ///// <summary>
-        ///// Returns true if the value at the given index is a number or a string convertible to a number, and false otherwise.
-        ///// </summary>
-        //Boolean IsNumber(int idx);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a string or a number (which is always convertible to a string), and false otherwise.
-        ///// </summary>
-        //Boolean IsString(int idx);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a C function, and false otherwise.
-        ///// </summary>
-        //Boolean IsCFunction(int idx);
-        ///// <summary>
-        ///// Returns true if the value at the given index is an integer (that is, the value is a number and is represented as an integer), and false otherwise.
-        ///// </summary>
-        //Boolean IsInteger(int idx);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a userdata (either full or light), and false otherwise.
-        ///// </summary>
-        //Boolean IsUserData(int idx);
-        ///// <summary>
-        ///// Returns the type of the value in the given valid index, or LUA_TNONE for a non-valid (but acceptable) index
-        ///// </summary>
-        //LuaType Type(int idx);
-        ///// <summary>
-        ///// Returns the name of the type encoded by the value tp, which must be one the values returned by Type.
-        ///// </summary>
-        //String TypeName(LuaType tp);
+        /// <summary>
+        /// Returns true if the value at the given index is a number or a string convertible to a number, and false otherwise.
+        /// </summary>
+        public Boolean LuaIsNumber(int idx)
+        {
+            return LuaDll.lua_isnumber(NativeState, idx) != 0;
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is a string or a number (which is always convertible to a string), and false otherwise.
+        /// </summary>
+        public Boolean LuaIsString(int idx)
+        {
+            return LuaDll.lua_isstring(NativeState, idx) != 0;
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is a C function, and false otherwise.
+        /// </summary>
+        public Boolean LuaIsCFunction(int idx)
+        {
+            return LuaDll.lua_iscfunction(NativeState, idx) != 0;
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is an integer (that is, the value is a number and is represented as an integer), and false otherwise.
+        /// </summary>
+        public Boolean LuaIsInteger(int idx)
+        {
+            return LuaDll.lua_isinteger(NativeState, idx) != 0;
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is a userdata (either full or light), and false otherwise.
+        /// </summary>
+        public Boolean LuaIsUserData(int idx)
+        {
+            return LuaDll.lua_isuserdata(NativeState, idx) != 0;
+        }
+        /// <summary>
+        /// Returns the type of the value in the given valid index, or LUA_TNONE for a non-valid (but acceptable) index
+        /// </summary>
+        public LuaType LuaType(int idx)
+        {
+            return (LuaType)LuaDll.lua_type(NativeState, idx);
+        }
+        /// <summary>
+        /// Returns the name of the type encoded by the value tp, which must be one the values returned by Type.
+        /// </summary>
+        public String LuaTypeName(LuaType tp)
+        {
+            return LuaDll.lua_typename(NativeState, (int)tp);
+        }
 
-        ///// <summary>
-        ///// Converts the Lua value at the given index to the C type lua_Number
-        ///// </summary>
-        //Double ToNumber(int idx, out bool isnum);
-        ///// <summary>
-        ///// Converts the Lua value at the given index to the C type lua_Integer
-        ///// </summary>
-        //int ToInteger(int idx, out bool isnum);
-        ///// <summary>
-        ///// Converts the Lua value at the given index to a C boolean value
-        ///// </summary>
-        //Boolean ToBoolean(int idx);
+        /// <summary>
+        /// Converts the Lua value at the given index to the C type lua_Number
+        /// </summary>
+        public Double LuaToNumberX(int idx, out bool isnum)
+        {
+            int nisnum;
+            var result = LuaDll.lua_tonumberx(NativeState, idx, out nisnum);
+            isnum = nisnum != 0;
+            return result;
+        }
+        /// <summary>
+        /// Converts the Lua value at the given index to the C type lua_Integer
+        /// </summary>
+        public Int64 LuaToIntegerX(int idx, out bool isnum)
+        {
+            int nisnum;
+            var result = LuaDll.lua_tointegerx(NativeState, idx, out nisnum);
+            isnum = nisnum != 0;
+            return result;
+        }
+        /// <summary>
+        /// Converts the Lua value at the given index to a C boolean value
+        /// </summary>
+        public Boolean LuaToBoolean(int idx)
+        {
+            return LuaDll.lua_toboolean(NativeState, idx) != 0;
+        }
         /// <summary>
         /// Converts the Lua value at the given index to a string.
         /// </summary>
@@ -391,34 +450,50 @@ namespace LuaN.DllWrapper
         {
             return LuaDll.lua_tostring(NativeState, idx);
         }
-        ///// <summary>
-        ///// Returns the raw "length" of the value at the given index
-        ///// </summary>
-        ///// <remarks>
-        ///// Returns the raw "length" of the value at the given index: for strings, this is the string length; 
-        ///// for tables, this is the result of the length operator ('#') with no metamethods; for userdata, this is the size 
-        ///// of the block of memory allocated for the userdata; for other values, it is 0.
-        ///// </remarks>
-        //UInt32 RawLen(int idx);
-        ///// <summary>
-        ///// Converts a value at the given index to a C function
-        ///// </summary>
-        //LuaFunction ToCFunction(int idx);
-        ///// <summary>
-        ///// If the value at the given index is a full userdata, returns its block address. If the value is a light userdata, returns its pointer. Otherwise, returns NULL.
-        ///// </summary>
-        //Object ToUserData(int idx);
-        ///// <summary>
-        ///// Converts the value at the given index to a Lua thread
-        ///// </summary>
-        //ILuaState ToThread(int idx);
+        /// <summary>
+        /// Returns the raw "length" of the value at the given index
+        /// </summary>
+        /// <remarks>
+        /// Returns the raw "length" of the value at the given index: for strings, this is the string length; 
+        /// for tables, this is the result of the length operator ('#') with no metamethods; for userdata, this is the size 
+        /// of the block of memory allocated for the userdata; for other values, it is 0.
+        /// </remarks>
+        public UInt32 LuaRawLen(int idx)
+        {
+            return LuaDll.lua_rawlen(NativeState, idx);
+        }
+        /// <summary>
+        /// Converts a value at the given index to a C function
+        /// </summary>
+        public LuaCFunction LuaToCFunction(int idx)
+        {
+            return WrapFunction(LuaDll.lua_tocfunction(NativeState, idx));
+        }
+        /// <summary>
+        /// If the value at the given index is a full userdata, returns its block address. If the value is a light userdata, returns its pointer. Otherwise, returns NULL.
+        /// </summary>
+        public Object LuaToUserData(int idx)
+        {
+            return GetUserData(LuaDll.lua_touserdata(NativeState, idx));
+        }
+        /// <summary>
+        /// Converts the value at the given index to a Lua thread
+        /// </summary>
+        public ILuaState LuaToThread(int idx)
+        {
+            var ptr = LuaDll.lua_tothread(NativeState, idx);
+            return ptr != IntPtr.Zero ? FindState(ptr, true) : null;
+        }
         #endregion
 
         #region push functions (C -> stack)
-        ///// <summary>
-        ///// Push a nil value
-        ///// </summary>
-        //ILuaState PushNil();
+        /// <summary>
+        /// Push a nil value
+        /// </summary>
+        public void LuaPushNil()
+        {
+            LuaDll.lua_pushnil(NativeState);
+        }
         /// <summary>
         /// Push a number value
         /// </summary>
@@ -426,10 +501,13 @@ namespace LuaN.DllWrapper
         {
             LuaDll.lua_pushnumber(NativeState, n);
         }
-        ///// <summary>
-        ///// Push a integer value
-        ///// </summary>
-        //ILuaState PushInteger(int n);
+        /// <summary>
+        /// Push a integer value
+        /// </summary>
+        public void LuaPushInteger(Int64 n)
+        {
+            LuaDll.lua_pushinteger(NativeState, n);
+        }
         /// <summary>
         /// Push a String value
         /// </summary>
@@ -485,14 +563,20 @@ namespace LuaN.DllWrapper
         ///// Push a formatted string value
         ///// </summary>
         //String PushFString(String fmt, int arg0, int arg1);
-        ///// <summary>
-        ///// Push a C closure
-        ///// </summary>
-        //ILuaState PushCClosure(LuaFunction fn, int n);
-        ///// <summary>
-        ///// Push a boolean value
-        ///// </summary>
-        //ILuaState PushBoolean(Boolean b);
+        /// <summary>
+        /// Push a C closure
+        /// </summary>
+        public void LuaPushCClosure(LuaCFunction fn, int n)
+        {
+            LuaDll.lua_pushcclosure(NativeState, WrapFunction(fn), n);
+        }
+        /// <summary>
+        /// Push a boolean value
+        /// </summary>
+        public void LuaPushBoolean(Boolean b)
+        {
+            LuaDll.lua_pushboolean(NativeState, b ? 1 : 0);
+        }
         ///// <summary>
         ///// Push a light user data
         ///// </summary>
@@ -735,10 +819,13 @@ namespace LuaN.DllWrapper
         {
             return LuaDll.lua_tonumber(NativeState, idx);
         }
-        ///// <summary>
-        ///// Converts the Lua value at the given index to the C type integer
-        ///// </summary>
-        //int ToInteger(int idx);
+        /// <summary>
+        /// Converts the Lua value at the given index to the C type integer
+        /// </summary>
+        public Int64 LuaToInteger(int idx)
+        {
+            return LuaDll.lua_tointeger(NativeState, idx);
+        }
         /// <summary>
         /// Pops n elements from the stack. 
         /// </summary>
@@ -1148,6 +1235,11 @@ namespace LuaN.DllWrapper
                 return _NativeState;
             }
         }
+
+        /// <summary>
+        /// The user data index
+        /// </summary>
+        public UserDataIndex UserDataIndex { get; private set; }
 
     }
 }
