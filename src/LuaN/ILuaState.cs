@@ -237,14 +237,15 @@ namespace LuaN
         /// Push a boolean value
         /// </summary>
         void LuaPushBoolean(Boolean b);
-        ///// <summary>
-        ///// Push a light user data
-        ///// </summary>
-        //ILuaState PushLightUserData(Object userData);
-        ///// <summary>
-        ///// Push a thread
-        ///// </summary>
-        //int PushThread();
+        /// <summary>
+        /// Push a light user data
+        /// </summary>
+        void LuaPushLightUserData(Object userData);
+        /// <summary>
+        /// Push a thread
+        /// </summary>
+        /// <returns>True if the thread is the main thread of its state.</returns>
+        bool LuaPushThread();
         #endregion
 
         #region get functions (Lua -> stack)

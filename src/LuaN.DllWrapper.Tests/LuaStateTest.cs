@@ -381,7 +381,7 @@ namespace LuaN.DllWrapper.Tests
             L.LuaPushBoolean(true);
             L.LuaPushCClosure(f, 0);
             // TODO Uncomment when this methods will be implemented
-            //L.LuaPushLightUserData(DateTime.Now);
+            //L.LuaPushLightUserData(userData ?? DateTime.Now);
             //L.LuaPushGlobalTable();
             //L.LuaPushThread();
         }
@@ -782,7 +782,7 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestToCFunction()
+        public void TestLuaToCFunction()
         {
             LuaState L = null;
             using (L = new LuaState())
@@ -806,7 +806,7 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestToUserData()
+        public void TestLuaToUserData()
         {
             LuaState L = null;
             using (L = new LuaState())
@@ -844,7 +844,7 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestToThread()
+        public void TestLuaToThread()
         {
             LuaState L = null;
             using (L = new LuaState())
@@ -867,6 +867,165 @@ namespace LuaN.DllWrapper.Tests
             }
         }
 
+        [Fact]
+        public void TestLuaPushNil()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushNil();
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Nil, L.LuaType(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPushNumber()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushNumber(1234);
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Number, L.LuaType(-1));
+                Assert.Equal(1234, L.LuaToNumber(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPushInteger()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushInteger(1234);
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Number, L.LuaType(-1));
+                Assert.Equal(1234, L.LuaToInteger(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPushString()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushString("Text");
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.String, L.LuaType(-1));
+            }
+        }
+
+        //[Fact]
+        //public void TestPushFString()
+        //{
+        //    LuaState L = null;
+        //    using (L = new LuaState())
+        //    {
+        //        L.PushFString("-s-d-", 1234);
+        //        L.PushFString("-%s-", "Text");
+        //        L.PushFString("-%f-", 123.45);
+        //        L.PushFString("-%d-", 987);
+        //        L.PushFString("-%s-%s-", "Str", "Text");
+        //        L.PushFString("-%s-%f-", "Str", 123.45);
+        //        L.PushFString("-%s-%d-", "Str", 987);
+        //        L.PushFString("-%f-%s-", 11.22, "Text");
+        //        L.PushFString("-%f-%f-", 11.22, 123.45);
+        //        L.PushFString("-%f-%d-", 11.22, 987);
+        //        L.PushFString("-%d-%s-", 9988, "Text");
+        //        L.PushFString("-%d-%f-", 9988, 123.45);
+        //        L.PushFString("-%d-%d-", 9988, 987);
+        //        Assert.Equal(13, L.GetTop());
+        //        Assert.Equal(LuaType.String, L.Type(-1));
+        //        Assert.Equal("-s-d-", L.ToString(1));
+        //        Assert.Equal("-Text-", L.ToString(2));
+        //        Assert.Equal("-123.45-", L.ToString(3));
+        //        Assert.Equal("-987-", L.ToString(4));
+        //        Assert.Equal("-Str-Text-", L.ToString(5));
+        //        Assert.Equal("-Str-123.45-", L.ToString(6));
+        //        Assert.Equal("-Str-987-", L.ToString(7));
+        //        Assert.Equal("-11.22-Text-", L.ToString(8));
+        //        Assert.Equal("-11.22-123.45-", L.ToString(9));
+        //        Assert.Equal("-11.22-987-", L.ToString(10));
+        //        Assert.Equal("-9988-Text-", L.ToString(11));
+        //        Assert.Equal("-9988-123.45-", L.ToString(12));
+        //        Assert.Equal("-9988-987-", L.ToString(13));
+        //    }
+        //}
+
+        [Fact]
+        public void TestLuaPushCClosure()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                LuaCFunction f = l => 0;
+                L.LuaPushCClosure(f, 0);
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Function, L.LuaType(-1));
+                Assert.Same(f, L.LuaToCFunction(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPushBoolean()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushBoolean(true);
+                L.LuaPushBoolean(false);
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(LuaType.Boolean, L.LuaType(-1));
+                Assert.Equal(LuaType.Boolean, L.LuaType(-2));
+                Assert.Equal(false, L.LuaToBoolean(-1));
+                Assert.Equal(true, L.LuaToBoolean(-2));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPushLightUserData()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushLightUserData(DateTime.Now);
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.LightUserData, L.LuaType(-1));
+
+                var dt = DateTime.Now;
+                L.LuaSetTop(0);
+                L.LuaPushLightUserData(this);
+                L.LuaPushLightUserData(dt);
+                L.LuaPushLightUserData(null);
+                L.LuaPushLightUserData(this);
+                Assert.Same(this, L.LuaToUserData(1));
+                Assert.Equal(dt, L.LuaToUserData(2));
+                Assert.Equal(null, L.LuaToUserData(3));
+                Assert.Same(this, L.LuaToUserData(4));
+            }
+        }
+
+        [Fact]
+        public void TestPushThread()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(true, L.LuaPushThread());
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Thread, L.LuaType(-1));
+
+                using (var C = L.LuaNewThread())
+                {
+                    Assert.Equal(false, C.LuaPushThread());
+                    Assert.Equal(1, C.LuaGetTop());
+                    Assert.Equal(LuaType.Thread, C.LuaType(-1));
+                }
+
+            }
+        }
 
         //[Fact]
         //public void TestInsert()

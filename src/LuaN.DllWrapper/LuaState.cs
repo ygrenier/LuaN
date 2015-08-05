@@ -189,7 +189,8 @@ namespace LuaN.DllWrapper
         /// </summary>
         public Object GetUserData(IntPtr ptr)
         {
-            return UserDataIndex.FindPointer(ptr);
+            var rud = UserDataIndex.FindPointer(ptr);
+            return rud != null ? rud.Data : null;
         }
 
         /// <summary>
@@ -577,14 +578,21 @@ namespace LuaN.DllWrapper
         {
             LuaDll.lua_pushboolean(NativeState, b ? 1 : 0);
         }
-        ///// <summary>
-        ///// Push a light user data
-        ///// </summary>
-        //ILuaState PushLightUserData(Object userData);
-        ///// <summary>
-        ///// Push a thread
-        ///// </summary>
-        //int PushThread();
+        /// <summary>
+        /// Push a light user data
+        /// </summary>
+        public void LuaPushLightUserData(Object userData)
+        {
+            LuaDll.lua_pushlightuserdata(NativeState, GetUserDataPtr(userData));
+        }
+        /// <summary>
+        /// Push a thread
+        /// </summary>
+        /// <returns>True if the thread is the main thread of its state.</returns>
+        public bool LuaPushThread()
+        {
+            return LuaDll.lua_pushthread(NativeState) == 1;
+        }
         #endregion
 
         #region get functions (Lua -> stack)
