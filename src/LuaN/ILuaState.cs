@@ -73,10 +73,10 @@ namespace LuaN
         /// Set the top of the stack
         /// </summary>
         void LuaSetTop(int idx);
-        ///// <summary>
-        ///// Push a value on the stack
-        ///// </summary>
-        //ILuaState PushValue(int idx);
+        /// <summary>
+        /// Push a value on the stack
+        /// </summary>
+        void LuaPushValue(int idx);
         ///// <summary>
         ///// Rotates the n stack elements between the valid index idx and the top of the stack
         ///// </summary>
@@ -469,10 +469,10 @@ namespace LuaN
         #endregion
 
         #region some useful macros
-        ///// <summary>
-        ///// Converts the Lua value at the given index to the C type Number 
-        ///// </summary>
-        //Double ToNumber(int idx);
+        /// <summary>
+        /// Converts the Lua value at the given index to the C type Number 
+        /// </summary>
+        Double LuaToNumber(int idx);
         ///// <summary>
         ///// Converts the Lua value at the given index to the C type integer
         ///// </summary>

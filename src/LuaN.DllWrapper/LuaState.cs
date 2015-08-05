@@ -291,10 +291,13 @@ namespace LuaN.DllWrapper
         {
             LuaDll.lua_settop(NativeState, idx);
         }
-        ///// <summary>
-        ///// Push a value on the stack
-        ///// </summary>
-        //ILuaState PushValue(int idx);
+        /// <summary>
+        /// Push a value on the stack
+        /// </summary>
+        public void LuaPushValue(int idx)
+        {
+            LuaDll.lua_pushvalue(NativeState, idx);
+        }
         ///// <summary>
         ///// Rotates the n stack elements between the valid index idx and the top of the stack
         ///// </summary>
@@ -699,10 +702,13 @@ namespace LuaN.DllWrapper
         #endregion
 
         #region some useful macros
-        ///// <summary>
-        ///// Converts the Lua value at the given index to the C type Number 
-        ///// </summary>
-        //Double ToNumber(int idx);
+        /// <summary>
+        /// Converts the Lua value at the given index to the C type Number 
+        /// </summary>
+        public Double LuaToNumber(int idx)
+        {
+            return LuaDll.lua_tonumber(NativeState, idx);
+        }
         ///// <summary>
         ///// Converts the Lua value at the given index to the C type integer
         ///// </summary>

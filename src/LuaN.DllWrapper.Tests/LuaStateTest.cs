@@ -201,5 +201,32 @@ namespace LuaN.DllWrapper.Tests
             }
         }
 
+        [Fact]
+        public void TestPushValue()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaPushNumber(1);
+                L.LuaPushString("Test");
+                L.LuaPushNumber(2);
+                L.LuaPushString("Text");
+                Assert.Equal(4, L.LuaGetTop());
+
+                L.LuaPushValue(-1);
+                L.LuaPushValue(2);
+                Assert.Equal(6, L.LuaGetTop());
+
+                Assert.Equal(1, L.LuaToNumber(1));
+                Assert.Equal("Test", L.LuaToString(2));
+                Assert.Equal(2, L.LuaToNumber(3));
+                Assert.Equal("Text", L.LuaToString(4));
+                Assert.Equal("Text", L.LuaToString(5));
+                Assert.Equal("Test", L.LuaToString(6));
+
+            }
+        }
+
     }
 }
