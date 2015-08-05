@@ -284,10 +284,13 @@ namespace LuaN.DllWrapper
         {
             return LuaDll.lua_gettop(NativeState);
         }
-        ///// <summary>
-        ///// Set the top of the stack
-        ///// </summary>
-        //ILuaState SetTop(int idx);
+        /// <summary>
+        /// Set the top of the stack
+        /// </summary>
+        public void LuaSetTop(int idx)
+        {
+            LuaDll.lua_settop(NativeState, idx);
+        }
         ///// <summary>
         ///// Push a value on the stack
         ///// </summary>
@@ -387,10 +390,13 @@ namespace LuaN.DllWrapper
         ///// Push a nil value
         ///// </summary>
         //ILuaState PushNil();
-        ///// <summary>
-        ///// Push a number value
-        ///// </summary>
-        //ILuaState PushNumber(Double n);
+        /// <summary>
+        /// Push a number value
+        /// </summary>
+        public void LuaPushNumber(Double n)
+        {
+            LuaDll.lua_pushnumber(NativeState, n);
+        }
         ///// <summary>
         ///// Push a integer value
         ///// </summary>
@@ -692,7 +698,7 @@ namespace LuaN.DllWrapper
         ////void lua_setallocf(lua_State L, lua_Alloc f, IntPtr ud);
         #endregion
 
-        //#region some useful macros
+        #region some useful macros
         ///// <summary>
         ///// Converts the Lua value at the given index to the C type Number 
         ///// </summary>
@@ -701,10 +707,13 @@ namespace LuaN.DllWrapper
         ///// Converts the Lua value at the given index to the C type integer
         ///// </summary>
         //int ToInteger(int idx);
-        ///// <summary>
-        ///// Pops n elements from the stack. 
-        ///// </summary>
-        //ILuaState Pop(int n);
+        /// <summary>
+        /// Pops n elements from the stack. 
+        /// </summary>
+        public void LuaPop(int n)
+        {
+            LuaDll.lua_pop(NativeState, n);
+        }
         ///// <summary>
         ///// Creates a new empty table and pushes it onto the stack.
         ///// </summary>
@@ -774,7 +783,7 @@ namespace LuaN.DllWrapper
         ///// and then pops the top element. 
         ///// </summary>
         //ILuaState Replace(int idx);
-        //#endregion
+        #endregion
 
         //#region compatibility macros for unsigned conversions
         ///// <summary>

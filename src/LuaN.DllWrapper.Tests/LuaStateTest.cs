@@ -162,5 +162,44 @@ namespace LuaN.DllWrapper.Tests
             }
         }
 
+        [Fact]
+        public void TestGetTop()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaPushNumber(1);
+                Assert.Equal(1, L.LuaGetTop());
+                L.LuaPushNumber(1);
+                Assert.Equal(2, L.LuaGetTop());
+
+                L.LuaPop(1);
+                Assert.Equal(1, L.LuaGetTop());
+                L.LuaPop(1);
+                Assert.Equal(0, L.LuaGetTop());
+            }
+        }
+
+        [Fact]
+        public void TestSetTop()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaPushNumber(1);
+                L.LuaPushNumber(1);
+                L.LuaPushNumber(1);
+                L.LuaPushNumber(1);
+                Assert.Equal(4, L.LuaGetTop());
+
+                L.LuaSetTop(-2);
+                Assert.Equal(3, L.LuaGetTop());
+                L.LuaSetTop(2);
+                Assert.Equal(2, L.LuaGetTop());
+            }
+        }
+
     }
 }

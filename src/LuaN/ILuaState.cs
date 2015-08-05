@@ -69,10 +69,10 @@ namespace LuaN
         /// Get the top of the stack
         /// </summary>
         int LuaGetTop();
-        ///// <summary>
-        ///// Set the top of the stack
-        ///// </summary>
-        //ILuaState SetTop(int idx);
+        /// <summary>
+        /// Set the top of the stack
+        /// </summary>
+        void LuaSetTop(int idx);
         ///// <summary>
         ///// Push a value on the stack
         ///// </summary>
@@ -169,10 +169,10 @@ namespace LuaN
         ///// Push a nil value
         ///// </summary>
         //ILuaState PushNil();
-        ///// <summary>
-        ///// Push a number value
-        ///// </summary>
-        //ILuaState PushNumber(Double n);
+        /// <summary>
+        /// Push a number value
+        /// </summary>
+        void LuaPushNumber(Double n);
         ///// <summary>
         ///// Push a integer value
         ///// </summary>
@@ -468,7 +468,7 @@ namespace LuaN
         ////void lua_setallocf(lua_State L, lua_Alloc f, IntPtr ud);
         #endregion
 
-        //#region some useful macros
+        #region some useful macros
         ///// <summary>
         ///// Converts the Lua value at the given index to the C type Number 
         ///// </summary>
@@ -477,10 +477,10 @@ namespace LuaN
         ///// Converts the Lua value at the given index to the C type integer
         ///// </summary>
         //int ToInteger(int idx);
-        ///// <summary>
-        ///// Pops n elements from the stack. 
-        ///// </summary>
-        //ILuaState Pop(int n);
+        /// <summary>
+        /// Pops n elements from the stack. 
+        /// </summary>
+        void LuaPop(int n);
         ///// <summary>
         ///// Creates a new empty table and pushes it onto the stack.
         ///// </summary>
@@ -550,7 +550,7 @@ namespace LuaN
         ///// and then pops the top element. 
         ///// </summary>
         //ILuaState Replace(int idx);
-        //#endregion
+        #endregion
 
         //#region compatibility macros for unsigned conversions
         ///// <summary>
