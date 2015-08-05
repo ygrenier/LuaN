@@ -265,6 +265,18 @@ namespace LuaN.DllWrapper
             return new LuaState(this.Engine, thread, false);
         }
 
+        /// <summary>
+        /// Get a LuaState from a ILuaState
+        /// </summary>
+        LuaState GetAsLuaState(ILuaState state, String argName)
+        {
+            if (state == null) return null;
+            LuaState ls = state as LuaState;
+            if (ls == null)
+                throw new InvalidOperationException(String.Format("The '{0}' state is not a supported state.", argName));
+            return ls;
+        }
+
         #endregion
 
         #region Stack management
@@ -298,22 +310,36 @@ namespace LuaN.DllWrapper
         {
             LuaDll.lua_pushvalue(NativeState, idx);
         }
-        ///// <summary>
-        ///// Rotates the n stack elements between the valid index idx and the top of the stack
-        ///// </summary>
-        //ILuaState Rotate(int idx, int n);
-        ///// <summary>
-        ///// Copies the element at index fromidx into the valid index toidx, replacing the value at that position
-        ///// </summary>
-        //ILuaState Copy(int fromidx, int toidx);
-        ///// <summary>
-        ///// Ensures that the stack has space for at least n extra slots
-        ///// </summary>
-        //bool CheckStack(int n);
-        ///// <summary>
-        ///// Exchange values between different threads of the same state
-        ///// </summary>
-        //ILuaState XMove(ILuaState to, int n);
+        /// <summary>
+        /// Rotates the n stack elements between the valid index idx and the top of the stack
+        /// </summary>
+        public void LuaRotate(int idx, int n)
+        {
+            LuaDll.lua_rotate(NativeState, idx, n);
+        }
+        /// <summary>
+        /// Copies the element at index fromidx into the valid index toidx, replacing the value at that position
+        /// </summary>
+        public void LuaCopy(int fromidx, int toidx)
+        {
+            LuaDll.lua_copy(NativeState, fromidx, toidx);
+        }
+        /// <summary>
+        /// Ensures that the stack has space for at least n extra slots
+        /// </summary>
+        public bool LuaCheckStack(int n)
+        {
+            return LuaDll.lua_checkstack(NativeState, n) != 0;
+        }
+        /// <summary>
+        /// Exchange values between different threads of the same state
+        /// </summary>
+        public void LuaXMove(ILuaState to, int n)
+        {
+            if (to == null) throw new ArgumentNullException("to");
+            LuaState stTo = GetAsLuaState(to, "to");
+            LuaDll.lua_xmove(NativeState, stTo.NativeState, n);
+        }
         #endregion
 
         #region access functions (stack -> C)

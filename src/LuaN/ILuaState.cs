@@ -77,22 +77,22 @@ namespace LuaN
         /// Push a value on the stack
         /// </summary>
         void LuaPushValue(int idx);
-        ///// <summary>
-        ///// Rotates the n stack elements between the valid index idx and the top of the stack
-        ///// </summary>
-        //ILuaState Rotate(int idx, int n);
-        ///// <summary>
-        ///// Copies the element at index fromidx into the valid index toidx, replacing the value at that position
-        ///// </summary>
-        //ILuaState Copy(int fromidx, int toidx);
-        ///// <summary>
-        ///// Ensures that the stack has space for at least n extra slots
-        ///// </summary>
-        //bool CheckStack(int n);
-        ///// <summary>
-        ///// Exchange values between different threads of the same state
-        ///// </summary>
-        //ILuaState XMove(ILuaState to, int n);
+        /// <summary>
+        /// Rotates the n stack elements between the valid index idx and the top of the stack
+        /// </summary>
+        void LuaRotate(int idx, int n);
+        /// <summary>
+        /// Copies the element at index fromidx into the valid index toidx, replacing the value at that position
+        /// </summary>
+        void LuaCopy(int fromidx, int toidx);
+        /// <summary>
+        /// Ensures that the stack has space for at least n extra slots
+        /// </summary>
+        bool LuaCheckStack(int n);
+        /// <summary>
+        /// Exchange values between different threads of the same state
+        /// </summary>
+        void LuaXMove(ILuaState to, int n);
         #endregion
 
         #region access functions (stack -> C)

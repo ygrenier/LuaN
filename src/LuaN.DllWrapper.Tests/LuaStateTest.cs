@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -163,7 +164,7 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestGetTop()
+        public void TestLuaGetTop()
         {
             LuaState L = null;
             using (L = new LuaState())
@@ -182,7 +183,7 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestSetTop()
+        public void TestLuaSetTop()
         {
             LuaState L = null;
             using (L = new LuaState())
@@ -202,7 +203,7 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestPushValue()
+        public void TestLuaPushValue()
         {
             LuaState L = null;
             using (L = new LuaState())
@@ -227,6 +228,230 @@ namespace LuaN.DllWrapper.Tests
 
             }
         }
+
+        [Fact]
+        public void TestLuaRotate()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaPushNumber(1);
+                L.LuaPushString("Test");
+                L.LuaPushNumber(2);
+                L.LuaPushString("Text");
+                L.LuaPushNumber(3);
+                L.LuaPushString("Toto");
+                L.LuaPushNumber(4);
+                Assert.Equal(7, L.LuaGetTop());
+
+                L.LuaRotate(2, 1);
+                Assert.Equal(7, L.LuaGetTop());
+
+                Assert.Equal(1, L.LuaToNumber(1));
+                Assert.Equal(4, L.LuaToNumber(2));
+                Assert.Equal("Test", L.LuaToString(3));
+                Assert.Equal(2, L.LuaToNumber(4));
+                Assert.Equal("Text", L.LuaToString(5));
+                Assert.Equal(3, L.LuaToNumber(6));
+                Assert.Equal("Toto", L.LuaToString(7));
+
+                L.LuaRotate(2, 2);
+                Assert.Equal(7, L.LuaGetTop());
+
+                Assert.Equal(1, L.LuaToNumber(1));
+                Assert.Equal(3, L.LuaToNumber(2));
+                Assert.Equal("Toto", L.LuaToString(3));
+                Assert.Equal(4, L.LuaToNumber(4));
+                Assert.Equal("Test", L.LuaToString(5));
+                Assert.Equal(2, L.LuaToNumber(6));
+                Assert.Equal("Text", L.LuaToString(7));
+
+                L.LuaRotate(2, -3);
+                Assert.Equal(7, L.LuaGetTop());
+
+                Assert.Equal(1, L.LuaToNumber(1));
+                Assert.Equal("Test", L.LuaToString(2));
+                Assert.Equal(2, L.LuaToNumber(3));
+                Assert.Equal("Text", L.LuaToString(4));
+                Assert.Equal(3, L.LuaToNumber(5));
+                Assert.Equal("Toto", L.LuaToString(6));
+                Assert.Equal(4, L.LuaToNumber(7));
+
+            }
+        }
+
+        [Fact]
+        public void TestLuaCopy()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaPushNumber(1);
+                L.LuaPushString("Test");
+                L.LuaPushNumber(2);
+                L.LuaPushString("Text");
+                L.LuaPushNumber(3);
+                L.LuaPushString("Toto");
+                L.LuaPushNumber(4);
+                Assert.Equal(7, L.LuaGetTop());
+
+
+                L.LuaCopy(3, 6);
+                Assert.Equal(7, L.LuaGetTop());
+
+                Assert.Equal(1, L.LuaToNumber(1));
+                Assert.Equal("Test", L.LuaToString(2));
+                Assert.Equal(2, L.LuaToNumber(3));
+                Assert.Equal("Text", L.LuaToString(4));
+                Assert.Equal(3, L.LuaToNumber(5));
+                Assert.Equal(2, L.LuaToNumber(6));
+                Assert.Equal(4, L.LuaToNumber(7));
+
+            }
+        }
+
+        [Fact]
+        public void TestLuaCheckStack()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                Assert.Equal(true, L.LuaCheckStack(2));
+                Assert.Equal(0, L.LuaGetTop());
+                Assert.Equal(true, L.LuaCheckStack(35));
+                Assert.Equal(false, L.LuaCheckStack(1000000));
+            }
+        }
+
+        [Fact]
+        public void TestLuaXMove()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushString("#1 Line 1");
+                L.LuaPushString("#1 Line 2");
+                L.LuaPushString("#1 Line 3");
+                Assert.Equal(3, L.LuaGetTop());
+
+                using (LuaState L2 = new LuaState())
+                {
+                    L2.LuaPushString("#2 Line 1");
+                    L2.LuaPushString("#2 Line 2");
+                    L2.LuaPushString("#2 Line 3");
+                    Assert.Equal(3, L2.LuaGetTop());
+
+                    L.LuaXMove(L2, 2);
+
+                    Assert.Equal(1, L.LuaGetTop());
+                    Assert.Equal(5, L2.LuaGetTop());
+
+                    Assert.Equal("#1 Line 1", L.LuaToString(1));
+                    Assert.Equal(null, L.LuaToString(2));
+
+                    Assert.Equal("#2 Line 1", L2.LuaToString(1));
+                    Assert.Equal("#2 Line 2", L2.LuaToString(2));
+                    Assert.Equal("#2 Line 3", L2.LuaToString(3));
+                    Assert.Equal("#1 Line 2", L2.LuaToString(4));
+                    Assert.Equal("#1 Line 3", L2.LuaToString(5));
+
+                }
+
+                Assert.Throws<ArgumentNullException>(() => L.LuaXMove(null, 1));
+
+                var mockLs = new Mock<ILuaState>();
+                var ioex = Assert.Throws<InvalidOperationException>(() => L.LuaXMove(mockLs.Object, 1));
+                Assert.Equal("The 'to' state is not a supported state.", ioex.Message);
+            }
+        }
+
+        //[Fact]
+        //public void TestInsert()
+        //{
+        //    LuaState L = null;
+        //    using (L = new LuaState())
+        //    {
+        //        Assert.Equal(0, L.GetTop());
+        //        L.PushNumber(1);
+        //        L.PushString("Test");
+        //        L.PushNumber(2);
+        //        L.PushString("Text");
+        //        L.PushNumber(3);
+        //        L.PushString("Toto");
+        //        L.PushNumber(4);
+        //        Assert.Equal(7, L.GetTop());
+
+        //        L.Insert(2);
+        //        Assert.Equal(7, L.GetTop());
+
+        //        Assert.Equal(1, L.ToNumber(1));
+        //        Assert.Equal(4, L.ToNumber(2));
+        //        Assert.Equal("Test", L.ToString(3));
+        //        Assert.Equal(2, L.ToNumber(4));
+        //        Assert.Equal("Text", L.ToString(5));
+        //        Assert.Equal(3, L.ToNumber(6));
+        //        Assert.Equal("Toto", L.ToString(7));
+        //    }
+        //}
+
+        //[Fact]
+        //public void TestRemove()
+        //{
+        //    LuaState L = null;
+        //    using (L = new LuaState())
+        //    {
+        //        Assert.Equal(0, L.GetTop());
+        //        L.PushNumber(1);
+        //        L.PushString("Test");
+        //        L.PushNumber(2);
+        //        L.PushString("Text");
+        //        L.PushNumber(3);
+        //        L.PushString("Toto");
+        //        L.PushNumber(4);
+        //        Assert.Equal(7, L.GetTop());
+
+        //        L.Remove(2);
+        //        Assert.Equal(6, L.GetTop());
+
+        //        Assert.Equal(1, L.ToNumber(1));
+        //        Assert.Equal(2, L.ToNumber(2));
+        //        Assert.Equal("Text", L.ToString(3));
+        //        Assert.Equal(3, L.ToNumber(4));
+        //        Assert.Equal("Toto", L.ToString(5));
+        //        Assert.Equal(4, L.ToNumber(6));
+        //    }
+        //}
+
+        //[Fact]
+        //public void TestReplace()
+        //{
+        //    LuaState L = null;
+        //    using (L = new LuaState())
+        //    {
+        //        Assert.Equal(0, L.GetTop());
+        //        L.PushNumber(1);
+        //        L.PushString("Test");
+        //        L.PushNumber(2);
+        //        L.PushString("Text");
+        //        L.PushNumber(3);
+        //        L.PushString("Toto");
+        //        L.PushNumber(4);
+        //        Assert.Equal(7, L.GetTop());
+
+        //        L.Replace(2);
+        //        Assert.Equal(6, L.GetTop());
+
+        //        Assert.Equal(1, L.ToNumber(1));
+        //        Assert.Equal(4, L.ToNumber(2));
+        //        Assert.Equal(2, L.ToNumber(3));
+        //        Assert.Equal("Text", L.ToString(4));
+        //        Assert.Equal(3, L.ToNumber(5));
+        //        Assert.Equal("Toto", L.ToString(6));
+        //    }
+        //}
 
     }
 }
