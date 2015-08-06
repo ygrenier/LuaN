@@ -468,7 +468,7 @@ namespace LuaN.DllWrapper
         */
         //#if defined(LUA_COMPAT_APIINTCASTS)
 
-        public static void lua_pushunsigned(lua_State L, UInt32 n) { lua_pushinteger(L, (lua_Integer)(n)); }
+        public static void lua_pushunsigned(lua_State L, lua_Unsigned n) { lua_pushinteger(L, (lua_Integer)(n)); }
         public static lua_Unsigned lua_tounsignedx(lua_State L, int i, out int isn) { return ((lua_Unsigned)lua_tointegerx(L, i, out isn)); }
         public static lua_Unsigned lua_tounsigned(lua_State L, int i) { int dummy; return lua_tounsignedx(L, (i), out dummy); }
 

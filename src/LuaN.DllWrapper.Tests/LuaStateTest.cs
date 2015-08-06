@@ -2197,5 +2197,32 @@ return c..'!!'
             }
         }
 
+        [Fact]
+        public void TestPushUnsigned()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushUnsigned(23);
+                Assert.Equal(23, L.LuaToInteger(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaToUnsigned_LuaToUnsignedX()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushUnsigned(23);
+                Assert.Equal(23u, L.LuaToUnsigned(-1));
+                bool isnum;
+                Assert.Equal(23u, L.LuaToUnsignedX(-1, out isnum));
+                Assert.True(isnum);
+                Assert.Equal(23u, L.LuaToUnsigned(-1, out isnum));
+                Assert.True(isnum);
+            }
+        }
+
     }
 }

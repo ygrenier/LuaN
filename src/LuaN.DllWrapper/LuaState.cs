@@ -1144,20 +1144,32 @@ namespace LuaN.DllWrapper
         }
         #endregion
 
-        //#region compatibility macros for unsigned conversions
-        ///// <summary>
-        ///// Push an unsigned int
-        ///// </summary>
-        //ILuaState PushUnsigned(UInt32 n);
-        ///// <summary>
-        ///// Converts the Lua value at the given index to an unsigned int
-        ///// </summary>
-        //UInt32 ToUnsigned(int idx, out bool isnum);
-        ///// <summary>
-        ///// Converts the Lua value at the given index to an unsigned int
-        ///// </summary>
-        //UInt32 ToUnsigned(int idx);
-        //#endregion
+        #region compatibility macros for unsigned conversions
+        /// <summary>
+        /// Push an unsigned int
+        /// </summary>
+        public void LuaPushUnsigned(UInt64 n)
+        {
+            LuaDll.lua_pushunsigned(NativeState, n);
+        }
+        /// <summary>
+        /// Converts the Lua value at the given index to an unsigned int
+        /// </summary>
+        public UInt64 LuaToUnsignedX(int idx, out bool isnum)
+        {
+            int nisnum;
+            var res = LuaDll.lua_tounsignedx(NativeState, idx, out nisnum);
+            isnum = nisnum != 0;
+            return res;
+        }
+        /// <summary>
+        /// Converts the Lua value at the given index to an unsigned int
+        /// </summary>
+        public UInt64 LuaToUnsigned(int idx)
+        {
+            return LuaDll.lua_tounsigned(NativeState, idx);
+        }
+        #endregion
 
         //#region Debug API
         ///// <summary>

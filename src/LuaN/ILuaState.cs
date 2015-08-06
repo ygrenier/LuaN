@@ -554,20 +554,20 @@ namespace LuaN
         void LuaReplace(int idx);
         #endregion
 
-        //#region compatibility macros for unsigned conversions
-        ///// <summary>
-        ///// Push an unsigned int
-        ///// </summary>
-        //ILuaState PushUnsigned(UInt32 n);
-        ///// <summary>
-        ///// Converts the Lua value at the given index to an unsigned int
-        ///// </summary>
-        //UInt32 ToUnsigned(int idx, out bool isnum);
-        ///// <summary>
-        ///// Converts the Lua value at the given index to an unsigned int
-        ///// </summary>
-        //UInt32 ToUnsigned(int idx);
-        //#endregion
+        #region compatibility macros for unsigned conversions
+        /// <summary>
+        /// Push an unsigned int
+        /// </summary>
+        void LuaPushUnsigned(UInt64 n);
+        /// <summary>
+        /// Converts the Lua value at the given index to an unsigned int
+        /// </summary>
+        UInt64 LuaToUnsignedX(int idx, out bool isnum);
+        /// <summary>
+        /// Converts the Lua value at the given index to an unsigned int
+        /// </summary>
+        UInt64 LuaToUnsigned(int idx);
+        #endregion
 
         //#region Debug API
         ///// <summary>

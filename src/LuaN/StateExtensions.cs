@@ -24,5 +24,12 @@ namespace LuaN
         {
             return L.LuaToIntegerX(idx, out isnum);
         }
+        /// <summary>
+        /// Alias to LuaToUnsignedX
+        /// </summary>
+        public static UInt64 LuaToUnsigned(this ILuaState L, int idx, out Boolean isnum)
+        {
+            return L.LuaToUnsignedX(idx, out isnum);
+        }
     }
 }
