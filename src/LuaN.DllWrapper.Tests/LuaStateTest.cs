@@ -1008,7 +1008,7 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestPushThread()
+        public void TestLuaPushThread()
         {
             LuaState L = null;
             using (L = new LuaState())
@@ -1023,6 +1023,271 @@ namespace LuaN.DllWrapper.Tests
                     Assert.Equal(1, C.LuaGetTop());
                     Assert.Equal(LuaType.Thread, C.LuaType(-1));
                 }
+
+            }
+        }
+
+        [Fact]
+        public void TestLuaSetGetGlobal()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushString("Value A");
+                L.LuaSetGlobal("a");
+                Assert.Equal(0, L.LuaGetTop());
+
+                Assert.Equal(LuaType.String, L.LuaGetGlobal("a"));
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.String, L.LuaType(-1));
+
+                Assert.Equal(LuaType.Nil, L.LuaGetGlobal("b"));
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(LuaType.Nil, L.LuaType(-1));
+
+            }
+        }
+
+        [Fact]
+        public void TestLuaSetGetTable()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaCreateTable(0, 0);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaPushInteger(2);
+                L.LuaPushString("Value");
+                L.LuaSetTable(1);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaPushInteger(1);
+                Assert.Equal(LuaType.Nil, L.LuaGetTable(1));
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsNil(-1));
+
+                L.LuaPushInteger(2);
+                Assert.Equal(LuaType.String, L.LuaGetTable(1));
+                Assert.Equal(3, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsString(-1));
+                Assert.Equal("Value", L.LuaToString(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaSetGetField()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaCreateTable(0, 0);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaPushString("Value");
+                L.LuaSetField(1, "a");
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaGetField(1, "b");
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsNil(-1));
+
+                L.LuaGetField(1, "a");
+                Assert.Equal(3, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsString(-1));
+                Assert.Equal("Value", L.LuaToString(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaSetGetI()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaCreateTable(0, 0);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaPushString("Value");
+                L.LuaSetI(1, 2);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaGetI(1, 1);
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsNil(-1));
+
+                L.LuaGetI(1, 2);
+                Assert.Equal(3, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsString(-1));
+                Assert.Equal("Value", L.LuaToString(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaRawSetGet()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaCreateTable(0, 0);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaPushInteger(2);
+                L.LuaPushString("Value");
+                L.LuaRawSet(1);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaPushInteger(1);
+                L.LuaRawGet(1);
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsNil(-1));
+
+                L.LuaPushInteger(2);
+                L.LuaRawGet(1);
+                Assert.Equal(3, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsString(-1));
+                Assert.Equal("Value", L.LuaToString(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaRawSetGetI()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaCreateTable(0, 0);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaPushString("Value");
+                L.LuaRawSetI(1, 2);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaRawGetI(1, 1);
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsNil(-1));
+
+                L.LuaRawGetI(1, 2);
+                Assert.Equal(3, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsString(-1));
+                Assert.Equal("Value", L.LuaToString(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaRawSetGetP()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaCreateTable(0, 0);
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaPushString("Value");
+                L.LuaRawSetP(1, this);
+                Assert.Equal(1, L.LuaGetTop());
+
+                DateTime dt = DateTime.Now;
+
+                L.LuaRawGetP(1, dt);
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsNil(-1));
+
+                L.LuaRawGetP(1, this);
+                Assert.Equal(3, L.LuaGetTop());
+                Assert.Equal(true, L.LuaIsString(-1));
+                Assert.Equal("Value", L.LuaToString(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaCreateTable()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaCreateTable(0, 0);
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Table, L.LuaType(-1));
+
+                L.LuaCreateTable(3, 7);
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(LuaType.Table, L.LuaType(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaNewUserData()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                var ud = L.LuaNewUserData(12);
+                Assert.Equal(12u, ud.Size);
+                var bytes = ud.GetRawData();
+                Assert.NotNull(bytes);
+                Assert.Equal(12, bytes.Length);
+                for (int i = 0; i < bytes.Length; i++)
+                    bytes[i] = (byte)(i * 2);
+                ud.SetRawData(bytes);
+
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.UserData, L.LuaType(-1));
+
+                L.LuaPushValue(-1);
+                var udt = L.LuaToUserData(-1);
+                Assert.Same(ud, udt);
+
+            }
+        }
+
+        [Fact]
+        public void TestLuaGetSetMetatable()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                // Create the working table
+                L.LuaCreateTable(0, 0);
+
+                // Get the metatable
+                Assert.False(L.LuaGetMetatable(1));
+
+                // Create and set the metatable
+                L.LuaCreateTable(0, 0);
+                L.LuaSetMetatable(1);
+
+                // Get the metatable
+                Assert.True(L.LuaGetMetatable(1));
+                Assert.Equal(2, L.LuaGetTop());
+            }
+        }
+
+        [Fact]
+        public void TestLuaGetSetUserValue()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaCreateTable(0, 0);
+                Assert.Equal(15, (int)L.LuaGetUserValue(1));
+
+                L.LuaPushString("UserValue");
+                L.LuaSetUserValue(1);
+                Assert.Equal(2, L.LuaGetTop());
+
+                Assert.Equal(LuaType.String, L.LuaGetUserValue(1));
+
+                L.LuaSetTop(0);
+                var ud = L.LuaNewUserData(12);
+                Assert.Equal(LuaType.Nil, L.LuaGetUserValue(1));
+
+                L.LuaPushString("UserValue");
+                L.LuaSetUserValue(1);
+                Assert.Equal(2, L.LuaGetTop());
+
+                Assert.Equal(LuaType.String, L.LuaGetUserValue(1));
+                Assert.Equal("UserValue", L.LuaToString(-1));
 
             }
         }

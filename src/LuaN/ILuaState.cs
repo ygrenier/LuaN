@@ -249,125 +249,126 @@ namespace LuaN
         #endregion
 
         #region get functions (Lua -> stack)
-        ///// <summary>
-        ///// Pushes onto the stack the value of the global name. 
-        ///// </summary>
-        ///// <param name="name"></param>
-        ///// <returns>Returns the type of the pushed value.</returns>
-        //LuaType GetGlobal(String name);
-        ///// <summary>
-        ///// Pushes onto the stack the value t[k], where t is the value at the given index and k is the value at the top of the stack.
-        ///// </summary>
-        ///// <param name="idx"></param>
-        ///// <returns>Returns the type of the pushed value.</returns>
-        //LuaType GetTable(int idx);
-        ///// <summary>
-        ///// Pushes onto the stack the value t[k], where t is the value at the given index.
-        ///// </summary>
-        ///// <param name="idx"></param>
-        ///// <param name="k"></param>
-        ///// <returns>Returns the type of the pushed value.</returns>
-        //LuaType GetField(int idx, String k);
-        ///// <summary>
-        ///// Pushes onto the stack the value t[i], where t is the value at the given index.
-        ///// </summary>
-        ///// <param name="idx"></param>
-        ///// <param name="n"></param>
-        ///// <returns></returns>
-        ///// <returns>Returns the type of the pushed value.</returns>
-        //LuaType GetI(int idx, int n);
-        ///// <summary>
-        ///// Similar to GetTable, but does a raw access
-        ///// </summary>
-        ///// <param name="idx"></param>
-        ///// <returns>Returns the type of the pushed value.</returns>
-        //LuaType RawGet(int idx);
-        ///// <summary>
-        ///// Pushes onto the stack the value t[n], where t is the table at the given index.
-        ///// </summary>
-        ///// <param name="idx"></param>
-        ///// <param name="n"></param>
-        ///// <returns>Returns the type of the pushed value.</returns>
-        //LuaType RawGetI(int idx, int n);
-        ///// <summary>
-        ///// Pushes onto the stack the value t[k], where t is the table at the given index and k is the pointer p represented as a light userdata.
-        ///// </summary>
-        ///// <param name="idx"></param>
-        ///// <param name="p"></param>
-        ///// <returns>Returns the type of the pushed value.</returns>
-        //LuaType RawGetP(int idx, IntPtr p);
+        /// <summary>
+        /// Pushes onto the stack the value of the global name. 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>Returns the type of the pushed value.</returns>
+        LuaType LuaGetGlobal(String name);
+        /// <summary>
+        /// Pushes onto the stack the value t[k], where t is the value at the given index and k is the value at the top of the stack.
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns>Returns the type of the pushed value.</returns>
+        LuaType LuaGetTable(int idx);
+        /// <summary>
+        /// Pushes onto the stack the value t[k], where t is the value at the given index.
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="k"></param>
+        /// <returns>Returns the type of the pushed value.</returns>
+        LuaType LuaGetField(int idx, String k);
+        /// <summary>
+        /// Pushes onto the stack the value t[i], where t is the value at the given index.
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        /// <returns>Returns the type of the pushed value.</returns>
+        LuaType LuaGetI(int idx, int n);
+        /// <summary>
+        /// Similar to GetTable, but does a raw access
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns>Returns the type of the pushed value.</returns>
+        LuaType LuaRawGet(int idx);
+        /// <summary>
+        /// Pushes onto the stack the value t[n], where t is the table at the given index.
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="n"></param>
+        /// <returns>Returns the type of the pushed value.</returns>
+        LuaType LuaRawGetI(int idx, int n);
+        /// <summary>
+        /// Pushes onto the stack the value t[k], where t is the table at the given index and k is the pointer p represented as a light userdata.
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="p"></param>
+        /// <returns>Returns the type of the pushed value.</returns>
+        LuaType LuaRawGetP(int idx, Object p);
 
-        ///// <summary>
-        ///// Creates a new empty table and pushes it onto the stack.
-        ///// </summary>
-        //ILuaState CreateTable(int narr, int nrec);
-        ///// <summary>
-        ///// This function allocates a new block of memory with the given size, pushes onto the stack a new full userdata with the block address.
-        ///// </summary>
-        //IntPtr NewUserData(UInt32 sz);
-        ///// <summary>
-        ///// If the value at the given index has a metatable, the function pushes that metatable onto the stack and returns true. Otherwise, the function returns false and pushes nothing on the stack.
-        ///// </summary>
-        //bool GetMetatable(int objindex);
-        ///// <summary>
-        ///// Pushes onto the stack the Lua value associated with the userdata at the given index.
-        ///// </summary>
-        ///// <returns>Returns the type of the pushed value.</returns>
-        //LuaType GetUserValue(int idx);
+        /// <summary>
+        /// Creates a new empty table and pushes it onto the stack.
+        /// </summary>
+        void LuaCreateTable(int narr, int nrec);
+        /// <summary>
+        /// This function allocates a new block of memory with the given size, pushes onto the stack a new full userdata with the block address.
+        /// </summary>
+        ILuaUserData LuaNewUserData(UInt32 sz);
+        /// <summary>
+        /// If the value at the given index has a metatable, the function pushes that metatable onto the stack and returns true. Otherwise, the function returns false and pushes nothing on the stack.
+        /// </summary>
+        bool LuaGetMetatable(int objindex);
+        /// <summary>
+        /// Pushes onto the stack the Lua value associated with the userdata at the given index.
+        /// </summary>
+        /// <returns>Returns the type of the pushed value.</returns>
+        LuaType LuaGetUserValue(int idx);
         #endregion
 
         #region set functions (stack -> Lua)
-        ///// <summary>
-        ///// Pops a value from the stack and sets it as the new value of global name.
-        ///// </summary>
-        //ILuaState SetGlobal(String name);
-        ///// <summary>
-        ///// Does the equivalent to t[k] = v, where t is the value at the given index, v is the value at the top of the stack, and k is the value just below the top.
-        ///// </summary>
-        ///// <remarks>
-        ///// This function pops both the key and the value from the stack. As in Lua, this function may trigger a metamethod for the "newindex" event.
-        ///// </remarks>
-        //ILuaState SetTable(int idx);
-        ///// <summary>
-        ///// Does the equivalent to t[k] = v, where t is the value at the given index and v is the value at the top of the stack.
-        ///// </summary>
-        ///// <remarks>
-        ///// This function pops the value from the stack. As in Lua, this function may trigger a metamethod for the "newindex" event.
-        ///// </remarks>
-        //ILuaState SetField(int idx, String k);
-        ///// <summary>
-        ///// Does the equivalent to t[n] = v, where t is the value at the given index and v is the value at the top of the stack.
-        ///// </summary>
-        ///// <remarks>
-        ///// This function pops the value from the stack. As in Lua, this function may trigger a metamethod for the "newindex" event.
-        ///// </remarks>
-        //ILuaState SetI(int idx, int n);
-        ///// <summary>
-        ///// Similar to SetTable, but does a raw assignment (i.e., without metamethods).
-        ///// </summary>
-        //ILuaState RawSet(int idx);
-        ///// <summary>
-        ///// Does the equivalent of t[i] = v, where t is the table at the given index and v is the value at the top of the stack.
-        ///// </summary>
-        ///// <remarks>
-        ///// This function pops the value from the stack. The assignment is raw; that is, it does not invoke metamethods.
-        ///// </remarks>
-        //ILuaState RawSetI(int idx, int n);
-        ///// <summary>
-        ///// Does the equivalent of t[p] = v, where t is the table at the given index, p is encoded as a light userdata, and v is the value at the top of the stack.
-        ///// </summary>
-        ///// <remarks>
-        ///// This function pops the value from the stack. The assignment is raw; that is, it does not invoke metamethods.
-        ///// </remarks>
-        //ILuaState RawSetP(int idx, IntPtr p);
-        ///// <summary>
-        ///// Pops a table from the stack and sets it as the new metatable for the value at the given index.
-        ///// </summary>
-        //ILuaState SetMetatable(int objindex);
-        ///// <summary>
-        ///// Pops a value from the stack and sets it as the new value associated to the userdata at the given index.
-        ///// </summary>
-        //ILuaState SetUserValue(int idx);
+        /// <summary>
+        /// Pops a value from the stack and sets it as the new value of global name.
+        /// </summary>
+        void LuaSetGlobal(String name);
+        /// <summary>
+        /// Does the equivalent to t[k] = v, where t is the value at the given index, v is the value at the top of the stack, and k is the value just below the top.
+        /// </summary>
+        /// <remarks>
+        /// This function pops both the key and the value from the stack. As in Lua, this function may trigger a metamethod for the "newindex" event.
+        /// </remarks>
+        void LuaSetTable(int idx);
+        /// <summary>
+        /// Does the equivalent to t[k] = v, where t is the value at the given index and v is the value at the top of the stack.
+        /// </summary>
+        /// <remarks>
+        /// This function pops the value from the stack. As in Lua, this function may trigger a metamethod for the "newindex" event.
+        /// </remarks>
+        void LuaSetField(int idx, String k);
+        /// <summary>
+        /// Does the equivalent to t[n] = v, where t is the value at the given index and v is the value at the top of the stack.
+        /// </summary>
+        /// <remarks>
+        /// This function pops the value from the stack. As in Lua, this function may trigger a metamethod for the "newindex" event.
+        /// </remarks>
+        void LuaSetI(int idx, int n);
+        /// <summary>
+        /// Similar to SetTable, but does a raw assignment (i.e., without metamethods).
+        /// </summary>
+        void LuaRawSet(int idx);
+        /// <summary>
+        /// Does the equivalent of t[i] = v, where t is the table at the given index and v is the value at the top of the stack.
+        /// </summary>
+        /// <remarks>
+        /// This function pops the value from the stack. The assignment is raw; that is, it does not invoke metamethods.
+        /// </remarks>
+        void LuaRawSetI(int idx, int n);
+        /// <summary>
+        /// Does the equivalent of t[p] = v, where t is the table at the given index, p is encoded as a light userdata, and v is the value at the top of the stack.
+        /// </summary>
+        /// <remarks>
+        /// This function pops the value from the stack. The assignment is raw; that is, it does not invoke metamethods.
+        /// </remarks>
+        void LuaRawSetP(int idx, Object p);
+
+        /// <summary>
+        /// Pops a table from the stack and sets it as the new metatable for the value at the given index.
+        /// </summary>
+        void LuaSetMetatable(int objindex);
+        /// <summary>
+        /// Pops a value from the stack and sets it as the new value associated to the userdata at the given index.
+        /// </summary>
+        void LuaSetUserValue(int idx);
         #endregion
 
         #endregion
@@ -506,10 +507,10 @@ namespace LuaN
         ///// Returns true if the value at the given index is a light userdata, and false otherwise. 
         ///// </summary>
         //bool IsLightUserData(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is nil, and false otherwise. 
-        ///// </summary>
-        //bool IsNil(int n);
+        /// <summary>
+        /// Returns true if the value at the given index is nil, and false otherwise. 
+        /// </summary>
+        bool LuaIsNil(int n);
         ///// <summary>
         ///// Returns true if the value at the given index is a boolean, and false otherwise. 
         ///// </summary>

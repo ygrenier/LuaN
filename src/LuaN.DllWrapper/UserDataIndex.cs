@@ -25,7 +25,7 @@ namespace LuaN.DllWrapper
             public IntPtr Pointer { get; internal set; }
         }
 
-        int _NextRef = 1;
+        int _NextRef = -1;
         IDictionary<IntPtr, UserDataRef> _DataRefs = new Dictionary<IntPtr, UserDataRef>();
         IDictionary<SByte, IList<UserDataRef>> _DataIndex = new SortedDictionary<sbyte, IList<UserDataRef>>();
 
@@ -36,7 +36,7 @@ namespace LuaN.DllWrapper
         {
             _DataIndex.Clear();
             _DataRefs.Clear();
-            _NextRef = 1;
+            _NextRef = -1;
         }
 
         UserDataRef FindData(Object data, out IList<UserDataRef> lst, out SByte hash)
@@ -78,11 +78,22 @@ namespace LuaN.DllWrapper
             var result = FindData(data, out lst, out hash);
             if (result == null)
             {
-                result = new UserDataRef()
+                if(data is LuaUserData)
                 {
-                    Data = data,
-                    Pointer = new IntPtr(_NextRef++)
-                };
+                    result = new UserDataRef()
+                    {
+                        Data = data,
+                        Pointer = ((LuaUserData)data).Pointer
+                    };
+                }
+                else
+                {
+                    result = new UserDataRef()
+                    {
+                        Data = data,
+                        Pointer = new IntPtr(_NextRef--)
+                    };
+                }
                 _DataRefs[result.Pointer] = result;
                 if (lst == null)
                 {
