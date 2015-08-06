@@ -1292,6 +1292,57 @@ namespace LuaN.DllWrapper.Tests
             }
         }
 
+        [Fact]
+        public void TestLuaArith()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushNumber(12.34);
+                L.LuaPushNumber(98.76);
+                L.LuaArith(LuaArithOperator.Add);
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(111.1, L.LuaToNumber(-1), 2);
+                // TODO More tests with metamethods
+            }
+        }
+
+        [Fact]
+        public void TestRawEqual()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushNumber(12.34);
+                L.LuaPushNumber(98.76);
+                L.LuaPushNumber(12.34);
+                Assert.False(L.LuaRawEqual(1, 2));
+                Assert.False(L.LuaRawEqual(2, 3));
+                Assert.True(L.LuaRawEqual(1, 3));
+            }
+        }
+
+        [Fact]
+        public void TestCompare()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushNumber(12.34);
+                L.LuaPushNumber(98.76);
+                L.LuaPushNumber(12.34);
+                Assert.Equal(false, L.LuaCompare(1, 2, LuaRelOperator.EQ));
+                Assert.Equal(false, L.LuaCompare(2, 3, LuaRelOperator.EQ));
+                Assert.Equal(true, L.LuaCompare(1, 3, LuaRelOperator.EQ));
+                Assert.Equal(true, L.LuaCompare(1, 2, LuaRelOperator.LE));
+                Assert.Equal(false, L.LuaCompare(2, 3, LuaRelOperator.LE));
+                Assert.Equal(true, L.LuaCompare(1, 3, LuaRelOperator.LE));
+                Assert.Equal(true, L.LuaCompare(1, 2, LuaRelOperator.LT));
+                Assert.Equal(false, L.LuaCompare(2, 3, LuaRelOperator.LT));
+                Assert.Equal(false, L.LuaCompare(1, 3, LuaRelOperator.LT));
+            }
+        }
+
         //[Fact]
         //public void TestInsert()
         //{

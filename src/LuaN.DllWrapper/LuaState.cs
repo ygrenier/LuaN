@@ -783,20 +783,29 @@ namespace LuaN.DllWrapper
 
         #endregion
 
-        //#region Comparison and arithmetic functions
-        ///// <summary>
-        ///// Arithmetic operation
-        ///// </summary>
-        //void Arith(LuaArithOperator op);
-        ///// <summary>
-        ///// Do raw equality
-        ///// </summary>
-        //bool RawEqual(int idx1, int idx2);
-        ///// <summary>
-        ///// Compare two values
-        ///// </summary>
-        //bool Compare(int idx1, int idx2, LuaRelOperator op);
-        //#endregion
+        #region Comparison and arithmetic functions
+        /// <summary>
+        /// Arithmetic operation
+        /// </summary>
+        public void LuaArith(LuaArithOperator op)
+        {
+            LuaDll.lua_arith(NativeState, (int)op);
+        }
+        /// <summary>
+        /// Do raw equality
+        /// </summary>
+        public bool LuaRawEqual(int idx1, int idx2)
+        {
+            return LuaDll.lua_rawequal(NativeState, idx1, idx2) != 0;
+        }
+        /// <summary>
+        /// Compare two values
+        /// </summary>
+        public bool LuaCompare(int idx1, int idx2, LuaRelOperator op)
+        {
+            return LuaDll.lua_compare(NativeState, idx1, idx2, (int)op) != 0;
+        }
+        #endregion
 
         //#region 'load' and 'call' functions (load and run Lua code)
         ///// <summary>

@@ -373,20 +373,20 @@ namespace LuaN
 
         #endregion
 
-        //#region Comparison and arithmetic functions
-        ///// <summary>
-        ///// Arithmetic operation
-        ///// </summary>
-        //void Arith(LuaArithOperator op);
-        ///// <summary>
-        ///// Do raw equality
-        ///// </summary>
-        //bool RawEqual(int idx1, int idx2);
-        ///// <summary>
-        ///// Compare two values
-        ///// </summary>
-        //bool Compare(int idx1, int idx2, LuaRelOperator op);
-        //#endregion
+        #region Comparison and arithmetic functions
+        /// <summary>
+        /// Arithmetic operation
+        /// </summary>
+        void LuaArith(LuaArithOperator op);
+        /// <summary>
+        /// Do raw equality
+        /// </summary>
+        bool LuaRawEqual(int idx1, int idx2);
+        /// <summary>
+        /// Compare two values
+        /// </summary>
+        bool LuaCompare(int idx1, int idx2, LuaRelOperator op);
+        #endregion
 
         //#region 'load' and 'call' functions (load and run Lua code)
         ///// <summary>
