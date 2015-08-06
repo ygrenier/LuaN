@@ -60,6 +60,7 @@
     <Compile Include="..\LuaN\[Enums].cs">
       <Link>LuaN\[Enums].cs</Link>
     </Compile>
+    <Compile Include="LuaKFunctionWrapper.cs" />
     <Compile Include="LuaCFunctionWrapper.cs" />
     <Compile Include="LuaDll.lauxlib.h.cs" />
     <Compile Include="LuaDll.lua.h.cs" />

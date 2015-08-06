@@ -12,6 +12,7 @@ namespace LuaN.DllWrapper
     {
         static Dictionary<IntPtr, LuaState> _RegisteredStates = new Dictionary<IntPtr, LuaState>();
         List<LuaCFunctionWrapper> _CFunctionWrappers = new List<LuaCFunctionWrapper>();
+        List<LuaKFunctionWrapper> _KFunctionWrappers = new List<LuaKFunctionWrapper>();
         List<LuaReaderWrapper> _ReaderWrappers = new List<LuaReaderWrapper>();
         List<LuaWriterWrapper> _WriterWrappers = new List<LuaWriterWrapper>();
         IntPtr _NativeState;
@@ -115,6 +116,7 @@ namespace LuaN.DllWrapper
                 lock (_RegisteredStates)
                     _RegisteredStates.Remove(_NativeState);
                 _CFunctionWrappers.Clear();
+                _KFunctionWrappers.Clear();
                 foreach (var reader in _ReaderWrappers)
                     reader.Dispose();
                 _ReaderWrappers.Clear();
@@ -186,6 +188,21 @@ namespace LuaN.DllWrapper
             {
                 wrapper = new LuaCFunctionWrapper(function);
                 _CFunctionWrappers.Add(wrapper);
+            }
+            return wrapper.NativeFunction;
+        }
+
+        /// <summary>
+        /// Wrap a .Net K function
+        /// </summary>
+        public LuaDll.lua_KFunction WrapKFunction(LuaKFunction function)
+        {
+            if (function == null) return null;
+            var wrapper = _KFunctionWrappers.FirstOrDefault(w => w.KFunction == function);
+            if (wrapper == null)
+            {
+                wrapper = new LuaKFunctionWrapper(function);
+                _KFunctionWrappers.Add(wrapper);
             }
             return wrapper.NativeFunction;
         }
@@ -894,35 +911,56 @@ namespace LuaN.DllWrapper
         }
         #endregion
 
-        //#region coroutine functions
-        ///// <summary>
-        ///// Yields a coroutine (thread). 
-        ///// </summary>
-        //LuaStatus YieldK(int nresults, int ctx, LuaKFunction k);
-        ///// <summary>
-        ///// Starts and resumes a coroutine in the given thread
-        ///// </summary>
-        //LuaStatus Resume(ILuaState from, int narg);
-        ///// <summary>
-        ///// Returns the status of the thread
-        ///// </summary>
-        //LuaStatus Status();
-        ///// <summary>
-        ///// Returns true if the given coroutine can yield, and false otherwise. 
-        ///// </summary>
-        //Boolean IsYieldable();
-        ///// <summary>
-        ///// This function is equivalent to YieldK, but it has no continuation.
-        ///// </summary>
-        //LuaStatus Yield(int nresults);
-        //#endregion
+        #region coroutine functions
+        /// <summary>
+        /// Yields a coroutine (thread). 
+        /// </summary>
+        public LuaStatus LuaYieldK(int nresults, Int64 ctx, LuaKFunction k)
+        {
+            return (LuaStatus)LuaDll.lua_yieldk(NativeState, nresults, ctx, WrapKFunction(k));
+        }
+        /// <summary>
+        /// Starts and resumes a coroutine in the given thread
+        /// </summary>
+        public LuaStatus LuaResume(ILuaState from, int narg)
+        {
+            IntPtr fromState = IntPtr.Zero;
+            LuaState ls = GetAsLuaState(from, "from");
+            if (ls != null) fromState = ls.NativeState;
+            return (LuaStatus)LuaDll.lua_resume(NativeState, fromState, narg);
+        }
+        /// <summary>
+        /// Returns the status of the thread
+        /// </summary>
+        public LuaStatus LuaStatus()
+        {
+            return (LuaStatus)LuaDll.lua_status(NativeState);
+        }
+        /// <summary>
+        /// Returns true if the given coroutine can yield, and false otherwise. 
+        /// </summary>
+        public Boolean LuaIsYieldable()
+        {
+            return LuaDll.lua_isyieldable(NativeState) != 0;
+        }
+        /// <summary>
+        /// This function is equivalent to YieldK, but it has no continuation.
+        /// </summary>
+        public LuaStatus LuaYield(int nresults)
+        {
+            return (LuaStatus)LuaDll.lua_yield(NativeState, nresults);
+        }
+        #endregion
 
-        //#region garbage-collection function and options
-        ///// <summary>
-        ///// Controls the garbage collector.
-        ///// </summary>
-        //int GC(LuaGcFunction what, int data);
-        //#endregion
+        #region garbage-collection function and options
+        /// <summary>
+        /// Controls the garbage collector.
+        /// </summary>
+        public int LuaGC(LuaGcFunction what, int data)
+        {
+            return LuaDll.lua_gc(NativeState, (int)what, data);
+        }
+        #endregion
 
         #region miscellaneous functions
         /// <summary>

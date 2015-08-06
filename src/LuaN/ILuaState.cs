@@ -415,35 +415,35 @@ namespace LuaN
         int LuaDump(LuaWriter writer, Object data, int strip);
         #endregion
 
-        //#region coroutine functions
-        ///// <summary>
-        ///// Yields a coroutine (thread). 
-        ///// </summary>
-        //LuaStatus YieldK(int nresults, int ctx, LuaKFunction k);
-        ///// <summary>
-        ///// Starts and resumes a coroutine in the given thread
-        ///// </summary>
-        //LuaStatus Resume(ILuaState from, int narg);
-        ///// <summary>
-        ///// Returns the status of the thread
-        ///// </summary>
-        //LuaStatus Status();
-        ///// <summary>
-        ///// Returns true if the given coroutine can yield, and false otherwise. 
-        ///// </summary>
-        //Boolean IsYieldable();
-        ///// <summary>
-        ///// This function is equivalent to YieldK, but it has no continuation.
-        ///// </summary>
-        //LuaStatus Yield(int nresults);
-        //#endregion
+        #region coroutine functions
+        /// <summary>
+        /// Yields a coroutine (thread). 
+        /// </summary>
+        LuaStatus LuaYieldK(int nresults, Int64 ctx, LuaKFunction k);
+        /// <summary>
+        /// Starts and resumes a coroutine in the given thread
+        /// </summary>
+        LuaStatus LuaResume(ILuaState from, int narg);
+        /// <summary>
+        /// Returns the status of the thread
+        /// </summary>
+        LuaStatus LuaStatus();
+        /// <summary>
+        /// Returns true if the given coroutine can yield, and false otherwise. 
+        /// </summary>
+        Boolean LuaIsYieldable();
+        /// <summary>
+        /// This function is equivalent to YieldK, but it has no continuation.
+        /// </summary>
+        LuaStatus LuaYield(int nresults);
+        #endregion
 
-        //#region garbage-collection function and options
-        ///// <summary>
-        ///// Controls the garbage collector.
-        ///// </summary>
-        //int GC(LuaGcFunction what, int data);
-        //#endregion
+        #region garbage-collection function and options
+        /// <summary>
+        /// Controls the garbage collector.
+        /// </summary>
+        int LuaGC(LuaGcFunction what, int data);
+        #endregion
 
         #region miscellaneous functions
         /// <summary>
