@@ -110,6 +110,40 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
+        public void TestWrapReader()
+        {
+            using (var L = new LuaState())
+            {
+                LuaDll.lua_Reader nativeReader = null;
+                LuaReader reader = null;
+
+                Assert.Null(L.WrapReader(reader));
+
+                reader = (s, b) => null;
+                nativeReader = L.WrapReader(reader);
+
+                Assert.Same(nativeReader, L.WrapReader(reader));
+            }
+        }
+
+        [Fact]
+        public void TestWrapWriter()
+        {
+            using (var L = new LuaState())
+            {
+                LuaDll.lua_Writer nativeWriter = null;
+                LuaWriter writer = null;
+
+                Assert.Null(L.WrapWriter(writer));
+
+                writer = (l, p, u) => 0;
+                nativeWriter = L.WrapWriter(writer);
+
+                Assert.Same(nativeWriter, L.WrapWriter(writer));
+            }
+        }
+
+        [Fact]
         public void TestFindInstance()
         {
             using (var L = new LuaState())
@@ -1308,7 +1342,7 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestRawEqual()
+        public void TestLuaRawEqual()
         {
             LuaState L = null;
             using (L = new LuaState())
@@ -1323,7 +1357,7 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestCompare()
+        public void TestLuaCompare()
         {
             LuaState L = null;
             using (L = new LuaState())
@@ -1340,6 +1374,216 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(true, L.LuaCompare(1, 2, LuaRelOperator.LT));
                 Assert.Equal(false, L.LuaCompare(2, 3, LuaRelOperator.LT));
                 Assert.Equal(false, L.LuaCompare(1, 3, LuaRelOperator.LT));
+            }
+        }
+
+        [Fact]
+        public void TestLuaCall()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushCClosure(l => {
+                    var a = L.LuaToNumber(1);
+                    var b = L.LuaToNumber(2);
+                    L.LuaPushNumber(a * b);
+                    return 1;
+                }, 0);
+                L.LuaPushNumber(12);
+                L.LuaPushNumber(4);
+                L.LuaCall(2, 1);
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(48, L.LuaToNumber(-1));
+
+                // TODO Implements when methods will be implemented
+//                L.LuaDoString(@"
+//function testA(a,b)
+//return a-b
+//end
+//function testB(a,b)
+//DoAnError(a,b)
+//end
+//");
+//                Assert.Equal(1, L.GetTop());
+//                L.GetGlobal("testA");
+//                L.PushNumber(12);
+//                L.PushNumber(4);
+//                L.Call(2, 1);
+//                Assert.Equal(2, L.GetTop());
+//                Assert.Equal(8, L.ToNumber(-1));
+
+//                L.GetGlobal("testB");
+//                L.PushNumber(12);
+//                L.PushNumber(4);
+//                var ex = Assert.Throws<LuaAtPanicException>(() => L.Call(2, 1));
+//                Assert.Equal("[string \"\r...\"]:6: attempt to call a nil value (global 'DoAnError')", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestLuaCallK()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushCClosure(l => {
+                    var a = L.LuaToNumber(1);
+                    var b = L.LuaToNumber(2);
+                    L.LuaPushNumber(a * b);
+                    return 1;
+                }, 0);
+                L.LuaPushNumber(12);
+                L.LuaPushNumber(4);
+                Assert.Throws<NotImplementedException>(() => L.LuaCallK(2, 1, 0, null));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPCall()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushCClosure(l => {
+                    var a = L.LuaToNumber(1);
+                    var b = L.LuaToNumber(2);
+                    L.LuaPushNumber(a * b);
+                    return 1;
+                },0);
+                L.LuaPushNumber(12);
+                L.LuaPushNumber(4);
+                Assert.Equal(LuaStatus.Ok, L.LuaPCall(2, 1, 0));
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(48, L.LuaToNumber(-1));
+
+                /// TODO Implements when the methods will be implemented
+//                L.DoString(@"
+//function testA(a,b)
+//return a-b
+//end
+//function testB(a,b)
+//DoAnError(a,b)
+//end
+//");
+//                Assert.Equal(1, L.GetTop());
+//                L.GetGlobal("testA");
+//                L.PushNumber(12);
+//                L.PushNumber(4);
+//                Assert.Equal(LuaStatus.Ok, L.PCall(2, 1, 0));
+//                Assert.Equal(2, L.GetTop());
+//                Assert.Equal(8, L.ToNumber(-1));
+
+//                L.GetGlobal("testB");
+//                L.PushNumber(12);
+//                L.PushNumber(4);
+//                Assert.Equal(LuaStatus.ErrorRun, L.PCall(2, 1, 0));
+//                Assert.Equal("[string \"\r...\"]:6: attempt to call a nil value (global 'DoAnError')", L.ToString(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPCallK()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushCClosure(l => {
+                    var a = L.LuaToNumber(1);
+                    var b = L.LuaToNumber(2);
+                    L.LuaPushNumber(a * b);
+                    return 1;
+                }, 0);
+                L.LuaPushNumber(12);
+                L.LuaPushNumber(4);
+                Assert.Throws<NotImplementedException>(() => L.LuaPCallK(2, 1, 0, 0, null));
+            }
+        }
+
+        [Fact]
+        public void TestLuaLoad()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                String chunk = @"
+a = 'Lua'
+b = ' rocks'
+c=a..b
+return c..'!!'
+";
+                Byte[] chunkBytes = Encoding.ASCII.GetBytes(chunk);
+                int curr = 0;
+                LuaReader reader = (l, ud) =>
+                {
+                    Byte[] res = null;
+                    if (curr < chunkBytes.Length)
+                    {
+                        int c = Math.Min(7, chunkBytes.Length - curr);
+                        res = new Byte[c];
+                        Array.Copy(chunkBytes, curr, res, 0, c);
+                        curr += c;
+                    }
+                    return res;
+                };
+                var st = L.LuaLoad(reader, null, "main", null);
+                Assert.Equal(LuaStatus.Ok, st);
+                st = L.LuaPCall(0, 1, 0);
+                Assert.Equal(LuaStatus.Ok, st);
+                Assert.Equal("Lua rocks!!", L.LuaToString(-1));
+
+            }
+        }
+
+        [Fact]
+        public void TestLuaDump()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                String chunk = @"
+a = 'Lua'
+b = ' rocks'
+c=a..b
+return c..'!!'
+";
+                Byte[] chunkBytes = Encoding.ASCII.GetBytes(chunk);
+                int curr = 0;
+                LuaReader loadChunk = (l, ud) => {
+                    Byte[] res = null;
+                    if (curr < chunkBytes.Length)
+                    {
+                        int c = Math.Min(chunkBytes.Length, chunkBytes.Length - curr);
+                        res = new Byte[c];
+                        Array.Copy(chunkBytes, curr, res, 0, c);
+                        curr += c;
+                    }
+                    return res;
+                };
+                var st = L.LuaLoad(loadChunk, null, "main", null);
+                Assert.Equal(LuaStatus.Ok, st);
+
+                List<Byte[]> dump = new List<byte[]>();
+                LuaWriter fDump = (l, b, ud) => {
+                    dump.Add(b);
+                    return 0;
+                };
+                var r = L.LuaDump(fDump, null, 0);
+                Assert.Equal(0, r);
+                Byte[] dumpBytes = dump.SelectMany(d => d).ToArray();
+                Assert.Equal(199, dumpBytes.Length);
+
+                // Remove the function
+                L.LuaPop(1);
+                Assert.Equal(0, L.LuaGetTop());
+
+                // Reload chunk compiled
+                chunkBytes = dumpBytes;
+                curr = 0;
+                st = L.LuaLoad(loadChunk, null, "main", "b");
+                Assert.Equal(LuaStatus.Ok, st);
+                st = L.LuaPCall(0, 1, 0);
+                Assert.Equal(LuaStatus.Ok, st);
+                Assert.Equal("Lua rocks!!", L.LuaToString(-1));
             }
         }
 

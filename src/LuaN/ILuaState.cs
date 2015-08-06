@@ -388,32 +388,32 @@ namespace LuaN
         bool LuaCompare(int idx1, int idx2, LuaRelOperator op);
         #endregion
 
-        //#region 'load' and 'call' functions (load and run Lua code)
-        ///// <summary>
-        ///// Calls a function.
-        ///// </summary>
-        //ILuaState Call(int nargs, int nresults);
-        ///// <summary>
-        ///// Call with yield support
-        ///// </summary>
-        //ILuaState CallK(int nargs, int nresults, int ctx, LuaKFunction k);
-        ///// <summary>
-        ///// Calls a function in protected mode.
-        ///// </summary>
-        //LuaStatus PCall(int nargs, int nresults, int errfunc);
-        ///// <summary>
-        ///// Call in protected mode with yield support
-        ///// </summary>
-        //LuaStatus PCallK(int nargs, int nresults, int errfunc, int ctx, LuaKFunction k);
-        ///// <summary>
-        ///// Loads a Lua chunk without running it.
-        ///// </summary>
-        //LuaStatus Load(LuaReader reader, Object dt, String chunkname, String mode);
-        ///// <summary>
-        ///// Dumps a function as a binary chunk.
-        ///// </summary>
-        //int Dump(LuaWriter writer, Object data, int strip);
-        //#endregion
+        #region 'load' and 'call' functions (load and run Lua code)
+        /// <summary>
+        /// Calls a function.
+        /// </summary>
+        void LuaCall(int nargs, int nresults);
+        /// <summary>
+        /// Call with yield support
+        /// </summary>
+        void LuaCallK(int nargs, int nresults, int ctx, LuaKFunction k);
+        /// <summary>
+        /// Calls a function in protected mode.
+        /// </summary>
+        LuaStatus LuaPCall(int nargs, int nresults, int errfunc);
+        /// <summary>
+        /// Call in protected mode with yield support
+        /// </summary>
+        LuaStatus LuaPCallK(int nargs, int nresults, int errfunc, int ctx, LuaKFunction k);
+        /// <summary>
+        /// Loads a Lua chunk without running it.
+        /// </summary>
+        LuaStatus LuaLoad(LuaReader reader, Object dt, String chunkname, String mode);
+        /// <summary>
+        /// Dumps a function as a binary chunk.
+        /// </summary>
+        int LuaDump(LuaWriter writer, Object data, int strip);
+        #endregion
 
         //#region coroutine functions
         ///// <summary>

@@ -12,6 +12,8 @@ namespace LuaN.DllWrapper
     {
         static Dictionary<IntPtr, LuaState> _RegisteredStates = new Dictionary<IntPtr, LuaState>();
         List<LuaCFunctionWrapper> _CFunctionWrappers = new List<LuaCFunctionWrapper>();
+        List<LuaReaderWrapper> _ReaderWrappers = new List<LuaReaderWrapper>();
+        List<LuaWriterWrapper> _WriterWrappers = new List<LuaWriterWrapper>();
         IntPtr _NativeState;
         bool _OwnNativeState = true;
         LuaState _MainState;
@@ -113,6 +115,10 @@ namespace LuaN.DllWrapper
                 lock (_RegisteredStates)
                     _RegisteredStates.Remove(_NativeState);
                 _CFunctionWrappers.Clear();
+                foreach (var reader in _ReaderWrappers)
+                    reader.Dispose();
+                _ReaderWrappers.Clear();
+                _WriterWrappers.Clear();
                 UserDataIndex.Reset();
                 UserDataIndex = null;
                 _NativeState = IntPtr.Zero;
@@ -182,6 +188,40 @@ namespace LuaN.DllWrapper
                 _CFunctionWrappers.Add(wrapper);
             }
             return wrapper.NativeFunction;
+        }
+
+        /// <summary>
+        /// Wrap a .Net reader
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public LuaDll.lua_Reader WrapReader(LuaReader reader)
+        {
+            if (reader == null) return null;
+            var wrapper = _ReaderWrappers.FirstOrDefault(w => w.Reader == reader);
+            if(wrapper== null)
+            {
+                wrapper = new LuaReaderWrapper(reader);
+                _ReaderWrappers.Add(wrapper);
+            }
+            return wrapper.NativeReader;
+        }
+
+        /// <summary>
+        /// Wrap a .Net writer
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <returns></returns>
+        public LuaDll.lua_Writer WrapWriter(LuaWriter writer)
+        {
+            if (writer == null) return null;
+            var wrapper = _WriterWrappers.FirstOrDefault(w => w.Writer == writer);
+            if (wrapper == null)
+            {
+                wrapper = new LuaWriterWrapper(writer);
+                _WriterWrappers.Add(wrapper);
+            }
+            return wrapper.NativeWriter;
         }
 
         /// <summary>
@@ -807,32 +847,52 @@ namespace LuaN.DllWrapper
         }
         #endregion
 
-        //#region 'load' and 'call' functions (load and run Lua code)
-        ///// <summary>
-        ///// Calls a function.
-        ///// </summary>
-        //ILuaState Call(int nargs, int nresults);
-        ///// <summary>
-        ///// Call with yield support
-        ///// </summary>
-        //ILuaState CallK(int nargs, int nresults, int ctx, LuaKFunction k);
-        ///// <summary>
-        ///// Calls a function in protected mode.
-        ///// </summary>
-        //LuaStatus PCall(int nargs, int nresults, int errfunc);
-        ///// <summary>
-        ///// Call in protected mode with yield support
-        ///// </summary>
-        //LuaStatus PCallK(int nargs, int nresults, int errfunc, int ctx, LuaKFunction k);
-        ///// <summary>
-        ///// Loads a Lua chunk without running it.
-        ///// </summary>
-        //LuaStatus Load(LuaReader reader, Object dt, String chunkname, String mode);
-        ///// <summary>
-        ///// Dumps a function as a binary chunk.
-        ///// </summary>
-        //int Dump(LuaWriter writer, Object data, int strip);
-        //#endregion
+        #region 'load' and 'call' functions (load and run Lua code)
+        /// <summary>
+        /// Calls a function.
+        /// </summary>
+        public void LuaCall(int nargs, int nresults)
+        {
+            LuaDll.lua_call(NativeState, nargs, nresults);
+        }
+        /// <summary>
+        /// Call with yield support
+        /// </summary>
+        public void LuaCallK(int nargs, int nresults, int ctx, LuaKFunction k)
+        {
+            // TODO Implements
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Calls a function in protected mode.
+        /// </summary>
+        public LuaStatus LuaPCall(int nargs, int nresults, int errfunc)
+        {
+            return (LuaStatus)LuaDll.lua_pcall(NativeState, nargs, nresults, errfunc);
+        }
+        /// <summary>
+        /// Call in protected mode with yield support
+        /// </summary>
+        public LuaStatus LuaPCallK(int nargs, int nresults, int errfunc, int ctx, LuaKFunction k)
+        {
+            // TODO Implements
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Loads a Lua chunk without running it.
+        /// </summary>
+        public LuaStatus LuaLoad(LuaReader reader, Object dt, String chunkname, String mode)
+        {
+            return (LuaStatus)LuaDll.lua_load(NativeState, WrapReader(reader), GetUserDataPtr(dt), chunkname, mode);
+        }
+        /// <summary>
+        /// Dumps a function as a binary chunk.
+        /// </summary>
+        public int LuaDump(LuaWriter writer, Object data, int strip)
+        {
+            return LuaDll.lua_dump(NativeState, WrapWriter(writer), GetUserDataPtr(data), strip);
+        }
+        #endregion
 
         //#region coroutine functions
         ///// <summary>
