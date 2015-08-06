@@ -450,22 +450,22 @@ namespace LuaN
         /// Generates a Lua error, using the value at the top of the stack as the error object.
         /// </summary>
         void LuaError();
-        ///// <summary>
-        ///// Pops a key from the stack, and pushes a key–value pair from the table at the given index (the "next" pair after the given key).
-        ///// </summary>
-        //bool Next(int idx);
-        ///// <summary>
-        ///// Concatenates the n values at the top of the stack, pops them, and leaves the result at the top.
-        ///// </summary>
-        //void Concat(int n);
-        ///// <summary>
-        ///// Returns the length of the value at the given index. It is equivalent to the '#' operator in Lua .
-        ///// </summary>
-        //void Len(int idx);
-        ///// <summary>
-        ///// Converts the zero-terminated string s to a number, pushes that number into the stack, and returns the total size of the string, that is, its length plus one.
-        ///// </summary>
-        //int StringToNumber(String s);
+        /// <summary>
+        /// Pops a key from the stack, and pushes a key–value pair from the table at the given index (the "next" pair after the given key).
+        /// </summary>
+        bool LuaNext(int idx);
+        /// <summary>
+        /// Concatenates the n values at the top of the stack, pops them, and leaves the result at the top.
+        /// </summary>
+        void LuaConcat(int n);
+        /// <summary>
+        /// Returns the length of the value at the given index. It is equivalent to the '#' operator in Lua .
+        /// </summary>
+        void LuaLen(int idx);
+        /// <summary>
+        /// Converts the zero-terminated string s to a number, pushes that number into the stack, and returns the total size of the string, that is, its length plus one.
+        /// </summary>
+        int LuaStringToNumber(String s);
         ////lua_Alloc lua_getallocf(lua_State L, IntPtr ud);
         ////void lua_setallocf(lua_State L, lua_Alloc f, IntPtr ud);
         #endregion

@@ -1710,6 +1710,130 @@ return c..'!!'
             }
         }
 
+        [Fact]
+        public void TestLuaError()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushString("Error message");
+                var ex = Assert.Throws<LuaException>(() => L.LuaError());
+                Assert.Equal("Error message", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestLuaNext()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaCreateTable(0,0);
+                var t = L.LuaGetTop();
+                L.LuaPushString("Value A");
+                L.LuaSetField(t, "a");
+                L.LuaPushString("Value 2");
+                L.LuaSetI(t, 2);
+                Assert.Equal(1, L.LuaGetTop());
+
+                int count = 0;
+                bool foundA = false;
+                // First Key
+                L.LuaPushNil();
+                while (L.LuaNext(t))
+                {
+                    count++;
+                    // => 'key' at index -2 , 'value' as index -1
+                    if (LuaType.String == L.LuaType(-2))
+                    {
+                        Assert.False(foundA);
+                        Assert.Equal(LuaType.String, L.LuaType(-2));
+                        Assert.Equal("a", L.LuaToString(-2));
+                        Assert.Equal(LuaType.String, L.LuaType(-1));
+                        Assert.Equal("Value A", L.LuaToString(-1));
+                        foundA = true;
+                    }
+                    else
+                    {
+                        // Second key
+                        Assert.Equal(LuaType.Number, L.LuaType(-2));
+                        Assert.Equal(2, L.LuaToInteger(-2));
+                        Assert.Equal(LuaType.String, L.LuaType(-1));
+                        Assert.Equal("Value 2", L.LuaToString(-1));
+                    }
+                    // Remove 'value' and keep the 'key' on the stack for the next key
+                    L.LuaPop(1);
+                }
+                Assert.Equal(2, count);
+                Assert.True(foundA);
+                // No more key
+                // The stack is cleaned
+                Assert.Equal(1, L.LuaGetTop());
+
+            }
+        }
+
+        [Fact]
+        public void TestLuaConcat()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushString("One");
+                L.LuaPushNumber(2);
+                L.LuaPushString("Three");
+                L.LuaPushNumber(4);
+                L.LuaConcat(3);
+                Assert.Equal("2.0Three4.0", L.LuaToString(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaLen()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushString("Test");
+                L.LuaPushString("5.6");
+                L.LuaPushString("5D");
+                L.LuaPushString("5z");
+                L.LuaLen(1);
+                Assert.Equal(4, L.LuaToNumber(-1));
+                L.LuaLen(2);
+                Assert.Equal(3, L.LuaToNumber(-1));
+                L.LuaLen(3);
+                Assert.Equal(2, L.LuaToNumber(-1));
+                L.LuaLen(4);
+                Assert.Equal(2, L.LuaToNumber(-1));
+
+                // TODO Test with metamethod
+            }
+        }
+
+        [Fact]
+        public void TestLuaStringToNumber()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(4, L.LuaStringToNumber("5.6"));
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(5.6, L.LuaToNumber(-1));
+
+                Assert.Equal(2, L.LuaStringToNumber("5"));
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(5.0, L.LuaToNumber(-1));
+
+                Assert.Equal(0, L.LuaStringToNumber("5D"));
+                Assert.Equal(2, L.LuaGetTop());
+
+                Assert.Equal(0, L.LuaStringToNumber("Test"));
+                Assert.Equal(2, L.LuaGetTop());
+
+            }
+        }
+
         //[Fact]
         //public void TestInsert()
         //{
