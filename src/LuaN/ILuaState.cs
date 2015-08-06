@@ -483,75 +483,75 @@ namespace LuaN
         /// Pops n elements from the stack. 
         /// </summary>
         void LuaPop(int n);
-        ///// <summary>
-        ///// Creates a new empty table and pushes it onto the stack.
-        ///// </summary>
-        //ILuaState NewTable();
-        ///// <summary>
-        ///// Sets the C function f as the new value of global name.
-        ///// </summary>
-        //ILuaState Register(String n, LuaFunction f);
-        ///// <summary>
-        ///// Pushes a function onto the stack. 
-        ///// </summary>
-        //ILuaState PushFunction(LuaFunction f);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a function (either C or Lua), and false otherwise. 
-        ///// </summary>
-        //bool IsFunction(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a table, and false otherwise. 
-        ///// </summary>
-        //bool IsTable(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a light userdata, and false otherwise. 
-        ///// </summary>
-        //bool IsLightUserData(int n);
+        /// <summary>
+        /// Creates a new empty table and pushes it onto the stack.
+        /// </summary>
+        void LuaNewTable();
+        /// <summary>
+        /// Sets the C function f as the new value of global name.
+        /// </summary>
+        void LuaRegister(String n, LuaCFunction f);
+        /// <summary>
+        /// Pushes a function onto the stack. 
+        /// </summary>
+        void LuaPushCFunction(LuaCFunction f);
+        /// <summary>
+        /// Returns true if the value at the given index is a function (either C or Lua), and false otherwise. 
+        /// </summary>
+        bool LuaIsFunction(int n);
+        /// <summary>
+        /// Returns true if the value at the given index is a table, and false otherwise. 
+        /// </summary>
+        bool LuaIsTable(int n);
+        /// <summary>
+        /// Returns true if the value at the given index is a light userdata, and false otherwise. 
+        /// </summary>
+        bool LuaIsLightUserData(int n);
         /// <summary>
         /// Returns true if the value at the given index is nil, and false otherwise. 
         /// </summary>
         bool LuaIsNil(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a boolean, and false otherwise. 
-        ///// </summary>
-        //bool IsBoolean(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a thread, and false otherwise. 
-        ///// </summary>
-        //bool IsThread(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is none, and false otherwise. 
-        ///// </summary>
-        //bool IsNone(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is none or nil, and false otherwise. 
-        ///// </summary>
-        //bool IsNoneOrNil(int n);
-        ///// <summary>
-        ///// Pushes a literal string onto the stack
-        ///// </summary>
-        //String PushLiteral(String s);
-        ///// <summary>
-        ///// Pushes the global environment onto the stack. 
-        ///// </summary>
-        //ILuaState PushGlobalTable();
+        /// <summary>
+        /// Returns true if the value at the given index is a boolean, and false otherwise. 
+        /// </summary>
+        bool LuaIsBoolean(int n);
+        /// <summary>
+        /// Returns true if the value at the given index is a thread, and false otherwise. 
+        /// </summary>
+        bool LuaIsThread(int n);
+        /// <summary>
+        /// Returns true if the value at the given index is none, and false otherwise. 
+        /// </summary>
+        bool LuaIsNone(int n);
+        /// <summary>
+        /// Returns true if the value at the given index is none or nil, and false otherwise. 
+        /// </summary>
+        bool LuaIsNoneOrNil(int n);
+        /// <summary>
+        /// Pushes a literal string onto the stack
+        /// </summary>
+        void LuaPushLiteral(String s);
+        /// <summary>
+        /// Pushes the global environment onto the stack. 
+        /// </summary>
+        void LuaPushGlobalTable();
         ///// <summary>
         ///// Converts the Lua value at the given index to a string.
         ///// </summary>
-        //String ToString(int i);
-        ///// <summary>
-        ///// Moves the top element into the given valid index, shifting up the elements above this index to open space. 
-        ///// </summary>
-        //ILuaState Insert(int idx);
-        ///// <summary>
-        ///// Removes the element at the given valid index, shifting down the elements above this index to fill the gap. 
-        ///// </summary>
-        //ILuaState Remove(int idx);
-        ///// <summary>
-        ///// Moves the top element into the given valid index without shifting any element (therefore replacing the value at that given index), 
-        ///// and then pops the top element. 
-        ///// </summary>
-        //ILuaState Replace(int idx);
+        //String LuaToString(int i);
+        /// <summary>
+        /// Moves the top element into the given valid index, shifting up the elements above this index to open space. 
+        /// </summary>
+        void LuaInsert(int idx);
+        /// <summary>
+        /// Removes the element at the given valid index, shifting down the elements above this index to fill the gap. 
+        /// </summary>
+        void LuaRemove(int idx);
+        /// <summary>
+        /// Moves the top element into the given valid index without shifting any element (therefore replacing the value at that given index), 
+        /// and then pops the top element. 
+        /// </summary>
+        void LuaReplace(int idx);
         #endregion
 
         //#region compatibility macros for unsigned conversions

@@ -1024,30 +1024,49 @@ namespace LuaN.DllWrapper
         {
             LuaDll.lua_pop(NativeState, n);
         }
-        ///// <summary>
-        ///// Creates a new empty table and pushes it onto the stack.
-        ///// </summary>
-        //ILuaState NewTable();
-        ///// <summary>
-        ///// Sets the C function f as the new value of global name.
-        ///// </summary>
-        //ILuaState Register(String n, LuaFunction f);
-        ///// <summary>
-        ///// Pushes a function onto the stack. 
-        ///// </summary>
-        //ILuaState PushFunction(LuaFunction f);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a function (either C or Lua), and false otherwise. 
-        ///// </summary>
-        //bool IsFunction(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a table, and false otherwise. 
-        ///// </summary>
-        //bool IsTable(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a light userdata, and false otherwise. 
-        ///// </summary>
-        //bool IsLightUserData(int n);
+        /// <summary>
+        /// Creates a new empty table and pushes it onto the stack.
+        /// </summary>
+        public void LuaNewTable()
+        {
+            LuaDll.lua_newtable(NativeState);
+        }
+        /// <summary>
+        /// Sets the C function f as the new value of global name.
+        /// </summary>
+        public void LuaRegister(String n, LuaCFunction f)
+        {
+            LuaDll.lua_register(NativeState, n, WrapFunction(f));
+        }
+        /// <summary>
+        /// Pushes a function onto the stack. 
+        /// </summary>
+        public void LuaPushCFunction(LuaCFunction f)
+        {
+            if (f == null) throw new ArgumentNullException("f");
+            LuaDll.lua_pushcfunction(NativeState, WrapFunction(f));
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is a function (either C or Lua), and false otherwise. 
+        /// </summary>
+        public bool LuaIsFunction(int n)
+        {
+            return LuaDll.lua_isfunction(NativeState, n);
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is a table, and false otherwise. 
+        /// </summary>
+        public bool LuaIsTable(int n)
+        {
+            return LuaDll.lua_istable(NativeState, n);
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is a light userdata, and false otherwise. 
+        /// </summary>
+        public bool LuaIsLightUserData(int n)
+        {
+            return LuaDll.lua_islightuserdata(NativeState, n);
+        }
         /// <summary>
         /// Returns true if the value at the given index is nil, and false otherwise. 
         /// </summary>
@@ -1055,47 +1074,74 @@ namespace LuaN.DllWrapper
         {
             return LuaDll.lua_isnil(NativeState, n);
         }
-        ///// <summary>
-        ///// Returns true if the value at the given index is a boolean, and false otherwise. 
-        ///// </summary>
-        //bool IsBoolean(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is a thread, and false otherwise. 
-        ///// </summary>
-        //bool IsThread(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is none, and false otherwise. 
-        ///// </summary>
-        //bool IsNone(int n);
-        ///// <summary>
-        ///// Returns true if the value at the given index is none or nil, and false otherwise. 
-        ///// </summary>
-        //bool IsNoneOrNil(int n);
-        ///// <summary>
-        ///// Pushes a literal string onto the stack
-        ///// </summary>
-        //String PushLiteral(String s);
-        ///// <summary>
-        ///// Pushes the global environment onto the stack. 
-        ///// </summary>
-        //ILuaState PushGlobalTable();
+        /// <summary>
+        /// Returns true if the value at the given index is a boolean, and false otherwise. 
+        /// </summary>
+        public bool LuaIsBoolean(int n)
+        {
+            return LuaDll.lua_isboolean(NativeState, n);
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is a thread, and false otherwise. 
+        /// </summary>
+        public bool LuaIsThread(int n)
+        {
+            return LuaDll.lua_isthread(NativeState, n);
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is none, and false otherwise. 
+        /// </summary>
+        public bool LuaIsNone(int n)
+        {
+            return LuaDll.lua_isnone(NativeState, n);
+        }
+        /// <summary>
+        /// Returns true if the value at the given index is none or nil, and false otherwise. 
+        /// </summary>
+        public bool LuaIsNoneOrNil(int n)
+        {
+            return LuaDll.lua_isnoneornil(NativeState, n);
+        }
+        /// <summary>
+        /// Pushes a literal string onto the stack
+        /// </summary>
+        public void LuaPushLiteral(String s)
+        {
+            LuaDll.lua_pushliteral(NativeState, s);
+        }
+        /// <summary>
+        /// Pushes the global environment onto the stack. 
+        /// </summary>
+        public void LuaPushGlobalTable()
+        {
+            LuaDll.lua_pushglobaltable(NativeState);
+        }
         ///// <summary>
         ///// Converts the Lua value at the given index to a string.
         ///// </summary>
         //String ToString(int i);
-        ///// <summary>
-        ///// Moves the top element into the given valid index, shifting up the elements above this index to open space. 
-        ///// </summary>
-        //ILuaState Insert(int idx);
-        ///// <summary>
-        ///// Removes the element at the given valid index, shifting down the elements above this index to fill the gap. 
-        ///// </summary>
-        //ILuaState Remove(int idx);
-        ///// <summary>
-        ///// Moves the top element into the given valid index without shifting any element (therefore replacing the value at that given index), 
-        ///// and then pops the top element. 
-        ///// </summary>
-        //ILuaState Replace(int idx);
+        /// <summary>
+        /// Moves the top element into the given valid index, shifting up the elements above this index to open space. 
+        /// </summary>
+        public void LuaInsert(int idx)
+        {
+            LuaDll.lua_insert(NativeState, idx);
+        }
+        /// <summary>
+        /// Removes the element at the given valid index, shifting down the elements above this index to fill the gap. 
+        /// </summary>
+        public void LuaRemove(int idx)
+        {
+            LuaDll.lua_remove(NativeState, idx);
+        }
+        /// <summary>
+        /// Moves the top element into the given valid index without shifting any element (therefore replacing the value at that given index), 
+        /// and then pops the top element. 
+        /// </summary>
+        public void LuaReplace(int idx)
+        {
+            LuaDll.lua_replace(NativeState, idx);
+        }
         #endregion
 
         //#region compatibility macros for unsigned conversions

@@ -1834,90 +1834,368 @@ return c..'!!'
             }
         }
 
-        //[Fact]
-        //public void TestInsert()
-        //{
-        //    LuaState L = null;
-        //    using (L = new LuaState())
-        //    {
-        //        Assert.Equal(0, L.GetTop());
-        //        L.PushNumber(1);
-        //        L.PushString("Test");
-        //        L.PushNumber(2);
-        //        L.PushString("Text");
-        //        L.PushNumber(3);
-        //        L.PushString("Toto");
-        //        L.PushNumber(4);
-        //        Assert.Equal(7, L.GetTop());
+        [Fact]
+        public void TestLuaPop()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushNumber(1);
+                L.LuaPushString("Text");
+                L.LuaPushNumber(2);
+                L.LuaPushString("Text");
+                Assert.Equal(4, L.LuaGetTop());
+                L.LuaPop(2);
+                Assert.Equal(2, L.LuaGetTop());
+                L.LuaPop(1);
+                Assert.Equal(1, L.LuaGetTop());
+                L.LuaPop(2);
+                Assert.Equal(-1, L.LuaGetTop());
+            }
+        }
 
-        //        L.Insert(2);
-        //        Assert.Equal(7, L.GetTop());
+        [Fact]
+        public void TestLuaNewTable()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaNewTable();
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Table, L.LuaType(-1));
+            }
+        }
 
-        //        Assert.Equal(1, L.ToNumber(1));
-        //        Assert.Equal(4, L.ToNumber(2));
-        //        Assert.Equal("Test", L.ToString(3));
-        //        Assert.Equal(2, L.ToNumber(4));
-        //        Assert.Equal("Text", L.ToString(5));
-        //        Assert.Equal(3, L.ToNumber(6));
-        //        Assert.Equal("Toto", L.ToString(7));
-        //    }
-        //}
+        [Fact]
+        public void TestLuaRegister()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaGetGlobal("a");
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Nil, L.LuaType(-1));
 
-        //[Fact]
-        //public void TestRemove()
-        //{
-        //    LuaState L = null;
-        //    using (L = new LuaState())
-        //    {
-        //        Assert.Equal(0, L.GetTop());
-        //        L.PushNumber(1);
-        //        L.PushString("Test");
-        //        L.PushNumber(2);
-        //        L.PushString("Text");
-        //        L.PushNumber(3);
-        //        L.PushString("Toto");
-        //        L.PushNumber(4);
-        //        Assert.Equal(7, L.GetTop());
+                L.LuaRegister("a", (l) => {
+                    l.LuaPushNumber(12.34);
+                    return 0;
+                });
 
-        //        L.Remove(2);
-        //        Assert.Equal(6, L.GetTop());
+                L.LuaGetGlobal("a");
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(LuaType.Function, L.LuaType(-1));
+            }
+        }
 
-        //        Assert.Equal(1, L.ToNumber(1));
-        //        Assert.Equal(2, L.ToNumber(2));
-        //        Assert.Equal("Text", L.ToString(3));
-        //        Assert.Equal(3, L.ToNumber(4));
-        //        Assert.Equal("Toto", L.ToString(5));
-        //        Assert.Equal(4, L.ToNumber(6));
-        //    }
-        //}
+        [Fact]
+        public void TestLuaPushCFunction()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushCFunction((l) => {
+                    l.LuaPushNumber(12.34);
+                    return 0;
+                });
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Function, L.LuaType(-1));
 
-        //[Fact]
-        //public void TestReplace()
-        //{
-        //    LuaState L = null;
-        //    using (L = new LuaState())
-        //    {
-        //        Assert.Equal(0, L.GetTop());
-        //        L.PushNumber(1);
-        //        L.PushString("Test");
-        //        L.PushNumber(2);
-        //        L.PushString("Text");
-        //        L.PushNumber(3);
-        //        L.PushString("Toto");
-        //        L.PushNumber(4);
-        //        Assert.Equal(7, L.GetTop());
+                Assert.Throws<ArgumentNullException>(() => L.LuaPushCFunction(null));
+            }
+        }
 
-        //        L.Replace(2);
-        //        Assert.Equal(6, L.GetTop());
+        [Fact]
+        public void TestLuaIsFunction()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
 
-        //        Assert.Equal(1, L.ToNumber(1));
-        //        Assert.Equal(4, L.ToNumber(2));
-        //        Assert.Equal(2, L.ToNumber(3));
-        //        Assert.Equal("Text", L.ToString(4));
-        //        Assert.Equal(3, L.ToNumber(5));
-        //        Assert.Equal("Toto", L.ToString(6));
-        //    }
-        //}
+                // TODO Add test with Lua script function
+                Assert.False(L.LuaIsFunction(1));
+                Assert.False(L.LuaIsFunction(2));
+                Assert.False(L.LuaIsFunction(3));
+                Assert.False(L.LuaIsFunction(4));
+                Assert.False(L.LuaIsFunction(5));
+                Assert.False(L.LuaIsFunction(6));
+                Assert.False(L.LuaIsFunction(7));
+                Assert.False(L.LuaIsFunction(8));
+                Assert.True(L.LuaIsFunction(9));
+                Assert.False(L.LuaIsFunction(10));
+                Assert.False(L.LuaIsFunction(11));
+                Assert.False(L.LuaIsFunction(12));
+            }
+        }
+
+        [Fact]
+        public void TestLuaIsTable()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
+
+                Assert.False(L.LuaIsTable(1));
+                Assert.False(L.LuaIsTable(2));
+                Assert.False(L.LuaIsTable(3));
+                Assert.False(L.LuaIsTable(4));
+                Assert.False(L.LuaIsTable(5));
+                Assert.False(L.LuaIsTable(6));
+                Assert.False(L.LuaIsTable(7));
+                Assert.False(L.LuaIsTable(8));
+                Assert.False(L.LuaIsTable(9));
+                Assert.False(L.LuaIsTable(10));
+                Assert.False(L.LuaIsTable(11));
+                Assert.False(L.LuaIsTable(12));
+            }
+        }
+
+        [Fact]
+        public void TestLuaIsLightUserData()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
+
+                Assert.False(L.LuaIsLightUserData(1));
+                Assert.False(L.LuaIsLightUserData(2));
+                Assert.False(L.LuaIsLightUserData(3));
+                Assert.False(L.LuaIsLightUserData(4));
+                Assert.False(L.LuaIsLightUserData(5));
+                Assert.False(L.LuaIsLightUserData(6));
+                Assert.False(L.LuaIsLightUserData(7));
+                Assert.False(L.LuaIsLightUserData(8));
+                Assert.False(L.LuaIsLightUserData(9));
+                Assert.False(L.LuaIsLightUserData(10));
+                Assert.False(L.LuaIsLightUserData(11));
+                Assert.False(L.LuaIsLightUserData(12));
+            }
+        }
+
+        [Fact]
+        public void TestLuaIsNil()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
+
+                Assert.True(L.LuaIsNil(1));
+                Assert.False(L.LuaIsNil(2));
+                Assert.False(L.LuaIsNil(3));
+                Assert.False(L.LuaIsNil(4));
+                Assert.False(L.LuaIsNil(5));
+                Assert.False(L.LuaIsNil(6));
+                Assert.False(L.LuaIsNil(7));
+                Assert.False(L.LuaIsNil(8));
+                Assert.False(L.LuaIsNil(9));
+                Assert.False(L.LuaIsNil(10));
+                Assert.False(L.LuaIsNil(11));
+                Assert.False(L.LuaIsNil(12));
+            }
+        }
+
+        [Fact]
+        public void TestLuaIsBoolean()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
+
+                Assert.False(L.LuaIsBoolean(1));
+                Assert.False(L.LuaIsBoolean(2));
+                Assert.False(L.LuaIsBoolean(3));
+                Assert.False(L.LuaIsBoolean(4));
+                Assert.False(L.LuaIsBoolean(5));
+                Assert.False(L.LuaIsBoolean(6));
+                Assert.False(L.LuaIsBoolean(7));
+                Assert.True(L.LuaIsBoolean(8));
+                Assert.False(L.LuaIsBoolean(9));
+                Assert.False(L.LuaIsBoolean(10));
+                Assert.False(L.LuaIsBoolean(11));
+                Assert.False(L.LuaIsBoolean(12));
+            }
+        }
+
+        [Fact]
+        public void TestLuaIsThread()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
+
+                Assert.False(L.LuaIsThread(1));
+                Assert.False(L.LuaIsThread(2));
+                Assert.False(L.LuaIsThread(3));
+                Assert.False(L.LuaIsThread(4));
+                Assert.False(L.LuaIsThread(5));
+                Assert.False(L.LuaIsThread(6));
+                Assert.False(L.LuaIsThread(7));
+                Assert.False(L.LuaIsThread(8));
+                Assert.False(L.LuaIsThread(9));
+                Assert.False(L.LuaIsThread(10));
+                Assert.False(L.LuaIsThread(11));
+                Assert.False(L.LuaIsThread(12));
+            }
+        }
+
+        [Fact]
+        public void TestLuaIsNone()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
+
+                Assert.False(L.LuaIsNone(1));
+                Assert.False(L.LuaIsNone(2));
+                Assert.False(L.LuaIsNone(3));
+                Assert.False(L.LuaIsNone(4));
+                Assert.False(L.LuaIsNone(5));
+                Assert.False(L.LuaIsNone(6));
+                Assert.False(L.LuaIsNone(7));
+                Assert.False(L.LuaIsNone(8));
+                Assert.False(L.LuaIsNone(9));
+                Assert.True(L.LuaIsNone(10));
+                Assert.True(L.LuaIsNone(11));
+                Assert.True(L.LuaIsNone(12));
+            }
+        }
+
+        [Fact]
+        public void TestLuaIsNoneOrNil()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
+
+                Assert.True(L.LuaIsNoneOrNil(1));
+                Assert.False(L.LuaIsNoneOrNil(2));
+                Assert.False(L.LuaIsNoneOrNil(3));
+                Assert.False(L.LuaIsNoneOrNil(4));
+                Assert.False(L.LuaIsNoneOrNil(5));
+                Assert.False(L.LuaIsNoneOrNil(6));
+                Assert.False(L.LuaIsNoneOrNil(7));
+                Assert.False(L.LuaIsNoneOrNil(8));
+                Assert.False(L.LuaIsNoneOrNil(9));
+                Assert.True(L.LuaIsNoneOrNil(10));
+                Assert.True(L.LuaIsNoneOrNil(11));
+                Assert.True(L.LuaIsNoneOrNil(12));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPushLiteral()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushLiteral("Test");
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.String, L.LuaType(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPushGlobalTable()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushGlobalTable();
+                Assert.Equal(LuaType.Table, L.LuaType(-1));
+            }
+        }
+
+        [Fact]
+        public void TestLuaInsert()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaPushNumber(1);
+                L.LuaPushString("Test");
+                L.LuaPushNumber(2);
+                L.LuaPushString("Text");
+                L.LuaPushNumber(3);
+                L.LuaPushString("Toto");
+                L.LuaPushNumber(4);
+                Assert.Equal(7, L.LuaGetTop());
+
+                L.LuaInsert(2);
+                Assert.Equal(7, L.LuaGetTop());
+
+                Assert.Equal(1, L.LuaToNumber(1));
+                Assert.Equal(4, L.LuaToNumber(2));
+                Assert.Equal("Test", L.LuaToString(3));
+                Assert.Equal(2, L.LuaToNumber(4));
+                Assert.Equal("Text", L.LuaToString(5));
+                Assert.Equal(3, L.LuaToNumber(6));
+                Assert.Equal("Toto", L.LuaToString(7));
+            }
+        }
+
+        [Fact]
+        public void TestLuaRemove()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaPushNumber(1);
+                L.LuaPushString("Test");
+                L.LuaPushNumber(2);
+                L.LuaPushString("Text");
+                L.LuaPushNumber(3);
+                L.LuaPushString("Toto");
+                L.LuaPushNumber(4);
+                Assert.Equal(7, L.LuaGetTop());
+
+                L.LuaRemove(2);
+                Assert.Equal(6, L.LuaGetTop());
+
+                Assert.Equal(1, L.LuaToNumber(1));
+                Assert.Equal(2, L.LuaToNumber(2));
+                Assert.Equal("Text", L.LuaToString(3));
+                Assert.Equal(3, L.LuaToNumber(4));
+                Assert.Equal("Toto", L.LuaToString(5));
+                Assert.Equal(4, L.LuaToNumber(6));
+            }
+        }
+
+        [Fact]
+        public void TestLuaReplace()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaPushNumber(1);
+                L.LuaPushString("Test");
+                L.LuaPushNumber(2);
+                L.LuaPushString("Text");
+                L.LuaPushNumber(3);
+                L.LuaPushString("Toto");
+                L.LuaPushNumber(4);
+                Assert.Equal(7, L.LuaGetTop());
+
+                L.LuaReplace(2);
+                Assert.Equal(6, L.LuaGetTop());
+
+                Assert.Equal(1, L.LuaToNumber(1));
+                Assert.Equal(4, L.LuaToNumber(2));
+                Assert.Equal(2, L.LuaToNumber(3));
+                Assert.Equal("Text", L.LuaToString(4));
+                Assert.Equal(3, L.LuaToNumber(5));
+                Assert.Equal("Toto", L.LuaToString(6));
+            }
+        }
 
     }
 }
