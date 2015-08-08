@@ -1386,11 +1386,14 @@ namespace LuaN.DllWrapper
         ///// <summary>
         ///// Loads a file as a Lua chunk. 
         ///// </summary>
-        //LuaStatus LoadFile(String filename, String mode);
-        ///// <summary>
-        ///// Loads a file as a Lua chunk. 
-        ///// </summary>
-        //LuaStatus LoadFile(String filename);
+        //LuaStatus LuaLLoadFileX(String filename, String mode);
+        /// <summary>
+        /// Loads a file as a Lua chunk. 
+        /// </summary>
+        public LuaStatus LuaLLoadFile(String filename)
+        {
+            return (LuaStatus)LuaDll.luaL_loadfile(NativeState, filename);
+        }
 
         ////    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         ////    public extern static int luaL_loadbufferx(lua_State L, String buff, int sz, String name, String mode);

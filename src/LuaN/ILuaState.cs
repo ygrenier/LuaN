@@ -743,11 +743,11 @@ namespace LuaN
         ///// <summary>
         ///// Loads a file as a Lua chunk. 
         ///// </summary>
-        //LuaStatus LuaLLoadFile(String filename, String mode);
-        ///// <summary>
-        ///// Loads a file as a Lua chunk. 
-        ///// </summary>
-        //LuaStatus LuaLLoadFile(String filename);
+        //LuaStatus LuaLLoadFileX(String filename, String mode);
+        /// <summary>
+        /// Loads a file as a Lua chunk. 
+        /// </summary>
+        LuaStatus LuaLLoadFile(String filename);
 
         ////    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         ////    public extern static int luaL_loadbufferx(lua_State L, String buff, int sz, String name, String mode);
