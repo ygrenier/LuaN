@@ -69,6 +69,7 @@
     <Compile Include="LuaEngineTest.cs" />
     <Compile Include="LuaStateTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserDataIndexTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LuaStateTest.LAuxLib.cs" />

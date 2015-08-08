@@ -10,7 +10,7 @@ namespace LuaN.DllWrapper
     /// <summary>
     /// Wrapp the Dll user data
     /// </summary>
-    class LuaUserData : ILuaUserData
+    public class LuaUserData : ILuaUserData
     {
 
         /// <summary>

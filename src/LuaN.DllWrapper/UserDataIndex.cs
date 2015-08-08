@@ -41,6 +41,12 @@ namespace LuaN.DllWrapper
 
         UserDataRef FindData(Object data, out IList<UserDataRef> lst, out SByte hash)
         {
+            if (data == null)
+            {
+                lst = null;
+                hash = 0;
+                return null;
+            }
             hash = (SByte)(data.GetHashCode() >> 24);
             if (!_DataIndex.TryGetValue(hash, out lst))
                 return null;
@@ -76,9 +82,9 @@ namespace LuaN.DllWrapper
             SByte hash;
             IList<UserDataRef> lst;
             var result = FindData(data, out lst, out hash);
-            if (result == null)
+            if (result == null && data != null)
             {
-                if(data is LuaUserData)
+                if (data is LuaUserData)
                 {
                     result = new UserDataRef()
                     {
@@ -112,6 +118,7 @@ namespace LuaN.DllWrapper
         {
             var ud = FindPointer(udRef);
             if (ud == null) return false;
+            _DataRefs.Remove(ud.Pointer);
             var hash = (SByte)(ud.Data.GetHashCode() >> 24);
             IList<UserDataRef> lst;
             if (_DataIndex.TryGetValue(hash, out lst))
@@ -122,6 +129,19 @@ namespace LuaN.DllWrapper
             }
             return true;
         }
+
+        /// <summary>
+        /// Get the list of the userdata
+        /// </summary>
+        public IEnumerable<UserDataRef> GetUserDatas()
+        {
+            return _DataRefs.Values;
+        }
+
+        /// <summary>
+        /// Count of userdata registered 
+        /// </summary>
+        public int Count { get { return _DataRefs.Count; } }
 
     }
 
