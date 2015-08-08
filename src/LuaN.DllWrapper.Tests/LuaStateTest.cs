@@ -1337,7 +1337,7 @@ namespace LuaN.DllWrapper.Tests
                 }, 0);
                 L.LuaPushNumber(12);
                 L.LuaPushNumber(4);
-                Assert.Throws<NotImplementedException>(() => L.LuaCallK(2, 1, 0, null));
+                L.LuaCallK(2, 1, 0, null);
             }
         }
 
@@ -1398,7 +1398,7 @@ namespace LuaN.DllWrapper.Tests
                 }, 0);
                 L.LuaPushNumber(12);
                 L.LuaPushNumber(4);
-                Assert.Throws<NotImplementedException>(() => L.LuaPCallK(2, 1, 0, 0, null));
+                L.LuaPCallK(2, 1, 0, 0, null);
             }
         }
 

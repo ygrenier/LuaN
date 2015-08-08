@@ -877,8 +877,7 @@ namespace LuaN.DllWrapper
         /// </summary>
         public void LuaCallK(int nargs, int nresults, int ctx, LuaKFunction k)
         {
-            // TODO Implements
-            throw new NotImplementedException();
+            LuaDll.lua_callk(NativeState, nargs, nresults, ctx, WrapKFunction(k));
         }
         /// <summary>
         /// Calls a function in protected mode.
@@ -892,8 +891,7 @@ namespace LuaN.DllWrapper
         /// </summary>
         public LuaStatus LuaPCallK(int nargs, int nresults, int errfunc, int ctx, LuaKFunction k)
         {
-            // TODO Implements
-            throw new NotImplementedException();
+            return (LuaStatus)LuaDll.lua_pcallk(NativeState, nargs, nresults, errfunc, ctx, WrapKFunction(k));
         }
         /// <summary>
         /// Loads a Lua chunk without running it.
