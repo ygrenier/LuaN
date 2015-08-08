@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Delegates.cs" />
+    <Compile Include="ILuaDebug.cs" />
     <Compile Include="ILuaEngine.cs" />
     <Compile Include="ILuaState.cs" />
     <Compile Include="ILuaUserData.cs" />

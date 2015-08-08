@@ -1169,27 +1169,70 @@ namespace LuaN.DllWrapper
         }
         #endregion
 
-        //#region Debug API
-        ///// <summary>
-        ///// Create a new debug info struct
-        ///// </summary>
-        //ILuaDebug NewLuaDebug();
-        ///// <summary>
-        ///// Gets information about the interpreter runtime stack. 
-        ///// </summary>
-        //bool GetStack(int level, ILuaDebug ar);
-        ///// <summary>
-        ///// Gets information about a specific function or function invocation. 
-        ///// </summary>
-        //bool GetInfo(LuaGetInfoWhat what, ILuaDebug ar);
-        ///// <summary>
-        ///// Gets information about a local variable of a given activation record or a given function. 
-        ///// </summary>
-        //String GetLocal(ILuaDebug ar, int n);
-        ///// <summary>
-        ///// Sets the value of a local variable of a given activation record. 
-        ///// </summary>
-        //String SetLocal(ILuaDebug ar, int n);
+        #region Debug API
+        /// <summary>
+        /// Create a new debug info struct
+        /// </summary>
+        public ILuaDebug NewLuaDebug()
+        {
+            return new LuaDebugWrapper();
+        }
+        /// <summary>
+        /// Gets information about the interpreter runtime stack. 
+        /// </summary>
+        public bool LuaGetStack(int level, ILuaDebug ar)
+        {
+            if (ar == null) throw new ArgumentNullException("ar");
+            LuaDebugWrapper wrapper = ar as LuaDebugWrapper;
+            if (wrapper == null) throw new ArgumentException("Invalid ILuaDebug", "ar");
+            var result = LuaDll.lua_getstack(NativeState, level, wrapper.NativePointer);
+            wrapper.NativeContentChanged(LuaGetInfoWhat.None);
+            return result != 0;
+        }
+        /// <summary>
+        /// Gets information about a specific function or function invocation. 
+        /// </summary>
+        public bool LuaGetInfo(LuaGetInfoWhat what, ILuaDebug ar)
+        {
+            if (ar == null) throw new ArgumentNullException("ar");
+            LuaDebugWrapper wrapper = ar as LuaDebugWrapper;
+            if (wrapper == null) throw new ArgumentException("Invalid ILuaDebug", "ar");
+            StringBuilder buildWhat = new StringBuilder();
+            if ((what & LuaGetInfoWhat.FromTopOfStack) != 0) buildWhat.Append('>');
+            if ((what & LuaGetInfoWhat.Name) != 0) buildWhat.Append('n');
+            if ((what & LuaGetInfoWhat.Source) != 0) buildWhat.Append('S');
+            if ((what & LuaGetInfoWhat.CurrentLine) != 0) buildWhat.Append('l');
+            if ((what & LuaGetInfoWhat.IsTailCall) != 0) buildWhat.Append('t');
+            if ((what & LuaGetInfoWhat.ParamsUps) != 0) buildWhat.Append('u');
+            if ((what & LuaGetInfoWhat.PushFunction) != 0) buildWhat.Append('f');
+            if ((what & LuaGetInfoWhat.PushLines) != 0) buildWhat.Append('L');
+            var result = LuaDll.lua_getinfo(NativeState, buildWhat.ToString(), wrapper.NativePointer);
+            wrapper.NativeContentChanged(what);
+            return result != 0;
+        }
+        /// <summary>
+        /// Gets information about a local variable of a given activation record or a given function. 
+        /// </summary>
+        public String LuaGetLocal(ILuaDebug ar, int n)
+        {
+            LuaDebugWrapper wrapper = null;
+            if (ar != null)
+            {
+                wrapper = ar as LuaDebugWrapper;
+                if (wrapper == null) throw new ArgumentException("Invalid ILuaDebug", "ar");
+            }
+            return LuaDll.lua_getlocal(NativeState, wrapper != null ? wrapper.NativePointer : IntPtr.Zero, n);
+        }
+        /// <summary>
+        /// Sets the value of a local variable of a given activation record. 
+        /// </summary>
+        public String LuaSetLocal(ILuaDebug ar, int n)
+        {
+            if (ar == null) throw new ArgumentNullException("ar");
+            LuaDebugWrapper wrapper = ar as LuaDebugWrapper;
+            if (wrapper == null) throw new ArgumentException("Invalid ILuaDebug", "ar");
+            return LuaDll.lua_setlocal(NativeState, wrapper.NativePointer, n);
+        }
         ///// <summary>
         ///// Gets information about the n-th upvalue of the closure at index funcindex. 
         ///// </summary>
@@ -1222,7 +1265,7 @@ namespace LuaN.DllWrapper
         ///// Returns the current hook count. 
         ///// </summary>
         //int GetHookCount();
-        //#endregion
+        #endregion
 
         //#region lauxlib
 

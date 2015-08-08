@@ -569,27 +569,27 @@ namespace LuaN
         UInt64 LuaToUnsigned(int idx);
         #endregion
 
-        //#region Debug API
-        ///// <summary>
-        ///// Create a new debug info struct
-        ///// </summary>
-        //ILuaDebug NewLuaDebug();
-        ///// <summary>
-        ///// Gets information about the interpreter runtime stack. 
-        ///// </summary>
-        //bool GetStack(int level, ILuaDebug ar);
-        ///// <summary>
-        ///// Gets information about a specific function or function invocation. 
-        ///// </summary>
-        //bool GetInfo(LuaGetInfoWhat what, ILuaDebug ar);
-        ///// <summary>
-        ///// Gets information about a local variable of a given activation record or a given function. 
-        ///// </summary>
-        //String GetLocal(ILuaDebug ar, int n);
-        ///// <summary>
-        ///// Sets the value of a local variable of a given activation record. 
-        ///// </summary>
-        //String SetLocal(ILuaDebug ar, int n);
+        #region Debug API
+        /// <summary>
+        /// Create a new debug info struct
+        /// </summary>
+        ILuaDebug NewLuaDebug();
+        /// <summary>
+        /// Gets information about the interpreter runtime stack. 
+        /// </summary>
+        bool LuaGetStack(int level, ILuaDebug ar);
+        /// <summary>
+        /// Gets information about a specific function or function invocation. 
+        /// </summary>
+        bool LuaGetInfo(LuaGetInfoWhat what, ILuaDebug ar);
+        /// <summary>
+        /// Gets information about a local variable of a given activation record or a given function. 
+        /// </summary>
+        String LuaGetLocal(ILuaDebug ar, int n);
+        /// <summary>
+        /// Sets the value of a local variable of a given activation record. 
+        /// </summary>
+        String LuaSetLocal(ILuaDebug ar, int n);
         ///// <summary>
         ///// Gets information about the n-th upvalue of the closure at index funcindex. 
         ///// </summary>
@@ -622,9 +622,9 @@ namespace LuaN
         ///// Returns the current hook count. 
         ///// </summary>
         //int GetHookCount();
-        //#endregion
+        #endregion
 
-        //#region lauxlib
+        #region lauxlib
 
         ///// <summary>
         ///// Checks whether the core running the call, the core that created the Lua state, and the code making the call are all using the same version of Lua.
@@ -854,7 +854,7 @@ namespace LuaN
         ////    //#endif
         ////    /* }============================================================ */
 
-        //#endregion
+        #endregion
 
         //#region lualib
 

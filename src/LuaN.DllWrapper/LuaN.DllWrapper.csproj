@@ -42,6 +42,9 @@
     <Compile Include="..\LuaN\Delegates.cs">
       <Link>LuaN\Delegates.cs</Link>
     </Compile>
+    <Compile Include="..\LuaN\ILuaDebug.cs">
+      <Link>LuaN\ILuaDebug.cs</Link>
+    </Compile>
     <Compile Include="..\LuaN\ILuaEngine.cs">
       <Link>LuaN\ILuaEngine.cs</Link>
     </Compile>
@@ -60,6 +63,7 @@
     <Compile Include="..\LuaN\[Enums].cs">
       <Link>LuaN\[Enums].cs</Link>
     </Compile>
+    <Compile Include="LuaDebugWrapper.cs" />
     <Compile Include="LuaKFunctionWrapper.cs" />
     <Compile Include="LuaCFunctionWrapper.cs" />
     <Compile Include="LuaDll.lauxlib.h.cs" />
