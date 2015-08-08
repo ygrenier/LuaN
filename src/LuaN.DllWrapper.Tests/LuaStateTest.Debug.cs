@@ -139,22 +139,21 @@ namespace LuaN.DllWrapper.Tests
 
                 // TODO Add test from Lua code
 
-                // TODO Uncomment when the functions are implemented
-                //                L.LuaDoString(@"
-                //function test(a,b)
-                // local c = a + b
-                // print('test ', a, b, c)
-                //end
-                //");
-                //// Local names
-                //L.LuaGetGlobal("test");
-                //Assert.Equal(1, L.LuaGetTop());
-                //Assert.Equal(null, L.LuaGetLocal(null, 0));
-                //Assert.Equal("a", L.LuaGetLocal(null, 1));
-                //Assert.Equal("b", L.LuaGetLocal(null, 2));
-                //Assert.Equal(null, L.LuaGetLocal(null, 3));
-                //Assert.Equal(null, L.LuaGetLocal(null, 4));
-                //Assert.Equal(1, L.LuaGetTop());
+                L.LuaLDoString(@"
+function test(a,b)
+    local c = a + b
+    return a, b, c
+end
+                ");
+                // Local names
+                L.LuaGetGlobal("test");
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(null, L.LuaGetLocal(null, 0));
+                Assert.Equal("a", L.LuaGetLocal(null, 1));
+                Assert.Equal("b", L.LuaGetLocal(null, 2));
+                Assert.Equal(null, L.LuaGetLocal(null, 3));
+                Assert.Equal(null, L.LuaGetLocal(null, 4));
+                Assert.Equal(1, L.LuaGetTop());
 
                 var mDebug = new Mock<ILuaDebug>();
                 Assert.Throws<ArgumentException>(() => L.LuaGetLocal(mDebug.Object, 0));

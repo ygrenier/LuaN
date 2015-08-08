@@ -31,5 +31,26 @@ namespace LuaN
         {
             return L.LuaToUnsignedX(idx, out isnum);
         }
+        /// <summary>
+        /// Alias to LuaLLoadString
+        /// </summary>
+        public static LuaStatus LoadString(this ILuaState L, String s)
+        {
+            return L.LuaLLoadString(s);
+        }
+        /// <summary>
+        /// Alias to LuaLDoFile
+        /// </summary>
+        public static LuaStatus DoFile(this ILuaState L, String fn)
+        {
+            return L.LuaLDoFile(fn);
+        }
+        /// <summary>
+        /// Alias to LuaLDoString
+        /// </summary>
+        public static LuaStatus DoString(this ILuaState L, String s)
+        {
+            return L.LuaLDoString(s);
+        }
     }
 }

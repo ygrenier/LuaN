@@ -70,6 +70,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LuaStateTest.LAuxLib.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -405,6 +405,14 @@ namespace LuaN.DllWrapper.Tests
 
         void PushTestValues(LuaState L, LuaCFunction f = null, Object userData = null)
         {
+            var oldTop = L.LuaGetTop();
+            L.DoString(@"
+function test1(a,b)
+ return a * b
+end
+");
+            L.LuaSetTop(oldTop);
+
             f = f ?? (l => 0);
             L.LuaPushNil();
             L.LuaPushNumber(123.45);
@@ -414,6 +422,7 @@ namespace LuaN.DllWrapper.Tests
             L.LuaPushString("5D");
             L.LuaPushString("5z");
             L.LuaPushBoolean(true);
+            L.LuaGetGlobal("test1");
             L.LuaPushCClosure(f, 0);
             L.LuaPushLightUserData(userData ?? this);
             L.LuaPushGlobalTable();
@@ -440,6 +449,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.False(L.LuaIsNumber(10));
                 Assert.False(L.LuaIsNumber(11));
                 Assert.False(L.LuaIsNumber(12));
+                Assert.False(L.LuaIsNumber(13));
             }
         }
 
@@ -463,6 +473,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.False(L.LuaIsString(10));
                 Assert.False(L.LuaIsString(11));
                 Assert.False(L.LuaIsString(12));
+                Assert.False(L.LuaIsString(13));
             }
         }
 
@@ -474,7 +485,6 @@ namespace LuaN.DllWrapper.Tests
             {
                 PushTestValues(L);
 
-                // TODO Add test with Lua script function
                 Assert.False(L.LuaIsCFunction(1));
                 Assert.False(L.LuaIsCFunction(2));
                 Assert.False(L.LuaIsCFunction(3));
@@ -483,10 +493,11 @@ namespace LuaN.DllWrapper.Tests
                 Assert.False(L.LuaIsCFunction(6));
                 Assert.False(L.LuaIsCFunction(7));
                 Assert.False(L.LuaIsCFunction(8));
-                Assert.True(L.LuaIsCFunction(9));
-                Assert.False(L.LuaIsCFunction(10));
+                Assert.False(L.LuaIsCFunction(9));
+                Assert.True(L.LuaIsCFunction(10));
                 Assert.False(L.LuaIsCFunction(11));
                 Assert.False(L.LuaIsCFunction(12));
+                Assert.False(L.LuaIsCFunction(13));
             }
         }
 
@@ -510,6 +521,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.False(L.LuaIsInteger(10));
                 Assert.False(L.LuaIsInteger(11));
                 Assert.False(L.LuaIsInteger(12));
+                Assert.False(L.LuaIsInteger(13));
             }
         }
 
@@ -530,9 +542,10 @@ namespace LuaN.DllWrapper.Tests
                 Assert.False(L.LuaIsUserData(7));
                 Assert.False(L.LuaIsUserData(8));
                 Assert.False(L.LuaIsUserData(9));
-                Assert.True(L.LuaIsUserData(10));
-                Assert.False(L.LuaIsUserData(11));
+                Assert.False(L.LuaIsUserData(10));
+                Assert.True(L.LuaIsUserData(11));
                 Assert.False(L.LuaIsUserData(12));
+                Assert.False(L.LuaIsUserData(13));
             }
         }
 
@@ -553,9 +566,10 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(LuaType.String, L.LuaType(7));
                 Assert.Equal(LuaType.Boolean, L.LuaType(8));
                 Assert.Equal(LuaType.Function, L.LuaType(9));
-                Assert.Equal(LuaType.LightUserData, L.LuaType(10));
-                Assert.Equal(LuaType.Table, L.LuaType(11));
-                Assert.Equal(LuaType.Thread, L.LuaType(12));
+                Assert.Equal(LuaType.Function, L.LuaType(10));
+                Assert.Equal(LuaType.LightUserData, L.LuaType(11));
+                Assert.Equal(LuaType.Table, L.LuaType(12));
+                Assert.Equal(LuaType.Thread, L.LuaType(13));
             }
         }
 
@@ -614,6 +628,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(0.0, L.LuaToNumber(10));
                 Assert.Equal(0.0, L.LuaToNumber(11));
                 Assert.Equal(0.0, L.LuaToNumber(12));
+                Assert.Equal(0.0, L.LuaToNumber(13));
             }
         }
 
@@ -650,6 +665,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(0, L.LuaToInteger(10));
                 Assert.Equal(0, L.LuaToInteger(11));
                 Assert.Equal(0, L.LuaToInteger(12));
+                Assert.Equal(0, L.LuaToInteger(13));
             }
         }
 
@@ -673,6 +689,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(true, L.LuaToBoolean(10));
                 Assert.Equal(true, L.LuaToBoolean(11));
                 Assert.Equal(true, L.LuaToBoolean(12));
+                Assert.Equal(true, L.LuaToBoolean(13));
             }
         }
 
@@ -696,6 +713,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(null, L.LuaToString(10));
                 Assert.Equal(null, L.LuaToString(11));
                 Assert.Equal(null, L.LuaToString(12));
+                Assert.Equal(null, L.LuaToString(13));
             }
         }
 
@@ -719,6 +737,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(0u, L.LuaRawLen(10));
                 Assert.Equal(0u, L.LuaRawLen(11));
                 Assert.Equal(0u, L.LuaRawLen(12));
+                Assert.Equal(0u, L.LuaRawLen(13));
             }
         }
 
@@ -739,10 +758,11 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(null, L.LuaToCFunction(6));
                 Assert.Equal(null, L.LuaToCFunction(7));
                 Assert.Equal(null, L.LuaToCFunction(8));
-                Assert.Same(f, L.LuaToCFunction(9));
-                Assert.Equal(null, L.LuaToCFunction(10));
+                Assert.Equal(null, L.LuaToCFunction(9));
+                Assert.Same(f, L.LuaToCFunction(10));
                 Assert.Equal(null, L.LuaToCFunction(11));
                 Assert.Equal(null, L.LuaToCFunction(12));
+                Assert.Equal(null, L.LuaToCFunction(13));
             }
         }
 
@@ -765,9 +785,10 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(null, L.LuaToUserData(7));
                 Assert.Equal(null, L.LuaToUserData(8));
                 Assert.Equal(null, L.LuaToUserData(9));
-                Assert.Equal(dt, L.LuaToUserData(10));
-                Assert.Equal(null, L.LuaToUserData(11));
+                Assert.Equal(null, L.LuaToUserData(10));
+                Assert.Equal(dt, L.LuaToUserData(11));
                 Assert.Equal(null, L.LuaToUserData(12));
+                Assert.Equal(null, L.LuaToUserData(13));
 
                 L.LuaSetTop(0);
                 L.LuaPushLightUserData(this);
@@ -801,7 +822,8 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(null, L.LuaToThread(9));
                 Assert.Equal(null, L.LuaToThread(10));
                 Assert.Equal(null, L.LuaToThread(11));
-                Assert.Same(L, L.LuaToThread(12));
+                Assert.Equal(null, L.LuaToThread(12));
+                Assert.Same(L, L.LuaToThread(13));
             }
         }
 
@@ -1299,28 +1321,27 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(1, L.LuaGetTop());
                 Assert.Equal(48, L.LuaToNumber(-1));
 
-                // TODO Implements when methods will be implemented
-//                L.LuaDoString(@"
-//function testA(a,b)
-//return a-b
-//end
-//function testB(a,b)
-//DoAnError(a,b)
-//end
-//");
-//                Assert.Equal(1, L.GetTop());
-//                L.GetGlobal("testA");
-//                L.PushNumber(12);
-//                L.PushNumber(4);
-//                L.Call(2, 1);
-//                Assert.Equal(2, L.GetTop());
-//                Assert.Equal(8, L.ToNumber(-1));
+                L.DoString(@"
+function testA(a,b)
+ return a-b
+end
+function testB(a,b)
+ DoAnError(a,b)
+end
+");
+                Assert.Equal(1, L.LuaGetTop());
+                L.LuaGetGlobal("testA");
+                L.LuaPushNumber(12);
+                L.LuaPushNumber(4);
+                L.LuaCall(2, 1);
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(8, L.LuaToNumber(-1));
 
-//                L.GetGlobal("testB");
-//                L.PushNumber(12);
-//                L.PushNumber(4);
-//                var ex = Assert.Throws<LuaAtPanicException>(() => L.Call(2, 1));
-//                Assert.Equal("[string \"\r...\"]:6: attempt to call a nil value (global 'DoAnError')", ex.Message);
+                L.LuaGetGlobal("testB");
+                L.LuaPushNumber(12);
+                L.LuaPushNumber(4);
+                var ex = Assert.Throws<LuaException>(() => L.LuaCall(2, 1));
+                Assert.Equal("[string \"\r...\"]:6: attempt to call a nil value (global 'DoAnError')", ex.Message);
             }
         }
 
@@ -1360,28 +1381,27 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(1, L.LuaGetTop());
                 Assert.Equal(48, L.LuaToNumber(-1));
 
-                /// TODO Implements when the methods will be implemented
-//                L.DoString(@"
-//function testA(a,b)
-//return a-b
-//end
-//function testB(a,b)
-//DoAnError(a,b)
-//end
-//");
-//                Assert.Equal(1, L.GetTop());
-//                L.GetGlobal("testA");
-//                L.PushNumber(12);
-//                L.PushNumber(4);
-//                Assert.Equal(LuaStatus.Ok, L.PCall(2, 1, 0));
-//                Assert.Equal(2, L.GetTop());
-//                Assert.Equal(8, L.ToNumber(-1));
+                L.DoString(@"
+function testA(a,b)
+ return a-b
+end
+function testB(a,b)
+ DoAnError(a,b)
+end
+");
+                Assert.Equal(1, L.LuaGetTop());
+                L.LuaGetGlobal("testA");
+                L.LuaPushNumber(12);
+                L.LuaPushNumber(4);
+                Assert.Equal(LuaStatus.Ok, L.LuaPCall(2, 1, 0));
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(8, L.LuaToNumber(-1));
 
-//                L.GetGlobal("testB");
-//                L.PushNumber(12);
-//                L.PushNumber(4);
-//                Assert.Equal(LuaStatus.ErrorRun, L.PCall(2, 1, 0));
-//                Assert.Equal("[string \"\r...\"]:6: attempt to call a nil value (global 'DoAnError')", L.ToString(-1));
+                L.LuaGetGlobal("testB");
+                L.LuaPushNumber(12);
+                L.LuaPushNumber(4);
+                Assert.Equal(LuaStatus.ErrorRun, L.LuaPCall(2, 1, 0));
+                Assert.Equal("[string \"\r...\"]:6: attempt to call a nil value (global 'DoAnError')", L.LuaToString(-1));
             }
         }
 
@@ -1816,7 +1836,6 @@ return c..'!!'
             {
                 PushTestValues(L);
 
-                // TODO Add test with Lua script function
                 Assert.False(L.LuaIsFunction(1));
                 Assert.False(L.LuaIsFunction(2));
                 Assert.False(L.LuaIsFunction(3));
@@ -1826,9 +1845,10 @@ return c..'!!'
                 Assert.False(L.LuaIsFunction(7));
                 Assert.False(L.LuaIsFunction(8));
                 Assert.True(L.LuaIsFunction(9));
-                Assert.False(L.LuaIsFunction(10));
+                Assert.True(L.LuaIsFunction(10));
                 Assert.False(L.LuaIsFunction(11));
                 Assert.False(L.LuaIsFunction(12));
+                Assert.False(L.LuaIsFunction(13));
             }
         }
 
@@ -1850,8 +1870,9 @@ return c..'!!'
                 Assert.False(L.LuaIsTable(8));
                 Assert.False(L.LuaIsTable(9));
                 Assert.False(L.LuaIsTable(10));
-                Assert.True(L.LuaIsTable(11));
-                Assert.False(L.LuaIsTable(12));
+                Assert.False(L.LuaIsTable(11));
+                Assert.True(L.LuaIsTable(12));
+                Assert.False(L.LuaIsTable(13));
             }
         }
 
@@ -1872,9 +1893,10 @@ return c..'!!'
                 Assert.False(L.LuaIsLightUserData(7));
                 Assert.False(L.LuaIsLightUserData(8));
                 Assert.False(L.LuaIsLightUserData(9));
-                Assert.True(L.LuaIsLightUserData(10));
-                Assert.False(L.LuaIsLightUserData(11));
+                Assert.False(L.LuaIsLightUserData(10));
+                Assert.True(L.LuaIsLightUserData(11));
                 Assert.False(L.LuaIsLightUserData(12));
+                Assert.False(L.LuaIsLightUserData(13));
             }
         }
 
@@ -1898,6 +1920,7 @@ return c..'!!'
                 Assert.False(L.LuaIsNil(10));
                 Assert.False(L.LuaIsNil(11));
                 Assert.False(L.LuaIsNil(12));
+                Assert.False(L.LuaIsNil(13));
             }
         }
 
@@ -1921,6 +1944,7 @@ return c..'!!'
                 Assert.False(L.LuaIsBoolean(10));
                 Assert.False(L.LuaIsBoolean(11));
                 Assert.False(L.LuaIsBoolean(12));
+                Assert.False(L.LuaIsBoolean(13));
             }
         }
 
@@ -1943,7 +1967,8 @@ return c..'!!'
                 Assert.False(L.LuaIsThread(9));
                 Assert.False(L.LuaIsThread(10));
                 Assert.False(L.LuaIsThread(11));
-                Assert.True(L.LuaIsThread(12));
+                Assert.False(L.LuaIsThread(12));
+                Assert.True(L.LuaIsThread(13));
             }
         }
 
@@ -1967,7 +1992,8 @@ return c..'!!'
                 Assert.False(L.LuaIsNone(10));
                 Assert.False(L.LuaIsNone(11));
                 Assert.False(L.LuaIsNone(12));
-                Assert.True(L.LuaIsNone(13));
+                Assert.False(L.LuaIsNone(13));
+                Assert.True(L.LuaIsNone(14));
             }
         }
 
@@ -1991,7 +2017,8 @@ return c..'!!'
                 Assert.False(L.LuaIsNoneOrNil(10));
                 Assert.False(L.LuaIsNoneOrNil(11));
                 Assert.False(L.LuaIsNoneOrNil(12));
-                Assert.True(L.LuaIsNoneOrNil(13));
+                Assert.False(L.LuaIsNoneOrNil(13));
+                Assert.True(L.LuaIsNoneOrNil(14));
             }
         }
 

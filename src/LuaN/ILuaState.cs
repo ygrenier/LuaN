@@ -752,10 +752,10 @@ namespace LuaN
         ////    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         ////    public extern static int luaL_loadbufferx(lua_State L, String buff, int sz, String name, String mode);
 
-        ///// <summary>
-        ///// Loads a string as a Lua chunk. 
-        ///// </summary>
-        //LuaStatus LuaLLoadString(String s);
+        /// <summary>
+        /// Loads a string as a Lua chunk. 
+        /// </summary>
+        LuaStatus LuaLLoadString(String s);
         ///// <summary>
         ///// Returns the "length" of the value at the given index as a number; it is equivalent to the '#' operator in Lua 
         ///// </summary>
@@ -802,14 +802,14 @@ namespace LuaN
         ///// Returns the name of the type of the value at the given index. 
         ///// </summary>
         //String LuaLTypeName(int idx);
-        ///// <summary>
-        ///// Loads and runs the given file.
-        ///// </summary>
-        //LuaStatus LuaLDoFile(String fn);
-        ///// <summary>
-        ///// Loads and runs the given string.
-        ///// </summary>
-        //LuaStatus LuaLDoString(String s);
+        /// <summary>
+        /// Loads and runs the given file.
+        /// </summary>
+        LuaStatus LuaLDoFile(String fn);
+        /// <summary>
+        /// Loads and runs the given string.
+        /// </summary>
+        LuaStatus LuaLDoString(String s);
         ////    public static int luaL_getmetatable(lua_State L, String n) { return lua_getfield(L, LUA_REGISTRYINDEX, (n)); }
         ////    //public static int luaL_opt(lua_State L, lua_CFunction f, int n, int d) { return (lua_isnoneornil(L, (n)) ? (d) : f(L, (n))); }
         ////    //#define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))

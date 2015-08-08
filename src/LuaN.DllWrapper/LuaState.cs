@@ -1267,7 +1267,7 @@ namespace LuaN.DllWrapper
         //int GetHookCount();
         #endregion
 
-        //#region lauxlib
+        #region lauxlib
 
         ///// <summary>
         ///// Checks whether the core running the call, the core that created the Lua state, and the code making the call are all using the same version of Lua.
@@ -1395,10 +1395,13 @@ namespace LuaN.DllWrapper
         ////    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         ////    public extern static int luaL_loadbufferx(lua_State L, String buff, int sz, String name, String mode);
 
-        ///// <summary>
-        ///// Loads a string as a Lua chunk. 
-        ///// </summary>
-        //LuaStatus LoadString(String s);
+        /// <summary>
+        /// Loads a string as a Lua chunk. 
+        /// </summary>
+        public LuaStatus LuaLLoadString(String s)
+        {
+            return (LuaStatus)LuaDll.luaL_loadstring(NativeState, s);
+        }
         ///// <summary>
         ///// Returns the "length" of the value at the given index as a number; it is equivalent to the '#' operator in Lua 
         ///// </summary>
@@ -1445,14 +1448,20 @@ namespace LuaN.DllWrapper
         ///// Returns the name of the type of the value at the given index. 
         ///// </summary>
         //String TypeName(int idx);
-        ///// <summary>
-        ///// Loads and runs the given file.
-        ///// </summary>
-        //LuaStatus DoFile(String fn);
-        ///// <summary>
-        ///// Loads and runs the given string.
-        ///// </summary>
-        //LuaStatus DoString(String s);
+        /// <summary>
+        /// Loads and runs the given file.
+        /// </summary>
+        public LuaStatus LuaLDoFile(String fn)
+        {
+            return (LuaStatus)LuaDll.luaL_dofile(NativeState, fn);
+        }
+        /// <summary>
+        /// Loads and runs the given string.
+        /// </summary>
+        public LuaStatus LuaLDoString(String s)
+        {
+            return (LuaStatus)LuaDll.luaL_dostring(NativeState, s);
+        }
         ////    public static int luaL_getmetatable(lua_State L, String n) { return lua_getfield(L, LUA_REGISTRYINDEX, (n)); }
         ////    //public static int luaL_opt(lua_State L, lua_CFunction f, int n, int d) { return (lua_isnoneornil(L, (n)) ? (d) : f(L, (n))); }
         ////    //#define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
@@ -1497,7 +1506,7 @@ namespace LuaN.DllWrapper
         ////    //#endif
         ////    /* }============================================================ */
 
-        //#endregion
+        #endregion
 
         //#region lualib
 
