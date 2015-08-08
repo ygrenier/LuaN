@@ -1535,22 +1535,94 @@ namespace LuaN.DllWrapper
 
         #endregion
 
-        //#region lualib
+        #region lualib
 
-        //int OpenBase();
-        //int OpenCoroutine();
-        //int OpenTable();
-        //int OpenIo();
-        //int OpenOs();
-        //int OpenString();
-        //int OpenUtf8();
-        //int OpenBit32();
-        //int OpenMath();
-        //int OpenDebug();
-        //int OpenPackage();
-        //ILuaState OpenLibs();
+        /// <summary>
+        /// Open the basic library
+        /// </summary>
+        public int LuaOpenBase()
+        {
+            return LuaDll.luaopen_base(NativeState);
+        }
+        /// <summary>
+        /// Open the coroutine library
+        /// </summary>
+        public int LuaOpenCoroutine()
+        {
+            return LuaDll.luaopen_coroutine(NativeState);
+        }
+        /// <summary>
+        /// Open the table manipulation library
+        /// </summary>
+        public int LuaOpenTable()
+        {
+            return LuaDll.luaopen_table(NativeState);
+        }
+        /// <summary>
+        /// Open the input and output library
+        /// </summary>
+        public int LuaOpenIo()
+        {
+            return LuaDll.luaopen_io(NativeState);
+        }
+        /// <summary>
+        /// Open the operating system facilities library
+        /// </summary>
+        public int LuaOpenOs()
+        {
+            return LuaDll.luaopen_os(NativeState);
+        }
+        /// <summary>
+        /// Open the string manipulation library
+        /// </summary>
+        public int LuaOpenString()
+        {
+            return LuaDll.luaopen_string(NativeState);
+        }
+        /// <summary>
+        /// Open the basic UTF-8 support library
+        /// </summary>
+        public int LuaOpenUtf8()
+        {
+            return LuaDll.luaopen_utf8(NativeState);
+        }
+        /// <summary>
+        /// Open the bit32 library
+        /// </summary>
+        public int LuaOpenBit32()
+        {
+            return LuaDll.luaopen_bit32(NativeState);
+        }
+        /// <summary>
+        /// Open the mathematical functions library
+        /// </summary>
+        public int LuaOpenMath()
+        {
+            return LuaDll.luaopen_math(NativeState);
+        }
+        /// <summary>
+        /// Open the debug facilities library 
+        /// </summary>
+        public int LuaOpenDebug()
+        {
+            return LuaDll.luaopen_debug(NativeState);
+        }
+        /// <summary>
+        /// Open the package library 
+        /// </summary>
+        public int LuaOpenPackage()
+        {
+            return LuaDll.luaopen_package(NativeState);
+        }
+        /// <summary>
+        /// Open all standard library
+        /// </summary>
+        public void LuaOpenLibs()
+        {
+            LuaDll.luaL_openlibs(NativeState);
+        }
 
-        //#endregion
+        #endregion
 
         /// <summary>
         /// Access to the native state

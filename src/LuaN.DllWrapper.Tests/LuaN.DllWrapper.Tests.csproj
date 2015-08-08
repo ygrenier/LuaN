@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="LuaKFunctionWrapperTest.cs" />
     <Compile Include="LuaStateTest.Debug.cs" />
+    <Compile Include="LuaStateTest.LuaLib.cs" />
     <Compile Include="LuaWriterWrapperTest.cs" />
     <Compile Include="LuaReaderWrapperTest.cs" />
     <Compile Include="LuaCFunctionWrapperTest.cs" />

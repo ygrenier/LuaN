@@ -857,22 +857,58 @@ namespace LuaN
 
         #endregion
 
-        //#region lualib
+        #region lualib
 
-        //int OpenBase();
-        //int OpenCoroutine();
-        //int OpenTable();
-        //int OpenIo();
-        //int OpenOs();
-        //int OpenString();
-        //int OpenUtf8();
-        //int OpenBit32();
-        //int OpenMath();
-        //int OpenDebug();
-        //int OpenPackage();
-        //ILuaState OpenLibs();
+        /// <summary>
+        /// Open the basic library
+        /// </summary>
+        int LuaOpenBase();
+        /// <summary>
+        /// Open the coroutine library
+        /// </summary>
+        int LuaOpenCoroutine();
+        /// <summary>
+        /// Open the table manipulation library
+        /// </summary>
+        int LuaOpenTable();
+        /// <summary>
+        /// Open the input and output library
+        /// </summary>
+        int LuaOpenIo();
+        /// <summary>
+        /// Open the operating system facilities library
+        /// </summary>
+        int LuaOpenOs();
+        /// <summary>
+        /// Open the string manipulation library
+        /// </summary>
+        int LuaOpenString();
+        /// <summary>
+        /// Open the basic UTF-8 support library
+        /// </summary>
+        int LuaOpenUtf8();
+        /// <summary>
+        /// Open the bit32 library
+        /// </summary>
+        int LuaOpenBit32();
+        /// <summary>
+        /// Open the mathematical functions library
+        /// </summary>
+        int LuaOpenMath();
+        /// <summary>
+        /// Open the debug facilities library 
+        /// </summary>
+        int LuaOpenDebug();
+        /// <summary>
+        /// Open the package library 
+        /// </summary>
+        int LuaOpenPackage();
+        /// <summary>
+        /// Open all standard library
+        /// </summary>
+        void LuaOpenLibs();
 
-        //#endregion
+        #endregion
 
         ///// <summary>
         ///// Assert
