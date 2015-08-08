@@ -424,6 +424,7 @@ end
             L.LuaPushBoolean(true);
             L.LuaGetGlobal("test1");
             L.LuaPushCClosure(f, 0);
+            L.LuaNewUserData(20);
             L.LuaPushLightUserData(userData ?? this);
             L.LuaPushGlobalTable();
             L.LuaPushThread();
@@ -450,6 +451,7 @@ end
                 Assert.False(L.LuaIsNumber(11));
                 Assert.False(L.LuaIsNumber(12));
                 Assert.False(L.LuaIsNumber(13));
+                Assert.False(L.LuaIsNumber(14));
             }
         }
 
@@ -474,6 +476,7 @@ end
                 Assert.False(L.LuaIsString(11));
                 Assert.False(L.LuaIsString(12));
                 Assert.False(L.LuaIsString(13));
+                Assert.False(L.LuaIsString(14));
             }
         }
 
@@ -498,6 +501,7 @@ end
                 Assert.False(L.LuaIsCFunction(11));
                 Assert.False(L.LuaIsCFunction(12));
                 Assert.False(L.LuaIsCFunction(13));
+                Assert.False(L.LuaIsCFunction(14));
             }
         }
 
@@ -522,6 +526,7 @@ end
                 Assert.False(L.LuaIsInteger(11));
                 Assert.False(L.LuaIsInteger(12));
                 Assert.False(L.LuaIsInteger(13));
+                Assert.False(L.LuaIsInteger(14));
             }
         }
 
@@ -544,8 +549,9 @@ end
                 Assert.False(L.LuaIsUserData(9));
                 Assert.False(L.LuaIsUserData(10));
                 Assert.True(L.LuaIsUserData(11));
-                Assert.False(L.LuaIsUserData(12));
+                Assert.True(L.LuaIsUserData(12));
                 Assert.False(L.LuaIsUserData(13));
+                Assert.False(L.LuaIsUserData(14));
             }
         }
 
@@ -567,9 +573,10 @@ end
                 Assert.Equal(LuaType.Boolean, L.LuaType(8));
                 Assert.Equal(LuaType.Function, L.LuaType(9));
                 Assert.Equal(LuaType.Function, L.LuaType(10));
-                Assert.Equal(LuaType.LightUserData, L.LuaType(11));
-                Assert.Equal(LuaType.Table, L.LuaType(12));
-                Assert.Equal(LuaType.Thread, L.LuaType(13));
+                Assert.Equal(LuaType.UserData, L.LuaType(11));
+                Assert.Equal(LuaType.LightUserData, L.LuaType(12));
+                Assert.Equal(LuaType.Table, L.LuaType(13));
+                Assert.Equal(LuaType.Thread, L.LuaType(14));
             }
         }
 
@@ -629,6 +636,7 @@ end
                 Assert.Equal(0.0, L.LuaToNumber(11));
                 Assert.Equal(0.0, L.LuaToNumber(12));
                 Assert.Equal(0.0, L.LuaToNumber(13));
+                Assert.Equal(0.0, L.LuaToNumber(14));
             }
         }
 
@@ -666,6 +674,7 @@ end
                 Assert.Equal(0, L.LuaToInteger(11));
                 Assert.Equal(0, L.LuaToInteger(12));
                 Assert.Equal(0, L.LuaToInteger(13));
+                Assert.Equal(0, L.LuaToInteger(14));
             }
         }
 
@@ -690,6 +699,7 @@ end
                 Assert.Equal(true, L.LuaToBoolean(11));
                 Assert.Equal(true, L.LuaToBoolean(12));
                 Assert.Equal(true, L.LuaToBoolean(13));
+                Assert.Equal(true, L.LuaToBoolean(14));
             }
         }
 
@@ -714,6 +724,7 @@ end
                 Assert.Equal(null, L.LuaToString(11));
                 Assert.Equal(null, L.LuaToString(12));
                 Assert.Equal(null, L.LuaToString(13));
+                Assert.Equal(null, L.LuaToString(14));
             }
         }
 
@@ -735,9 +746,10 @@ end
                 Assert.Equal(0u, L.LuaRawLen(8));
                 Assert.Equal(0u, L.LuaRawLen(9));
                 Assert.Equal(0u, L.LuaRawLen(10));
-                Assert.Equal(0u, L.LuaRawLen(11));
+                Assert.Equal(20u, L.LuaRawLen(11));
                 Assert.Equal(0u, L.LuaRawLen(12));
                 Assert.Equal(0u, L.LuaRawLen(13));
+                Assert.Equal(0u, L.LuaRawLen(14));
             }
         }
 
@@ -763,6 +775,7 @@ end
                 Assert.Equal(null, L.LuaToCFunction(11));
                 Assert.Equal(null, L.LuaToCFunction(12));
                 Assert.Equal(null, L.LuaToCFunction(13));
+                Assert.Equal(null, L.LuaToCFunction(14));
             }
         }
 
@@ -786,9 +799,12 @@ end
                 Assert.Equal(null, L.LuaToUserData(8));
                 Assert.Equal(null, L.LuaToUserData(9));
                 Assert.Equal(null, L.LuaToUserData(10));
-                Assert.Equal(dt, L.LuaToUserData(11));
-                Assert.Equal(null, L.LuaToUserData(12));
+                var ud = L.LuaToUserData(11);
+                Assert.IsAssignableFrom<ILuaUserData>(ud);
+                Assert.Equal(20u, ((ILuaUserData)ud).Size);
+                Assert.Equal(dt, L.LuaToUserData(12));
                 Assert.Equal(null, L.LuaToUserData(13));
+                Assert.Equal(null, L.LuaToUserData(14));
 
                 L.LuaSetTop(0);
                 L.LuaPushLightUserData(this);
@@ -823,7 +839,8 @@ end
                 Assert.Equal(null, L.LuaToThread(10));
                 Assert.Equal(null, L.LuaToThread(11));
                 Assert.Equal(null, L.LuaToThread(12));
-                Assert.Same(L, L.LuaToThread(13));
+                Assert.Equal(null, L.LuaToThread(13));
+                Assert.Same(L, L.LuaToThread(14));
             }
         }
 
@@ -1718,21 +1735,41 @@ return c..'!!'
             LuaState L = null;
             using (L = new LuaState())
             {
-                L.LuaPushString("Test");
-                L.LuaPushString("5.6");
-                L.LuaPushString("5D");
-                L.LuaPushString("5z");
-                L.LuaLen(1);
-                Assert.Equal(4, L.LuaToNumber(-1));
-                L.LuaLen(2);
-                Assert.Equal(3, L.LuaToNumber(-1));
-                L.LuaLen(3);
-                Assert.Equal(2, L.LuaToNumber(-1));
+                PushTestValues(L);
+
+                Exception ex = Assert.Throws<LuaException>(() => L.LuaLen(1));
+                Assert.Equal("attempt to get length of a nil value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLen(2));
+                Assert.Equal("attempt to get length of a number value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLen(3));
+                Assert.Equal("attempt to get length of a number value", ex.Message);
                 L.LuaLen(4);
-                Assert.Equal(2, L.LuaToNumber(-1));
+                Assert.Equal(4u, L.LuaToNumber(-1));
+                L.LuaLen(5);
+                Assert.Equal(3u, L.LuaToNumber(-1));
+                L.LuaLen(6);
+                Assert.Equal(2u, L.LuaToNumber(-1));
+                L.LuaLen(7);
+                Assert.Equal(2u, L.LuaToNumber(-1));
+                ex = Assert.Throws<LuaException>(() => L.LuaLen(8));
+                Assert.Equal("attempt to get length of a boolean value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLen(9));
+                Assert.Equal("attempt to get length of a function value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLen(10));
+                Assert.Equal("attempt to get length of a function value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLen(11));
+                Assert.Equal("attempt to get length of a userdata value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLen(12));
+                Assert.Equal("attempt to get length of a userdata value", ex.Message);
+                L.LuaLen(13);
+                Assert.Equal(0u, L.LuaToNumber(-1));
+                ex = Assert.Throws<LuaException>(() => L.LuaLen(14));
+                Assert.Equal("attempt to get length of a thread value", ex.Message);
 
                 // TODO Test with metamethod
+
             }
+
         }
 
         [Fact]
@@ -1849,6 +1886,7 @@ return c..'!!'
                 Assert.False(L.LuaIsFunction(11));
                 Assert.False(L.LuaIsFunction(12));
                 Assert.False(L.LuaIsFunction(13));
+                Assert.False(L.LuaIsFunction(14));
             }
         }
 
@@ -1871,8 +1909,9 @@ return c..'!!'
                 Assert.False(L.LuaIsTable(9));
                 Assert.False(L.LuaIsTable(10));
                 Assert.False(L.LuaIsTable(11));
-                Assert.True(L.LuaIsTable(12));
-                Assert.False(L.LuaIsTable(13));
+                Assert.False(L.LuaIsTable(12));
+                Assert.True(L.LuaIsTable(13));
+                Assert.False(L.LuaIsTable(14));
             }
         }
 
@@ -1894,9 +1933,10 @@ return c..'!!'
                 Assert.False(L.LuaIsLightUserData(8));
                 Assert.False(L.LuaIsLightUserData(9));
                 Assert.False(L.LuaIsLightUserData(10));
-                Assert.True(L.LuaIsLightUserData(11));
-                Assert.False(L.LuaIsLightUserData(12));
+                Assert.False(L.LuaIsLightUserData(11));
+                Assert.True(L.LuaIsLightUserData(12));
                 Assert.False(L.LuaIsLightUserData(13));
+                Assert.False(L.LuaIsLightUserData(14));
             }
         }
 
@@ -1921,6 +1961,7 @@ return c..'!!'
                 Assert.False(L.LuaIsNil(11));
                 Assert.False(L.LuaIsNil(12));
                 Assert.False(L.LuaIsNil(13));
+                Assert.False(L.LuaIsNil(14));
             }
         }
 
@@ -1945,6 +1986,7 @@ return c..'!!'
                 Assert.False(L.LuaIsBoolean(11));
                 Assert.False(L.LuaIsBoolean(12));
                 Assert.False(L.LuaIsBoolean(13));
+                Assert.False(L.LuaIsBoolean(14));
             }
         }
 
@@ -1968,7 +2010,8 @@ return c..'!!'
                 Assert.False(L.LuaIsThread(10));
                 Assert.False(L.LuaIsThread(11));
                 Assert.False(L.LuaIsThread(12));
-                Assert.True(L.LuaIsThread(13));
+                Assert.False(L.LuaIsThread(13));
+                Assert.True(L.LuaIsThread(14));
             }
         }
 
@@ -1993,7 +2036,8 @@ return c..'!!'
                 Assert.False(L.LuaIsNone(11));
                 Assert.False(L.LuaIsNone(12));
                 Assert.False(L.LuaIsNone(13));
-                Assert.True(L.LuaIsNone(14));
+                Assert.False(L.LuaIsNone(14));
+                Assert.True(L.LuaIsNone(15));
             }
         }
 
@@ -2018,7 +2062,8 @@ return c..'!!'
                 Assert.False(L.LuaIsNoneOrNil(11));
                 Assert.False(L.LuaIsNoneOrNil(12));
                 Assert.False(L.LuaIsNoneOrNil(13));
-                Assert.True(L.LuaIsNoneOrNil(14));
+                Assert.False(L.LuaIsNoneOrNil(14));
+                Assert.True(L.LuaIsNoneOrNil(15));
             }
         }
 
