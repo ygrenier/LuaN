@@ -629,57 +629,57 @@ namespace LuaN
         ///// <summary>
         ///// Checks whether the core running the call, the core that created the Lua state, and the code making the call are all using the same version of Lua.
         ///// </summary>
-        //ILuaState CheckVersion();
+        //void LuaLCheckVersion();
         ///// <summary>
         ///// Pushes onto the stack the field e from the metatable of the object at index obj and returns the type of pushed value.
         ///// </summary>
-        //LuaType GetMetaField(int obj, String e);
+        //LuaType LuaLGetMetaField(int obj, String e);
         ///// <summary>
         ///// Calls a metamethod. 
         ///// </summary>
-        //Boolean CallMeta(int obj, String e);
+        //Boolean LuaLCallMeta(int obj, String e);
         ////    extern static IntPtr _luaL_tolstring(lua_State L, int idx, out int len);
         ////    public static String luaL_tolstring(lua_State L, int idx, out int len)
         ///// <summary>
         ///// Raises an error reporting a problem with argument arg of the C function that called it
         ///// </summary>
-        //void ArgError(int arg, String extramsg);
+        //void LuaLArgError(int arg, String extramsg);
         ///// <summary>
         ///// Checks whether the function argument arg is a string and returns this string; if l is not null fills l with the string's length.
         ///// </summary>
-        //String CheckLString(int arg, out UInt32 l);
+        //String LuaLCheckLString(int arg, out UInt32 l);
         ///// <summary>
         ///// If the function argument arg is a string, returns this string. If this argument is absent or is nil, returns d. Otherwise, raises an error. 
         ///// </summary>
-        //String OptLString(int arg, String def, out UInt32 l);
+        //String LuaLOptLString(int arg, String def, out UInt32 l);
         ///// <summary>
         ///// Checks whether the function argument arg is a number and returns this number. 
         ///// </summary>
-        //Double CheckNumber(int arg);
+        //Double LuaLCheckNumber(int arg);
         ///// <summary>
         ///// If the function argument arg is a number, returns this number. If this argument is absent or is nil, returns d. Otherwise, raises an error. 
         ///// </summary>
-        //Double OptNumber(int arg, Double def);
+        //Double LuaLOptNumber(int arg, Double def);
         ///// <summary>
         ///// Checks whether the function argument arg is an integer (or can be converted to an integer) and returns this integer cast to a Int32. 
         ///// </summary>
-        //Int32 CheckInteger(int arg);
+        //Int32 LuaLCheckInteger(int arg);
         ///// <summary>
         ///// If the function argument arg is an integer (or convertible to an integer), returns this integer. If this argument is absent or is nil, returns d. Otherwise, raises an error. 
         ///// </summary>
-        //Int32 OptInteger(int arg, Int32 def);
+        //Int32 LuaLOptInteger(int arg, Int32 def);
         ///// <summary>
         ///// Grows the stack size to top + sz elements, raising an error if the stack cannot grow to that size.
         ///// </summary>
-        //ILuaState CheckStack(int sz, String msg);
+        //ILuaState LuaLCheckStack(int sz, String msg);
         ///// <summary>
         ///// Checks whether the function argument arg has type t.
         ///// </summary>
-        //ILuaState CheckType(int arg, LuaType t);
+        //ILuaState LuaLCheckType(int arg, LuaType t);
         ///// <summary>
         ///// Checks whether the function has an argument of any type (including nil) at position arg. 
         ///// </summary>
-        //ILuaState CheckAny(int arg);
+        //ILuaState LuaLCheckAny(int arg);
         ///// <summary>
         ///// Create and register a new metatable
         ///// </summary>
@@ -689,27 +689,27 @@ namespace LuaN
         ///// (The entry __name is used by some error-reporting functions.) 
         ///// In both cases pushes onto the stack the final value associated with tname in the registry. 
         ///// </remarks>
-        //bool NewMetatable(String tname);
+        //bool LuaLNewMetatable(String tname);
         ///// <summary>
         ///// Sets the metatable of the object at the top of the stack as the metatable associated with name tname in the registry
         ///// </summary>
-        //ILuaState SetMetatable(String tname);
-        ///// <summary>
-        ///// Checks whether the function argument arg is a userdata of the type tname and returns the userdata address. 
-        ///// </summary>
-        //Object Checkudata(int arg, String tname);
+        //void LuaLSetMetatable(String tname);
         ///// <summary>
         ///// This function works like CheckUData, except that, when the test fails, it returns null instead of raising an error. 
         ///// </summary>
-        //Object TestUData(int arg, String tname);
+        //Object LuaLTestUData(int arg, String tname);
+        ///// <summary>
+        ///// Checks whether the function argument arg is a userdata of the type tname and returns the userdata address. 
+        ///// </summary>
+        //Object LuaLCheckudata(int arg, String tname);
         ///// <summary>
         ///// Pushes onto the stack a string identifying the current position of the control at level lvl in the call stack
         ///// </summary>
-        //ILuaState Where(int lvl);
+        //void LuaLWhere(int lvl);
         ///// <summary>
         ///// Raises an error.
         ///// </summary>
-        //void Error(String message);
+        //void LuaLError(String message);
         ///// <summary>
         ///// Raises an error.
         ///// </summary>
@@ -731,23 +731,23 @@ namespace LuaN
         ///// <summary>
         ///// Creates and returns a reference, in the table at index 'table', for the object at the top of the stack (and pops the object). 
         ///// </summary>
-        //int LRef(int table);
+        //int LuaLRef(int table);
         ///// <summary>
         ///// Releases reference reference from the table at index table.
         ///// </summary>
         ///// <remarks>
         ///// The entry is removed from the table, so that the referred object can be collected. The reference reference is also freed to be used again. 
         ///// </remarks>
-        //void LUnref(int table, int reference);
+        //void LuaLUnref(int table, int reference);
 
         ///// <summary>
         ///// Loads a file as a Lua chunk. 
         ///// </summary>
-        //LuaStatus LoadFile(String filename, String mode);
+        //LuaStatus LuaLLoadFile(String filename, String mode);
         ///// <summary>
         ///// Loads a file as a Lua chunk. 
         ///// </summary>
-        //LuaStatus LoadFile(String filename);
+        //LuaStatus LuaLLoadFile(String filename);
 
         ////    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         ////    public extern static int luaL_loadbufferx(lua_State L, String buff, int sz, String name, String mode);
@@ -755,68 +755,68 @@ namespace LuaN
         ///// <summary>
         ///// Loads a string as a Lua chunk. 
         ///// </summary>
-        //LuaStatus LoadString(String s);
+        //LuaStatus LuaLLoadString(String s);
         ///// <summary>
         ///// Returns the "length" of the value at the given index as a number; it is equivalent to the '#' operator in Lua 
         ///// </summary>
-        //Int32 LLen(int idx);
+        //Int32 LuaLLen(int idx);
         ///// <summary>
         ///// Creates a copy of string s by replacing any occurrence of the string p with the string r. 
         ///// Pushes the resulting string on the stack and returns it. 
         ///// </summary>
-        //String GSub(String s, String p, String r);
+        //String LuaLGSub(String s, String p, String r);
         ///// <summary>
         ///// Registers all functions in the array l (see luaL_Reg) into the table on the top of the stack
         ///// </summary>
-        //ILuaState SetFuncs(IEnumerable<Tuple<String, LuaFunction>> l, int nup);
+        //ILuaState LuaLSetFuncs(IEnumerable<Tuple<String, LuaFunction>> l, int nup);
         ///// <summary>
         ///// Ensures that the value t[fname], where t is the value at index idx, is a table, and pushes that table onto the stack. 
         ///// Returns true if it finds a previous table there and false if it creates a new table. 
         ///// </summary>
-        //bool GetSubTable(int idx, String fname);
+        //bool LuaLGetSubTable(int idx, String fname);
         ///// <summary>
         ///// Creates and pushes a traceback of the stack L1. 
         ///// </summary>
         ///// <remarks>
         ///// If msg is not NULL it is appended at the beginning of the traceback. The level parameter tells at which level to start the traceback. 
         ///// </remarks>
-        //ILuaState Traceback(ILuaState L1, String msg, int level);
+        //ILuaState LuaLTraceback(ILuaState L1, String msg, int level);
         ////    public extern static void luaL_requiref(lua_State L, String modname, lua_CFunction openf, int glb);
 
         //#region some useful macros
         ///// <summary>
         ///// Creates a new table with a size optimized to store all entries in the array l
         ///// </summary>
-        //ILuaState NewLibTable(Tuple<String, LuaFunction>[] l);
+        //ILuaState LuaLNewLibTable(Tuple<String, LuaFunction>[] l);
         ///// <summary>
         ///// Creates a new table and registers there the functions in list l. 
         ///// </summary>
-        //ILuaState NewLib(Tuple<String, LuaFunction>[] l);
+        //ILuaState LuaLNewLib(Tuple<String, LuaFunction>[] l);
         ///// <summary>
         ///// Checks whether cond is true. If it is not, raises an error with a standard message 
         ///// </summary>
-        //ILuaState ArgCheck(bool cond, int arg, String extramsg);
+        //ILuaState LuaLArgCheck(bool cond, int arg, String extramsg);
         ////    public static String luaL_checkstring(lua_State L, int n)
         ////    public static String luaL_optstring(lua_State L, int n, String def)
         ///// <summary>
         ///// Returns the name of the type of the value at the given index. 
         ///// </summary>
-        //String TypeName(int idx);
+        //String LuaLTypeName(int idx);
         ///// <summary>
         ///// Loads and runs the given file.
         ///// </summary>
-        //LuaStatus DoFile(String fn);
+        //LuaStatus LuaLDoFile(String fn);
         ///// <summary>
         ///// Loads and runs the given string.
         ///// </summary>
-        //LuaStatus DoString(String s);
+        //LuaStatus LuaLDoString(String s);
         ////    public static int luaL_getmetatable(lua_State L, String n) { return lua_getfield(L, LUA_REGISTRYINDEX, (n)); }
         ////    //public static int luaL_opt(lua_State L, lua_CFunction f, int n, int d) { return (lua_isnoneornil(L, (n)) ? (d) : f(L, (n))); }
         ////    //#define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
         ///// <summary>
         ///// Loads a buffer as a Lua chunk. 
         ///// </summary>
-        //LuaStatus LoadBuffer(String s, int sz, String n);
+        //LuaStatus LuaLLoadBuffer(String s, int sz, String n);
         //#endregion
 
         //#region Acces to the "Abstraction Layer" for basic report of messages and errors
