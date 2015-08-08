@@ -117,7 +117,7 @@ namespace LuaN
     /// <summary>
     /// Event codes
     /// </summary>
-    public enum LuaHookEvent{
+    public enum LuaHookEvent {
         HookCall = 0,
         HookRet = 1,
         HookLine = 2,
@@ -187,6 +187,21 @@ namespace LuaN
         /// All fills : Name | Source | CurrentLine | IsTailCall | ParamsUps
         /// </summary>
         AllFills = Name | Source | CurrentLine | IsTailCall | ParamsUps
+    }
+
+    /// <summary>
+    /// Pre-defined references
+    /// </summary>
+    public static class LuaRef
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public const int NoRef = -2;
+        /// <summary>
+        /// 
+        /// </summary>
+        public const int RefNil = -1;
     }
 
 }

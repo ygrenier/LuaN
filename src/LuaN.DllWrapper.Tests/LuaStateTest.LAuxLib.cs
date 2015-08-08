@@ -76,5 +76,44 @@ namespace LuaN.DllWrapper.Tests
             }
         }
 
+        [Fact]
+        public void TestLuaRef()
+        {
+            using (var L = new LuaState())
+            {
+                // Table to store
+                L.LuaNewTable();
+
+                // Table to reference
+                L.LuaNewTable();
+                L.LuaPushValue(2);  // Duplicate for two references
+                var tref1 = L.LuaLRef(1);
+                Assert.Equal(1, tref1);
+                var tref2 = L.LuaLRef(1);
+                Assert.Equal(2, tref2);
+                Assert.NotEqual(tref1, tref2);
+
+                Assert.Equal(1, L.LuaGetTop());
+
+                L.LuaRawGetI(1, tref1);
+                Assert.Equal(LuaType.Table, L.LuaType(-1));
+                L.LuaRawGetI(1, tref2);
+                Assert.Equal(LuaType.Table, L.LuaType(-1));
+                Assert.Equal(true, L.LuaRawEqual(2, 3));
+                L.LuaPop(2);
+
+                L.LuaLUnref(1, tref2);
+                L.LuaRawGetI(1, tref1);
+                Assert.Equal(LuaType.Table, L.LuaType(-1));
+                L.LuaRawGetI(1, tref2);
+                Assert.Equal(LuaType.Nil, L.LuaType(-1));
+                Assert.Equal(false, L.LuaRawEqual(2, 3));
+                L.LuaPop(2);
+
+                L.LuaPushNil();
+                Assert.Equal(LuaRef.RefNil, L.LuaLRef(1));
+            }
+        }
+
     }
 }
