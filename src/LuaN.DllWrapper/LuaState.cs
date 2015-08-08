@@ -342,7 +342,7 @@ namespace LuaN.DllWrapper
         public ILuaState LuaNewThread()
         {
             var thread = LuaDll.lua_newthread(NativeState);
-            LuaDll.lua_pop(NativeState, 1);
+            //LuaDll.lua_pop(NativeState, 1);
             return new LuaState(this.Engine, thread, false);
         }
 

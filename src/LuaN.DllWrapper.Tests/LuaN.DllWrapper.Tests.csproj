@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LuaStateTest.LAuxLib.cs" />
+    <Compile Include="LuaStateTest.NetObject.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

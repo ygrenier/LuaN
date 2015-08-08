@@ -54,7 +54,7 @@ namespace LuaN.DllWrapper.Tests
                         Assert.Null(ar.ShortSource);
                         Assert.Null(ar.Source);
                         Assert.Equal(-1, ar.CurrentLine);
-                        Assert.NotEqual(LuaHookEvent.HookCall, ar.Event);
+                        //Assert.NotEqual(LuaHookEvent.HookCall, ar.Event);
                         Assert.Equal(-1, ar.LineDefined);
                         Assert.Equal(-1, ar.LastLineDefined);
                         Assert.Equal(false, ar.IsTailCall);
