@@ -626,18 +626,19 @@ namespace LuaN
 
         #region lauxlib
 
-        ///// <summary>
-        ///// Checks whether the core running the call, the core that created the Lua state, and the code making the call are all using the same version of Lua.
-        ///// </summary>
-        //void LuaLCheckVersion();
-        ///// <summary>
-        ///// Pushes onto the stack the field e from the metatable of the object at index obj and returns the type of pushed value.
-        ///// </summary>
-        //LuaType LuaLGetMetaField(int obj, String e);
-        ///// <summary>
-        ///// Calls a metamethod. 
-        ///// </summary>
-        //Boolean LuaLCallMeta(int obj, String e);
+        /// <summary>
+        /// Checks whether the core running the call, the core that created the Lua state, and the code making the 
+        /// call are all using the same version of Lua.
+        /// </summary>
+        void LuaLCheckVersion();
+        /// <summary>
+        /// Pushes onto the stack the field e from the metatable of the object at index obj and returns the type of pushed value.
+        /// </summary>
+        LuaType LuaLGetMetaField(int obj, String e);
+        /// <summary>
+        /// Calls a metamethod. 
+        /// </summary>
+        Boolean LuaLCallMeta(int obj, String e);
         ////    extern static IntPtr _luaL_tolstring(lua_State L, int idx, out int len);
         ////    public static String luaL_tolstring(lua_State L, int idx, out int len)
         ///// <summary>
@@ -680,20 +681,20 @@ namespace LuaN
         ///// Checks whether the function has an argument of any type (including nil) at position arg. 
         ///// </summary>
         //ILuaState LuaLCheckAny(int arg);
-        ///// <summary>
-        ///// Create and register a new metatable
-        ///// </summary>
-        ///// <remarks>
-        ///// If the registry already has the key tname, returns false. Otherwise, creates a new table to be used as a metatable for userdata, adds 
-        ///// to this new table the pair __name = tname, adds to the registry the pair [tname] = new table, and returns true. 
-        ///// (The entry __name is used by some error-reporting functions.) 
-        ///// In both cases pushes onto the stack the final value associated with tname in the registry. 
-        ///// </remarks>
-        //bool LuaLNewMetatable(String tname);
-        ///// <summary>
-        ///// Sets the metatable of the object at the top of the stack as the metatable associated with name tname in the registry
-        ///// </summary>
-        //void LuaLSetMetatable(String tname);
+        /// <summary>
+        /// Create and register a new metatable
+        /// </summary>
+        /// <remarks>
+        /// If the registry already has the key tname, returns false. Otherwise, creates a new table to be used as a metatable for userdata, adds 
+        /// to this new table the pair __name = tname, adds to the registry the pair [tname] = new table, and returns true. 
+        /// (The entry __name is used by some error-reporting functions.) 
+        /// In both cases pushes onto the stack the final value associated with tname in the registry. 
+        /// </remarks>
+        bool LuaLNewMetatable(String tname);
+        /// <summary>
+        /// Sets the metatable of the object at the top of the stack as the metatable associated with name tname in the registry
+        /// </summary>
+        void LuaLSetMetatable(String tname);
         ///// <summary>
         ///// This function works like CheckUData, except that, when the test fails, it returns null instead of raising an error. 
         ///// </summary>

@@ -1269,18 +1269,28 @@ namespace LuaN.DllWrapper
 
         #region lauxlib
 
-        ///// <summary>
-        ///// Checks whether the core running the call, the core that created the Lua state, and the code making the call are all using the same version of Lua.
-        ///// </summary>
-        //ILuaState CheckVersion();
-        ///// <summary>
-        ///// Pushes onto the stack the field e from the metatable of the object at index obj and returns the type of pushed value.
-        ///// </summary>
-        //LuaType GetMetaField(int obj, String e);
-        ///// <summary>
-        ///// Calls a metamethod. 
-        ///// </summary>
-        //Boolean CallMeta(int obj, String e);
+        /// <summary>
+        /// Checks whether the core running the call, the core that created the Lua state, and the code making the 
+        /// call are all using the same version of Lua.
+        /// </summary>
+        public void LuaLCheckVersion()
+        {
+            LuaDll.luaL_checkversion(NativeState);
+        }
+        /// <summary>
+        /// Pushes onto the stack the field e from the metatable of the object at index obj and returns the type of pushed value.
+        /// </summary>
+        public LuaType LuaLGetMetaField(int obj, String e)
+        {
+            return (LuaType)LuaDll.luaL_getmetafield(NativeState, obj, e);
+        }
+        /// <summary>
+        /// Calls a metamethod. 
+        /// </summary>
+        public Boolean LuaLCallMeta(int obj, String e)
+        {
+            return LuaDll.luaL_callmeta(NativeState, obj, e) != 0;
+        }
         ////    extern static IntPtr _luaL_tolstring(lua_State L, int idx, out int len);
         ////    public static String luaL_tolstring(lua_State L, int idx, out int len)
         ///// <summary>
@@ -1323,20 +1333,28 @@ namespace LuaN.DllWrapper
         ///// Checks whether the function has an argument of any type (including nil) at position arg. 
         ///// </summary>
         //ILuaState CheckAny(int arg);
-        ///// <summary>
-        ///// Create and register a new metatable
-        ///// </summary>
-        ///// <remarks>
-        ///// If the registry already has the key tname, returns false. Otherwise, creates a new table to be used as a metatable for userdata, adds 
-        ///// to this new table the pair __name = tname, adds to the registry the pair [tname] = new table, and returns true. 
-        ///// (The entry __name is used by some error-reporting functions.) 
-        ///// In both cases pushes onto the stack the final value associated with tname in the registry. 
-        ///// </remarks>
-        //bool NewMetatable(String tname);
-        ///// <summary>
-        ///// Sets the metatable of the object at the top of the stack as the metatable associated with name tname in the registry
-        ///// </summary>
-        //ILuaState SetMetatable(String tname);
+        /// <summary>
+        /// Create and register a new metatable
+        /// </summary>
+        /// <remarks>
+        /// If the registry already has the key tname, returns false. Otherwise, creates a new table to be used as a metatable for userdata, adds 
+        /// to this new table the pair __name = tname, adds to the registry the pair [tname] = new table, and returns true. 
+        /// (The entry __name is used by some error-reporting functions.) 
+        /// In both cases pushes onto the stack the final value associated with tname in the registry. 
+        /// </remarks>
+        public bool LuaLNewMetatable(String tname)
+        {
+            if (String.IsNullOrWhiteSpace(tname)) throw new ArgumentNullException("tname");
+            return LuaDll.luaL_newmetatable(NativeState, tname) != 0;
+        }
+        /// <summary>
+        /// Sets the metatable of the object at the top of the stack as the metatable associated with name tname in the registry
+        /// </summary>
+        public void LuaLSetMetatable(String tname)
+        {
+            if (String.IsNullOrWhiteSpace(tname)) throw new ArgumentNullException("tname");
+            LuaDll.luaL_setmetatable(NativeState, tname);
+        }
         ///// <summary>
         ///// Checks whether the function argument arg is a userdata of the type tname and returns the userdata address. 
         ///// </summary>

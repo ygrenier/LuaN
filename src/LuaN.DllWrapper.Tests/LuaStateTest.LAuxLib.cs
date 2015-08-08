@@ -115,5 +115,150 @@ namespace LuaN.DllWrapper.Tests
             }
         }
 
+        [Fact]
+        public void TestLuaLCheckVersion()
+        {
+            using (var L = new LuaState())
+            {
+                L.LuaLCheckVersion();
+            }
+        }
+
+        [Fact]
+        public void TestLuaLGetMetaField()
+        {
+            using (var L = new LuaState())
+            {
+                // Create a table
+                L.LuaNewTable();
+                L.LuaPushString("Field Value");
+                L.LuaSetField(1, "TableField");
+                L.LuaPushString("Another Value");
+                L.LuaSetField(1, "NoMetaField");
+
+                // Create the metatable
+                L.LuaNewTable();
+                L.LuaPushString("Field MetaValue");
+                L.LuaSetField(2, "TableField");
+                L.LuaSetMetatable(1);
+
+                Assert.Equal(1, L.LuaGetTop());
+
+                // Get field by metatable
+                Assert.Equal(LuaType.String, L.LuaLGetMetaField(1, "TableField"));
+                Assert.Equal("Field MetaValue", L.LuaToString(-1));
+                Assert.Equal(2, L.LuaGetTop());
+
+                Assert.Equal(LuaType.Nil, L.LuaLGetMetaField(1, "NoMetaField"));
+                Assert.Equal(2, L.LuaGetTop());
+
+                Assert.Equal(LuaType.Nil, L.LuaLGetMetaField(1, "AnotherMetaField"));
+                Assert.Equal(2, L.LuaGetTop());
+
+            }
+        }
+
+        [Fact]
+        public void TestLuaLGetCallMeta()
+        {
+            using (var L = new LuaState())
+            {
+                // Create a table
+                L.LuaNewTable();
+                L.LuaPushCFunction(state =>
+                {
+                    state.LuaPushString("Result call");
+                    return 1;
+                });
+                L.LuaSetField(1, "TableCall");
+                L.LuaPushCFunction(state =>
+                {
+                    state.LuaPushString("Another Result call");
+                    return 1;
+                });
+                L.LuaSetField(1, "NoMetaCall");
+                L.LuaPushNumber(123);
+                L.LuaSetField(1, "NoCallableField");
+                L.LuaPushNumber(123);
+                L.LuaSetField(1, "NoMetaCallableField");
+
+                // Create the metatable
+                L.LuaNewTable();
+                L.LuaPushCFunction(state =>
+                {
+                    state.LuaPushString("Result meta call");
+                    return 1;
+                });
+                L.LuaSetField(2, "TableCall");
+                L.LuaSetMetatable(1);
+                L.LuaPushNumber(987);
+                L.LuaSetField(1, "NoCallableField");
+
+                Assert.Equal(1, L.LuaGetTop());
+
+                // Call by metatable
+                Assert.Equal(true, L.LuaLCallMeta(1, "TableCall"));
+                Assert.Equal("Result meta call", L.LuaToString(-1));
+                Assert.Equal(2, L.LuaGetTop());
+
+                Assert.Equal(false, L.LuaLCallMeta(1, "NoMetaCall"));
+                Assert.Equal(2, L.LuaGetTop());
+
+                Assert.Equal(false, L.LuaLCallMeta(1, "NoCallableField"));
+                Assert.Equal(2, L.LuaGetTop());
+
+                Assert.Equal(false, L.LuaLCallMeta(1, "NoMetaCallableField"));
+                Assert.Equal(2, L.LuaGetTop());
+
+                Assert.Equal(false, L.LuaLCallMeta(1, "AnotherCall"));
+                Assert.Equal(2, L.LuaGetTop());
+
+            }
+        }
+
+        [Fact]
+        public void TestLuaLNewMetatable()
+        {
+            using (var L=new LuaState())
+            {
+                Assert.True(L.LuaLNewMetatable("meta1"));
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.String, L.LuaGetField(1, "__name"));
+                Assert.Equal("meta1", L.LuaToString(-1));
+                L.LuaPop(1);
+
+                Assert.Equal(LuaType.Table, L.LuaGetField(L.RegistryIndex, "meta1"));
+                Assert.Equal(true, L.LuaRawEqual(1, 2));
+                L.LuaPop(1);
+
+                // Fail to create a new metatable with the same name, but push the existing metatable on the stack
+                Assert.False(L.LuaLNewMetatable("meta1"));
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(true, L.LuaRawEqual(1, 2));
+
+                Assert.Throws<ArgumentNullException>(() => L.LuaLNewMetatable("  "));
+            }
+        }
+
+        [Fact]
+        public void TestLuaLSetMetatable()
+        {
+            using (var L = new LuaState())
+            {
+                Assert.True(L.LuaLNewMetatable("meta1"));
+
+                L.LuaNewTable();
+                L.LuaLSetMetatable("meta1");
+                Assert.True(L.LuaGetMetatable(-1));
+                Assert.Equal(true, L.LuaRawEqual(1, -1));
+
+                L.LuaNewTable();
+                L.LuaLSetMetatable("meta2");
+                Assert.False(L.LuaGetMetatable(-1));
+
+                Assert.Throws<ArgumentNullException>(() => L.LuaLSetMetatable("  "));
+            }
+        }
+
     }
 }
