@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("LuaN")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("LuaN: a .Net Lua base engine")]
+[assembly: AssemblyDescription("Library to provide a basic .Net interface for Lua langage")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Yan Grenier")]
 [assembly: AssemblyProduct("LuaN")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright © Yan Grenier 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("fr")]
@@ -26,5 +26,5 @@ using System.Runtime.InteropServices;
 // Vous pouvez spécifier toutes les valeurs ou utiliser par défaut les numéros de build et de version 
 // en utilisant '*', comme indiqué ci-dessous :
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("5.3.0.0")]
+[assembly: AssemblyFileVersion("5.3.0.0")]
