@@ -1576,42 +1576,41 @@ return c..'!!'
             LuaState L = null;
             using (L = new LuaState())
             {
-                // TODO Implements when methods will be implemented
-                //List<String> output = new List<string>();
-//                L.OnPrint += (s, e) => output.Add(e.Text);
-//                L.OpenLibs();
-//                LuaKFunction testK = (state, status, ctx) =>
-//                {
-//                    Assert.Equal(2, state.GetTop());
-//                    state.PushValue(1);
-//                    state.PushValue(2);
-//                    state.Arith(LuaArithOperator.Add);
-//                    Assert.Equal(3, state.GetTop());
-//                    return 3;
-//                };
-//                L.Register("test", (state) =>
-//                {
-//                    Assert.Equal(2, state.GetTop());
-//                    state.PushValue(1);
-//                    state.PushValue(2);
-//                    state.Arith(LuaArithOperator.Add);
-//                    Assert.Equal(3, state.GetTop());
-//                    state.YieldK(3, 0, testK);
-//                    return 0;
-//                });
+                List<String> output = new List<string>();
+                L.OnPrint += (s, e) => output.Add(e.Text);
+                L.LuaOpenLibs();
+                LuaKFunction testK = (state, status, ctx) =>
+                {
+                    Assert.Equal(2, state.LuaGetTop());
+                    state.LuaPushValue(1);
+                    state.LuaPushValue(2);
+                    state.LuaArith(LuaArithOperator.Add);
+                    Assert.Equal(3, state.LuaGetTop());
+                    return 3;
+                };
+                L.LuaRegister("test", (state) =>
+                {
+                    Assert.Equal(2, state.LuaGetTop());
+                    state.LuaPushValue(1);
+                    state.LuaPushValue(2);
+                    state.LuaArith(LuaArithOperator.Add);
+                    Assert.Equal(3, state.LuaGetTop());
+                    state.LuaYieldK(3, 0, testK);
+                    return 0;
+                });
 
-//                Assert.Equal(LuaStatus.Ok, L.DoString(@"
-//co = coroutine.create(test)
-//print('1:', coroutine.resume(co, 1, 2))
-//print('2:', coroutine.resume(co, 5, 8))
-//print('3:', coroutine.resume(co, 10, 12))
-//"));
+                Assert.Equal(LuaStatus.Ok, L.DoString(@"
+co = coroutine.create(test)
+print('1:', coroutine.resume(co, 1, 2))
+print('2:', coroutine.resume(co, 5, 8))
+print('3:', coroutine.resume(co, 10, 12))
+"));
 
-//                Assert.Equal(new String[] {
-//                    "1:	true	1	2	3",
-//                    "2:	true	5	8",
-//                    "3:	false	cannot resume dead coroutine"
-//                }, output);
+                Assert.Equal(new String[] {
+                    "1:	true	1	2	3",
+                    "2:	true	5	8",
+                    "3:	false	cannot resume dead coroutine"
+                }, output);
             }
         }
 
@@ -1653,33 +1652,32 @@ return c..'!!'
             LuaState L = null;
             using (L = new LuaState())
             {
-                // TODO Implements when methods will be implemented
-//                List<String> output = new List<string>();
-//                L.OnPrint += (s, e) => output.Add(e.Text);
-//                L.OpenLibs();
-//                L.Register("test", (state) =>
-//                {
-//                    Assert.Equal(2, state.GetTop());
-//                    state.PushValue(1);
-//                    state.PushValue(2);
-//                    state.Arith(LuaArithOperator.Add);
-//                    Assert.Equal(3, state.GetTop());
-//                    state.Yield(3);
-//                    return 0;
-//                });
+                List<String> output = new List<string>();
+                L.OnPrint += (s, e) => output.Add(e.Text);
+                L.LuaOpenLibs();
+                L.LuaRegister("test", (state) =>
+                {
+                    Assert.Equal(2, state.LuaGetTop());
+                    state.LuaPushValue(1);
+                    state.LuaPushValue(2);
+                    state.LuaArith(LuaArithOperator.Add);
+                    Assert.Equal(3, state.LuaGetTop());
+                    state.LuaYield(3);
+                    return 0;
+                });
 
-//                Assert.Equal(LuaStatus.Ok, L.DoString(@"
-//co = coroutine.create(test)
-//print('1:', coroutine.resume(co, 1, 2))
-//print('2:', coroutine.resume(co, 5, 8))
-//print('3:', coroutine.resume(co, 10, 12))
-//"));
+                Assert.Equal(LuaStatus.Ok, L.DoString(@"
+co = coroutine.create(test)
+print('1:', coroutine.resume(co, 1, 2))
+print('2:', coroutine.resume(co, 5, 8))
+print('3:', coroutine.resume(co, 10, 12))
+"));
 
-//                Assert.Equal(new String[] {
-//                    "1:	true	1	2	3",
-//                    "2:	true	5	8",
-//                    "3:	false	cannot resume dead coroutine"
-//                }, output);
+                Assert.Equal(new String[] {
+                    "1:	true	1	2	3",
+                    "2:	true	5	8",
+                    "3:	false	cannot resume dead coroutine"
+                }, output);
             }
         }
 
@@ -1808,7 +1806,17 @@ return c..'!!'
                 ex = Assert.Throws<LuaException>(() => L.LuaLen(14));
                 Assert.Equal("attempt to get length of a thread value", ex.Message);
 
-                // TODO Test with metamethod
+                // Test with metamethod __len
+                L.LuaNewTable();
+                L.LuaPushCFunction(state =>
+                {
+                    state.LuaPushNumber(1234);
+                    return 1;
+                });
+                L.LuaSetField(-2, "__len");
+                L.LuaSetMetatable(11);
+                L.LuaLen(11);
+                Assert.Equal(1234u, L.LuaToNumber(-1));
 
             }
 
