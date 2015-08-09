@@ -140,7 +140,7 @@ namespace LuaN
         /// <summary>
         /// Converts the Lua value at the given index to a string.
         /// </summary>
-        String LuaToString(int idx);
+        String LuaToLString(int idx, out uint len);
         /// <summary>
         /// Returns the raw "length" of the value at the given index
         /// </summary>
@@ -180,11 +180,15 @@ namespace LuaN
         /// <summary>
         /// Push a String value
         /// </summary>
+        void LuaPushLString(String s, uint len);
+        /// <summary>
+        /// Push a String value
+        /// </summary>
         void LuaPushString(String s);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, String arg0);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, String arg0);
         ///// <summary>
         ///// Push a formatted string value
         ///// </summary>
@@ -535,10 +539,10 @@ namespace LuaN
         /// Pushes the global environment onto the stack. 
         /// </summary>
         void LuaPushGlobalTable();
-        ///// <summary>
-        ///// Converts the Lua value at the given index to a string.
-        ///// </summary>
-        //String LuaToString(int i);
+        /// <summary>
+        /// Converts the Lua value at the given index to a string.
+        /// </summary>
+        String LuaToString(int idx);
         /// <summary>
         /// Moves the top element into the given valid index, shifting up the elements above this index to open space. 
         /// </summary>
@@ -669,10 +673,10 @@ namespace LuaN
         ///// If the function argument arg is an integer (or convertible to an integer), returns this integer. If this argument is absent or is nil, returns d. Otherwise, raises an error. 
         ///// </summary>
         //Int32 LuaLOptInteger(int arg, Int32 def);
-        ///// <summary>
-        ///// Grows the stack size to top + sz elements, raising an error if the stack cannot grow to that size.
-        ///// </summary>
-        //ILuaState LuaLCheckStack(int sz, String msg);
+        /// <summary>
+        /// Grows the stack size to top + sz elements, raising an error if the stack cannot grow to that size.
+        /// </summary>
+        void LuaLCheckStack(int sz, String msg);
         ///// <summary>
         ///// Checks whether the function argument arg has type t.
         ///// </summary>
@@ -749,18 +753,18 @@ namespace LuaN
         /// Loads a file as a Lua chunk. 
         /// </summary>
         LuaStatus LuaLLoadFile(String filename);
-
-        ////    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        ////    public extern static int luaL_loadbufferx(lua_State L, String buff, int sz, String name, String mode);
-
+        /// <summary>
+        /// Loads a buffer as a Lua chunk.
+        /// </summary>
+        int LuaLLoadBufferX(String buff, int sz, String name, String mode);
         /// <summary>
         /// Loads a string as a Lua chunk. 
         /// </summary>
         LuaStatus LuaLLoadString(String s);
-        ///// <summary>
-        ///// Returns the "length" of the value at the given index as a number; it is equivalent to the '#' operator in Lua 
-        ///// </summary>
-        //Int32 LuaLLen(int idx);
+        /// <summary>
+        /// Returns the "length" of the value at the given index as a number; it is equivalent to the '#' operator in Lua 
+        /// </summary>
+        Int64 LuaLLen(int idx);
         ///// <summary>
         ///// Creates a copy of string s by replacing any occurrence of the string p with the string r. 
         ///// Pushes the resulting string on the stack and returns it. 
@@ -775,16 +779,16 @@ namespace LuaN
         ///// Returns true if it finds a previous table there and false if it creates a new table. 
         ///// </summary>
         //bool LuaLGetSubTable(int idx, String fname);
-        ///// <summary>
-        ///// Creates and pushes a traceback of the stack L1. 
-        ///// </summary>
-        ///// <remarks>
-        ///// If msg is not NULL it is appended at the beginning of the traceback. The level parameter tells at which level to start the traceback. 
-        ///// </remarks>
-        //ILuaState LuaLTraceback(ILuaState L1, String msg, int level);
+        /// <summary>
+        /// Creates and pushes a traceback of the stack L1. 
+        /// </summary>
+        /// <remarks>
+        /// If msg is not NULL it is appended at the beginning of the traceback. The level parameter tells at which level to start the traceback. 
+        /// </remarks>
+        void LuaLTraceback(ILuaState L1, String msg, int level);
         ////    public extern static void luaL_requiref(lua_State L, String modname, lua_CFunction openf, int glb);
 
-        //#region some useful macros
+        #region some useful macros
         ///// <summary>
         ///// Creates a new table with a size optimized to store all entries in the array l
         ///// </summary>
@@ -799,10 +803,10 @@ namespace LuaN
         //ILuaState LuaLArgCheck(bool cond, int arg, String extramsg);
         ////    public static String luaL_checkstring(lua_State L, int n)
         ////    public static String luaL_optstring(lua_State L, int n, String def)
-        ///// <summary>
-        ///// Returns the name of the type of the value at the given index. 
-        ///// </summary>
-        //String LuaLTypeName(int idx);
+        /// <summary>
+        /// Returns the name of the type of the value at the given index. 
+        /// </summary>
+        String LuaLTypeName(int idx);
         /// <summary>
         /// Loads and runs the given file.
         /// </summary>
@@ -814,26 +818,26 @@ namespace LuaN
         ////    public static int luaL_getmetatable(lua_State L, String n) { return lua_getfield(L, LUA_REGISTRYINDEX, (n)); }
         ////    //public static int luaL_opt(lua_State L, lua_CFunction f, int n, int d) { return (lua_isnoneornil(L, (n)) ? (d) : f(L, (n))); }
         ////    //#define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
-        ///// <summary>
-        ///// Loads a buffer as a Lua chunk. 
-        ///// </summary>
-        //LuaStatus LuaLLoadBuffer(String s, int sz, String n);
-        //#endregion
+        /// <summary>
+        /// Loads a buffer as a Lua chunk. 
+        /// </summary>
+        LuaStatus LuaLLoadBuffer(String s, int sz, String n);
+        #endregion
 
-        //#region Acces to the "Abstraction Layer" for basic report of messages and errors
-        ///// <summary>
-        ///// print a string
-        ///// </summary>
-        //ILuaState WriteString(String s);
-        ///// <summary>
-        ///// print a newline and flush the output
-        ///// </summary>
-        //ILuaState WriteLine();
-        ///// <summary>
-        ///// print an error message
-        ///// </summary>
-        //ILuaState WriteStringError(String s, String p);
-        //#endregion
+        #region Acces to the "Abstraction Layer" for basic report of messages and errors
+        /// <summary>
+        /// Write a string
+        /// </summary>
+        void LuaWriteString(String s);
+        /// <summary>
+        /// Write a new line feed
+        /// </summary>
+        void LuaWriteLine();
+        /// <summary>
+        /// print an error message
+        /// </summary>
+        void LuaWriteStringError(String s, String p);
+        #endregion
 
         ////    /*
         ////    ** {============================================================
@@ -854,6 +858,11 @@ namespace LuaN
 
         ////    //#endif
         ////    /* }============================================================ */
+
+        /// <summary>
+        /// Assert
+        /// </summary>
+        void LuaAssert(bool cond);
 
         #endregion
 
@@ -907,20 +916,7 @@ namespace LuaN
         /// Open all standard library
         /// </summary>
         void LuaOpenLibs();
-        /// <summary>
-        /// Write a string
-        /// </summary>
-        void LuaWriteString(String s);
-        /// <summary>
-        /// Write a new line feed
-        /// </summary>
-        void LuaWriteLine();
         #endregion
-
-        ///// <summary>
-        ///// Assert
-        ///// </summary>
-        //void Assert(bool cond);
 
         /// <summary>
         /// Event raised when "print" is called
@@ -937,10 +933,10 @@ namespace LuaN
         /// </summary>
         event EventHandler<WriteEventArgs> OnWriteLine;
 
-        ///// <summary>
-        ///// Event raised when lua_writestringerror is called
-        ///// </summary>
-        //event EventHandler<WriteEventArgs> OnWriteStringError;
+        /// <summary>
+        /// Event raised when lua_writestringerror is called
+        /// </summary>
+        event EventHandler<WriteEventArgs> OnWriteStringError;
 
     }
 }

@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3A391724
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaN.DllWrapper.Tests", "LuaN.DllWrapper.Tests\LuaN.DllWrapper.Tests.csproj", "{9A55B49D-E80E-4FA9-AEB0-8DA261B87C73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaN.Lua", "LuaN.Lua\LuaN.Lua.csproj", "{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,18 @@ Global
 		{9A55B49D-E80E-4FA9-AEB0-8DA261B87C73}.Release|x64.Build.0 = Release|Any CPU
 		{9A55B49D-E80E-4FA9-AEB0-8DA261B87C73}.Release|x86.ActiveCfg = Release|Any CPU
 		{9A55B49D-E80E-4FA9-AEB0-8DA261B87C73}.Release|x86.Build.0 = Release|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Release|x64.Build.0 = Release|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F6469E0-82AE-4C3E-AC7D-A5DA4D70C02C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -130,6 +130,15 @@ namespace LuaN
             //    throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Returns the LuaToUserData typed
+        /// </summary>
+        public static T ToUserData<T>(this ILuaState L, int idx)
+        {
+            var obj = L.LuaToUserData(idx);
+            return (obj is T) ? (T)obj : default(T);
+        }
+
         #endregion
 
     }

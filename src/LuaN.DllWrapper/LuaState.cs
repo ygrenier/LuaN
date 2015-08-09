@@ -536,9 +536,9 @@ namespace LuaN.DllWrapper
         /// <summary>
         /// Converts the Lua value at the given index to a string.
         /// </summary>
-        public String LuaToString(int idx)
+        public String LuaToLString(int idx, out uint len)
         {
-            return LuaDll.lua_tostring(NativeState, idx);
+            return LuaDll.lua_tolstring(NativeState, idx, out len);
         }
         /// <summary>
         /// Returns the raw "length" of the value at the given index
@@ -601,14 +601,24 @@ namespace LuaN.DllWrapper
         /// <summary>
         /// Push a String value
         /// </summary>
+        public void LuaPushLString(String s, uint len)
+        {
+            LuaDll.lua_pushlstring(NativeState, s, len);
+        }
+        /// <summary>
+        /// Push a String value
+        /// </summary>
         public void LuaPushString(String s)
         {
             LuaDll.lua_pushstring(NativeState, s);
         }
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, String arg0);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, String arg0)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0);
+        }
         ///// <summary>
         ///// Push a formatted string value
         ///// </summary>
@@ -1146,10 +1156,13 @@ namespace LuaN.DllWrapper
         {
             LuaDll.lua_pushglobaltable(NativeState);
         }
-        ///// <summary>
-        ///// Converts the Lua value at the given index to a string.
-        ///// </summary>
-        //String ToString(int i);
+        /// <summary>
+        /// Converts the Lua value at the given index to a string.
+        /// </summary>
+        public String LuaToString(int idx)
+        {
+            return LuaDll.lua_tostring(NativeState, idx);
+        }
         /// <summary>
         /// Moves the top element into the given valid index, shifting up the elements above this index to open space. 
         /// </summary>
@@ -1377,10 +1390,13 @@ namespace LuaN.DllWrapper
         ///// If the function argument arg is an integer (or convertible to an integer), returns this integer. If this argument is absent or is nil, returns d. Otherwise, raises an error. 
         ///// </summary>
         //Int32 OptInteger(int arg, Int32 def);
-        ///// <summary>
-        ///// Grows the stack size to top + sz elements, raising an error if the stack cannot grow to that size.
-        ///// </summary>
-        //ILuaState CheckStack(int sz, String msg);
+        /// <summary>
+        /// Grows the stack size to top + sz elements, raising an error if the stack cannot grow to that size.
+        /// </summary>
+        public void LuaLCheckStack(int sz, String msg)
+        {
+            LuaDll.luaL_checkstack(NativeState, sz, msg);
+        }
         ///// <summary>
         ///// Checks whether the function argument arg has type t.
         ///// </summary>
@@ -1477,10 +1493,13 @@ namespace LuaN.DllWrapper
         {
             return (LuaStatus)LuaDll.luaL_loadfile(NativeState, filename);
         }
-
-        ////    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        ////    public extern static int luaL_loadbufferx(lua_State L, String buff, int sz, String name, String mode);
-
+        /// <summary>
+        /// Loads a buffer as a Lua chunk.
+        /// </summary>
+        public int LuaLLoadBufferX(String buff, int sz, String name, String mode)
+        {
+            return LuaDll.luaL_loadbufferx(NativeState, buff, sz, name, mode);
+        }
         /// <summary>
         /// Loads a string as a Lua chunk. 
         /// </summary>
@@ -1488,10 +1507,13 @@ namespace LuaN.DllWrapper
         {
             return (LuaStatus)LuaDll.luaL_loadstring(NativeState, s);
         }
-        ///// <summary>
-        ///// Returns the "length" of the value at the given index as a number; it is equivalent to the '#' operator in Lua 
-        ///// </summary>
-        //Int32 LLen(int idx);
+        /// <summary>
+        /// Returns the "length" of the value at the given index as a number; it is equivalent to the '#' operator in Lua 
+        /// </summary>
+        public Int64 LuaLLen(int idx)
+        {
+            return LuaDll.luaL_len(NativeState, idx);
+        }
         ///// <summary>
         ///// Creates a copy of string s by replacing any occurrence of the string p with the string r. 
         ///// Pushes the resulting string on the stack and returns it. 
@@ -1506,16 +1528,20 @@ namespace LuaN.DllWrapper
         ///// Returns true if it finds a previous table there and false if it creates a new table. 
         ///// </summary>
         //bool GetSubTable(int idx, String fname);
-        ///// <summary>
-        ///// Creates and pushes a traceback of the stack L1. 
-        ///// </summary>
-        ///// <remarks>
-        ///// If msg is not NULL it is appended at the beginning of the traceback. The level parameter tells at which level to start the traceback. 
-        ///// </remarks>
-        //ILuaState Traceback(ILuaState L1, String msg, int level);
+        /// <summary>
+        /// Creates and pushes a traceback of the stack L1. 
+        /// </summary>
+        /// <remarks>
+        /// If msg is not NULL it is appended at the beginning of the traceback. The level parameter tells at which level to start the traceback. 
+        /// </remarks>
+        public void LuaLTraceback(ILuaState L1, String msg, int level)
+        {
+            var state1 = GetAsLuaState(L1, "L1");
+            LuaDll.luaL_traceback(NativeState, state1.NativeState, msg, level);
+        }
         ////    public extern static void luaL_requiref(lua_State L, String modname, lua_CFunction openf, int glb);
 
-        //#region some useful macros
+        #region some useful macros
         ///// <summary>
         ///// Creates a new table with a size optimized to store all entries in the array l
         ///// </summary>
@@ -1530,10 +1556,13 @@ namespace LuaN.DllWrapper
         //ILuaState ArgCheck(bool cond, int arg, String extramsg);
         ////    public static String luaL_checkstring(lua_State L, int n)
         ////    public static String luaL_optstring(lua_State L, int n, String def)
-        ///// <summary>
-        ///// Returns the name of the type of the value at the given index. 
-        ///// </summary>
-        //String TypeName(int idx);
+        /// <summary>
+        /// Returns the name of the type of the value at the given index. 
+        /// </summary>
+        public String LuaLTypeName(int idx)
+        {
+            return LuaDll.luaL_typename(NativeState, idx);
+        }
         /// <summary>
         /// Loads and runs the given file.
         /// </summary>
@@ -1551,26 +1580,57 @@ namespace LuaN.DllWrapper
         ////    public static int luaL_getmetatable(lua_State L, String n) { return lua_getfield(L, LUA_REGISTRYINDEX, (n)); }
         ////    //public static int luaL_opt(lua_State L, lua_CFunction f, int n, int d) { return (lua_isnoneornil(L, (n)) ? (d) : f(L, (n))); }
         ////    //#define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
-        ///// <summary>
-        ///// Loads a buffer as a Lua chunk. 
-        ///// </summary>
-        //LuaStatus LoadBuffer(String s, int sz, String n);
-        //#endregion
+        /// <summary>
+        /// Loads a buffer as a Lua chunk. 
+        /// </summary>
+        public LuaStatus LuaLLoadBuffer(String s, int sz, String n)
+        {
+            return (LuaStatus)LuaDll.luaL_loadbuffer(NativeState, s, sz, n);
+        }
+        #endregion
 
-        //#region Acces to the "Abstraction Layer" for basic report of messages and errors
-        ///// <summary>
-        ///// print a string
-        ///// </summary>
-        //ILuaState WriteString(String s);
-        ///// <summary>
-        ///// print a newline and flush the output
-        ///// </summary>
-        //ILuaState WriteLine();
-        ///// <summary>
-        ///// print an error message
-        ///// </summary>
-        //ILuaState WriteStringError(String s, String p);
-        //#endregion
+        #region Acces to the "Abstraction Layer" for basic report of messages and errors
+        /// <summary>
+        /// Write a string
+        /// </summary>
+        public void LuaWriteString(String s)
+        {
+            var e = new WriteEventArgs(s);
+            var h = OnWriteString;
+            if (h != null)
+                h(this, e);
+            if (!e.Handled)
+                LuaDll.lua_writestring(s);
+        }
+
+        /// <summary>
+        /// Write a new line feed
+        /// </summary>
+        public void LuaWriteLine()
+        {
+            var e = new WriteEventArgs(Environment.NewLine);
+            var h = OnWriteLine;
+            if (h != null)
+                h(this, e);
+            if (!e.Handled)
+                LuaDll.lua_writeline();
+        }
+
+        /// <summary>
+        /// print an error message
+        /// </summary>
+        public void LuaWriteStringError(String s, String p)
+        {
+            var str = String.Format(s.Replace("%s", "{0}"), p);
+            var e = new WriteEventArgs(str);
+            var h = OnWriteStringError;
+            if (h != null)
+                h(this, e);
+            if (!e.Handled)
+                LuaDll.lua_writestringerror(s, p);
+        }
+
+        #endregion
 
         ////    /*
         ////    ** {============================================================
@@ -1591,6 +1651,16 @@ namespace LuaN.DllWrapper
 
         ////    //#endif
         ////    /* }============================================================ */
+
+        /// <summary>
+        /// Assert
+        /// </summary>
+        public void LuaAssert(bool cond)
+        {
+#if DEBUG
+            System.Diagnostics.Debug.Assert(cond);
+#endif
+        }
 
         #endregion
 
@@ -1737,32 +1807,6 @@ namespace LuaN.DllWrapper
             OverridePrint();
         }
 
-        /// <summary>
-        /// Write a string
-        /// </summary>
-        public void LuaWriteString(String s)
-        {
-            var e = new WriteEventArgs(s);
-            var h = OnWriteString;
-            if (h != null)
-                h(this, e);
-            if (!e.Handled)
-                LuaDll.lua_writestring(s);
-        }
-
-        /// <summary>
-        /// Write a new line feed
-        /// </summary>
-        public void LuaWriteLine()
-        {
-            var e = new WriteEventArgs(Environment.NewLine);
-            var h = OnWriteLine;
-            if (h != null)
-                h(this, e);
-            if (!e.Handled)
-                LuaDll.lua_writeline();
-        }
-
         #endregion
 
         /// <summary>
@@ -1797,6 +1841,11 @@ namespace LuaN.DllWrapper
         /// Event raised when lua_writeline is called
         /// </summary>
         public event EventHandler<WriteEventArgs> OnWriteLine;
+
+        /// <summary>
+        /// Event raised when lua_writestringerror is called
+        /// </summary>
+        public event EventHandler<WriteEventArgs> OnWriteStringError;
 
     }
 }
