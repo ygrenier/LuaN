@@ -94,33 +94,32 @@ namespace LuaN.DllWrapper
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public extern static void luaL_where(lua_State L, int lvl);
-        ////LUALIB_API int (luaL_error) (lua_State *L, const char *fmt, ...);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String message);
+        public extern static void luaL_error(lua_State L, String message);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, String arg0);
+        public extern static void luaL_error(lua_State L, String fmt, String arg0);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, lua_Number arg0);
+        public extern static void luaL_error(lua_State L, String fmt, lua_Number arg0);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, lua_Integer arg0);
+        public extern static void luaL_error(lua_State L, String fmt, lua_Integer arg0);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, String arg0, String arg1);
+        public extern static void luaL_error(lua_State L, String fmt, String arg0, String arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, lua_Number arg0, String arg1);
+        public extern static void luaL_error(lua_State L, String fmt, lua_Number arg0, String arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, lua_Integer arg0, String arg1);
+        public extern static void luaL_error(lua_State L, String fmt, lua_Integer arg0, String arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, String arg0, lua_Number arg1);
+        public extern static void luaL_error(lua_State L, String fmt, String arg0, lua_Number arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, lua_Number arg0, lua_Number arg1);
+        public extern static void luaL_error(lua_State L, String fmt, lua_Number arg0, lua_Number arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, lua_Integer arg0, lua_Number arg1);
+        public extern static void luaL_error(lua_State L, String fmt, lua_Integer arg0, lua_Number arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, String arg0, lua_Integer arg1);
+        public extern static void luaL_error(lua_State L, String fmt, String arg0, lua_Integer arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, lua_Number arg0, lua_Integer arg1);
+        public extern static void luaL_error(lua_State L, String fmt, lua_Number arg0, lua_Integer arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_error")]
-        public extern static int luaL_error(lua_State L, String fmt, lua_Integer arg0, lua_Integer arg1);
+        public extern static void luaL_error(lua_State L, String fmt, lua_Integer arg0, lua_Integer arg1);
 
         ////[DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         ////public extern static int luaL_checkoption(lua_State L, int arg, String def, String[] lst);
@@ -146,7 +145,7 @@ namespace LuaN.DllWrapper
         public static int luaL_loadfile(lua_State L, String filename) { return luaL_loadfilex(L, filename, null); }
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        public extern static int luaL_loadbufferx(lua_State L, String buff, int sz, String name, String mode);
+        public extern static int luaL_loadbufferx(lua_State L, byte[] buff, int sz, String name, String mode);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public extern static int luaL_loadstring(lua_State L, String s);
 
@@ -156,11 +155,10 @@ namespace LuaN.DllWrapper
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public extern static lua_Integer luaL_len(lua_State L, int idx);
 
-        //[DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_gsub")]
-        ////extern static IntPtr _luaL_gsub(lua_State L, String s, String p, String r);
-        ////public static String luaL_gsub(lua_State L, String s, String p, String r)
-        ////{ return Marshal.PtrToStringAnsi(_luaL_gsub(L, s, p, r)); }
-        //public extern static String luaL_gsub(lua_State L, String s, String p, String r);
+        [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_gsub")]
+        extern static IntPtr _luaL_gsub(lua_State L, String s, String p, String r);
+        public static String luaL_gsub(lua_State L, String s, String p, String r)
+        { return Marshal.PtrToStringAnsi(_luaL_gsub(L, s, p, r)); }
 
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "luaL_setfuncs")]
@@ -215,10 +213,11 @@ namespace LuaN.DllWrapper
 
         public static int luaL_getmetatable(lua_State L, String n) { return lua_getfield(L, LUA_REGISTRYINDEX, (n)); }
 
-        //public static int luaL_opt(lua_State L, lua_CFunction f, int n, int d) { return (lua_isnoneornil(L, (n)) ? (d) : f(L, (n))); }
         //#define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
+        public static int luaL_opt(lua_State L, Func<lua_State, int, int> f, int n, int d)
+        { return (lua_isnoneornil(L, (n)) ? (d) : f(L, (n))); }
 
-        public static int luaL_loadbuffer(lua_State L, String s, int sz, String n) { return luaL_loadbufferx(L, s, sz, n, null); }
+        public static int luaL_loadbuffer(lua_State L, byte[] s, int sz, String n) { return luaL_loadbufferx(L, s, sz, n, null); }
 
         ///*
         //** {======================================================

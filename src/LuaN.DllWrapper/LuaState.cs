@@ -619,50 +619,83 @@ namespace LuaN.DllWrapper
         {
             LuaDll.lua_pushfstring(NativeState, fmt, arg0);
         }
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, Double arg0);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, int arg0);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, String arg0, String arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, String arg0, Double arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, String arg0, int arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, Double arg0, String arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, Double arg0, Double arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, Double arg0, int arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, int arg0, String arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, int arg0, Double arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, int arg0, int arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, Double arg0)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, int arg0)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, String arg0, String arg1)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0, arg1);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, String arg0, Double arg1)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0, arg1);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, String arg0, int arg1)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0, arg1);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, Double arg0, String arg1)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0, arg1);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, Double arg0, Double arg1)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0, arg1);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, Double arg0, int arg1)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0, arg1);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, int arg0, String arg1)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0, arg1);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, int arg0, Double arg1)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0, arg1);
+        }
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        public void LuaPushFString(String fmt, int arg0, int arg1)
+        {
+            LuaDll.lua_pushfstring(NativeState, fmt, arg0, arg1);
+        }
         /// <summary>
         /// Push a C closure
         /// </summary>
@@ -945,9 +978,9 @@ namespace LuaN.DllWrapper
         /// <summary>
         /// Dumps a function as a binary chunk.
         /// </summary>
-        public int LuaDump(LuaWriter writer, Object data, int strip)
+        public int LuaDump(LuaWriter writer, Object data, bool strip)
         {
-            return LuaDll.lua_dump(NativeState, WrapWriter(writer), GetUserDataPtr(data), strip);
+            return LuaDll.lua_dump(NativeState, WrapWriter(writer), GetUserDataPtr(data), strip ? 1 : 0);
         }
         #endregion
 
@@ -1360,8 +1393,13 @@ namespace LuaN.DllWrapper
         {
             return LuaDll.luaL_callmeta(NativeState, obj, e) != 0;
         }
-        ////    extern static IntPtr _luaL_tolstring(lua_State L, int idx, out int len);
-        ////    public static String luaL_tolstring(lua_State L, int idx, out int len)
+        /// <summary>
+        /// Converts any Lua value at the given index to a C string in a reasonable format.
+        /// </summary>
+        public String LuaLToLString(int idx, out uint len)
+        {
+            return LuaDll.luaL_tolstring(NativeState, idx, out len);
+        }
         ///// <summary>
         ///// Raises an error reporting a problem with argument arg of the C function that called it
         ///// </summary>
@@ -1446,14 +1484,20 @@ namespace LuaN.DllWrapper
         {
             LuaDll.luaL_error(NativeState, message);
         }
-        ///// <summary>
-        ///// Raises an error.
-        ///// </summary>
-        //void Error(String fmt, String arg0);
-        ///// <summary>
-        ///// Raises an error.
-        ///// </summary>
-        //void Error(String fmt, String arg0, String arg1);
+        /// <summary>
+        /// Raises an error.
+        /// </summary>
+        public void LuaLError(String fmt, String arg0)
+        {
+            LuaDll.luaL_error(NativeState, fmt, arg0);
+        }
+        /// <summary>
+        /// Raises an error.
+        /// </summary>
+        public void LuaLError(String fmt, String arg0, String arg1)
+        {
+            LuaDll.luaL_error(NativeState, fmt, arg0, arg1);
+        }
 
         ////    //[DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         ////    //public extern static int luaL_checkoption(lua_State L, int arg, String def, String[] lst);
@@ -1482,10 +1526,13 @@ namespace LuaN.DllWrapper
             LuaDll.luaL_unref(NativeState, table, reference);
         }
 
-        ///// <summary>
-        ///// Loads a file as a Lua chunk. 
-        ///// </summary>
-        //LuaStatus LuaLLoadFileX(String filename, String mode);
+        /// <summary>
+        /// Loads a file as a Lua chunk. 
+        /// </summary>
+        public LuaStatus LuaLLoadFileX(String filename, String mode)
+        {
+            return (LuaStatus)LuaDll.luaL_loadfilex(NativeState, filename, mode);
+        }
         /// <summary>
         /// Loads a file as a Lua chunk. 
         /// </summary>
@@ -1496,9 +1543,9 @@ namespace LuaN.DllWrapper
         /// <summary>
         /// Loads a buffer as a Lua chunk.
         /// </summary>
-        public int LuaLLoadBufferX(String buff, int sz, String name, String mode)
+        public LuaStatus LuaLLoadBufferX(Byte[] buff, int sz, String name, String mode)
         {
-            return LuaDll.luaL_loadbufferx(NativeState, buff, sz, name, mode);
+            return (LuaStatus)LuaDll.luaL_loadbufferx(NativeState, buff, sz, name, mode);
         }
         /// <summary>
         /// Loads a string as a Lua chunk. 
@@ -1577,13 +1624,26 @@ namespace LuaN.DllWrapper
         {
             return (LuaStatus)LuaDll.luaL_dostring(NativeState, s);
         }
-        ////    public static int luaL_getmetatable(lua_State L, String n) { return lua_getfield(L, LUA_REGISTRYINDEX, (n)); }
-        ////    //public static int luaL_opt(lua_State L, lua_CFunction f, int n, int d) { return (lua_isnoneornil(L, (n)) ? (d) : f(L, (n))); }
-        ////    //#define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
+        /// <summary>
+        /// Pushes onto the stack the metatable associated with name tname in the registry.
+        /// </summary>
+        public LuaType LuaLGetMetatable(String n)
+        {
+            if (String.IsNullOrWhiteSpace(n)) throw new ArgumentNullException("n");
+            return (LuaType)LuaDll.luaL_getmetatable(NativeState, n);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public int LuaLOpt(Func<ILuaState, int, int> f, int n, int d)
+        {
+            return LuaDll.luaL_opt(NativeState, (state, sn) => f(FindState(state, true), sn), n, d);
+            //return (LuaIsNoneOrNil(n) ? d : f(this, n));
+        }
         /// <summary>
         /// Loads a buffer as a Lua chunk. 
         /// </summary>
-        public LuaStatus LuaLLoadBuffer(String s, int sz, String n)
+        public LuaStatus LuaLLoadBuffer(Byte[] s, int sz, String n)
         {
             return (LuaStatus)LuaDll.luaL_loadbuffer(NativeState, s, sz, n);
         }
@@ -1657,9 +1717,7 @@ namespace LuaN.DllWrapper
         /// </summary>
         public void LuaAssert(bool cond)
         {
-#if DEBUG
-            System.Diagnostics.Debug.Assert(cond);
-#endif
+            LuaDll.lua_assert(cond);
         }
 
         #endregion

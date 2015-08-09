@@ -12,6 +12,26 @@ namespace LuaN.DllWrapper.Tests
     {
 
         [Fact]
+        public void TestLuaLLoadFileX()
+        {
+            String file = System.IO.Path.GetTempFileName();
+            using (var L = new LuaState())
+            {
+                System.IO.File.WriteAllText(file, "return 2*5");
+                Assert.Equal(LuaStatus.Ok, L.LuaLLoadFileX(file, "t"));
+                Assert.Equal(LuaType.Function, L.LuaType(-1));
+                Assert.Equal(null, L.LuaToCFunction(-1));
+                L.LuaCall(0, 1);
+                Assert.Equal(10d, L.LuaToNumber(-1));
+
+                System.IO.File.WriteAllText(file, "return 2*");
+                Assert.Equal(LuaStatus.ErrorSyntax, L.LuaLLoadFileX(file, "t"));
+                Assert.Equal(file + ":1: unexpected symbol near <eof>", L.LuaToString(-1));
+            }
+            System.IO.File.Delete(file);
+        }
+
+        [Fact]
         public void TestLuaLLoadFile()
         {
             String file = System.IO.Path.GetTempFileName();
@@ -218,9 +238,43 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
+        public void TestLuaLToLString()
+        {
+            using (var L = new LuaState())
+            {
+                L.LuaOpenLibs();
+
+                uint len;
+                L.LuaPushNumber(1234);
+                Assert.Equal("1234.0", L.LuaLToLString(-1, out len));
+                Assert.Equal("1234.0", L.LuaToLString(-1, out len));
+                L.LuaGetGlobal("_G");
+                Assert.StartsWith("table: ", L.LuaLToLString(-1, out len));
+                Assert.StartsWith("table: ", L.LuaToLString(-1, out len));
+            }
+        }
+
+        [Fact]
+        public void TestLuaLCheckStack()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaLCheckStack(2, "Failed 1");
+                Assert.Equal(0, L.LuaGetTop());
+                L.LuaLCheckStack(35, "Failed 2");
+                var lex = Assert.Throws<LuaException>(() => L.LuaLCheckStack(1000000, "Failed 3"));
+                Assert.Equal("stack overflow (Failed 3)", lex.Message);
+                lex = Assert.Throws<LuaException>(() => L.LuaLCheckStack(1000000, null));
+                Assert.Equal("stack overflow", lex.Message);
+            }
+        }
+
+        [Fact]
         public void TestLuaLNewMetatable()
         {
-            using (var L=new LuaState())
+            using (var L = new LuaState())
             {
                 Assert.True(L.LuaLNewMetatable("meta1"));
                 Assert.Equal(1, L.LuaGetTop());
@@ -262,12 +316,35 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
+        public void TestLuaLGetMetatable()
+        {
+            using (var L = new LuaState())
+            {
+                Assert.True(L.LuaLNewMetatable("meta1"));
+
+                Assert.Equal(LuaType.Table, L.LuaLGetMetatable("meta1"));
+                Assert.Equal(true, L.LuaRawEqual(1, -1));
+
+                Assert.Equal(LuaType.Nil, L.LuaLGetMetatable("meta2"));
+
+                Assert.Throws<ArgumentNullException>(() => L.LuaLGetMetatable("  "));
+            }
+        }
+
+        [Fact]
         public void TestLuaLError()
         {
-            using (var L=new LuaState())
+            using (var L = new LuaState())
             {
                 var ex = Assert.Throws<LuaException>(() => L.LuaLError("Error message"));
                 Assert.Equal("Error message", ex.Message);
+
+                ex = Assert.Throws<LuaException>(() => L.LuaLError("Error message : %s", "That's an error"));
+                Assert.Equal("Error message : That's an error", ex.Message);
+
+                ex = Assert.Throws<LuaException>(() => L.LuaLError("Error message (%s): %s", "test", "That's an error"));
+                Assert.Equal("Error message (test): That's an error", ex.Message);
+
             }
         }
 
@@ -318,6 +395,211 @@ namespace LuaN.DllWrapper.Tests
             finally
             {
                 Console.SetOut(oldStdout);
+            }
+        }
+
+        [Fact]
+        public void TestLuaWriteStringError()
+        {
+            var oldStderr = Console.Error;
+            StringBuilder stderr = new StringBuilder();
+            Console.SetError(new StringWriter(stderr));
+            try
+            {
+                using (var L = new LuaState())
+                {
+                    List<String> output = new List<string>();
+                    L.LuaWriteStringError("%s error", "First");
+
+                    bool doHandled = false;
+                    L.OnWriteStringError += (s, e) =>
+                    {
+                        output.Add("E:" + e.Text);
+                        e.Handled = doHandled;
+                    };
+
+                    L.LuaWriteStringError("%s error", "Second");
+
+                    doHandled = true;
+
+                    L.LuaWriteStringError("%s error", "Third");
+
+                    Assert.Equal("First errorSecond error", stderr.ToString());
+                    Assert.Equal(new String[]
+                    {
+                        "E:Second error",
+                        "E:Third error",
+                    }, output);
+                }
+            }
+            finally
+            {
+                Console.SetError(oldStderr);
+            }
+        }
+
+        [Fact]
+        public void TestLuaAsset()
+        {
+            using (var L = new LuaState())
+            {
+                L.LuaAssert(true);
+
+                //Assert.Throws<Exception>(() => L.LuaAssert(false));
+            }
+        }
+
+        [Fact]
+        public void TestLuaLLen()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
+
+                Exception ex = Assert.Throws<LuaException>(() => L.LuaLLen(1));
+                Assert.Equal("attempt to get length of a nil value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLLen(2));
+                Assert.Equal("attempt to get length of a number value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLLen(3));
+                Assert.Equal("attempt to get length of a number value", ex.Message);
+                Assert.Equal(4u, L.LuaLLen(4));
+                Assert.Equal(3u, L.LuaLLen(5));
+                Assert.Equal(2u, L.LuaLLen(6));
+                Assert.Equal(2u, L.LuaLLen(7));
+                ex = Assert.Throws<LuaException>(() => L.LuaLLen(8));
+                Assert.Equal("attempt to get length of a boolean value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLLen(9));
+                Assert.Equal("attempt to get length of a function value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLLen(10));
+                Assert.Equal("attempt to get length of a function value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLLen(11));
+                Assert.Equal("attempt to get length of a userdata value", ex.Message);
+                ex = Assert.Throws<LuaException>(() => L.LuaLLen(12));
+                Assert.Equal("attempt to get length of a userdata value", ex.Message);
+                L.LuaLLen(13);
+                Assert.Equal(0u, L.LuaToNumber(-1));
+                ex = Assert.Throws<LuaException>(() => L.LuaLLen(14));
+                Assert.Equal("attempt to get length of a thread value", ex.Message);
+
+                // Test with metamethod __len
+                L.LuaNewTable();
+                L.LuaPushCFunction(state =>
+                {
+                    state.LuaPushNumber(1234);
+                    return 1;
+                });
+                L.LuaSetField(-2, "__len");
+                L.LuaSetMetatable(11);
+                Assert.Equal(1234u, L.LuaLLen(11));
+
+            }
+
+        }
+
+        [Fact]
+        public void TestLuaLTraceback()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaOpenLibs();
+                L.LuaRegister("TestTrace", state =>
+                {
+                    state.LuaLTraceback(state, "The Call Trace", 0);
+                    Assert.Equal(String.Join("\n", new String[] {
+                        "The Call Trace",
+                        "stack traceback:",
+                        "\t[C]: in function 'TestTrace'",
+                        "\t[string \"\r...\"]:3: in function 'f1'",
+                        "\t[string \"\r...\"]:6: in function 'f2'",
+                        "\t[string \"\r...\"]:8: in main chunk",
+                    }), state.LuaToString(-1));
+
+                    state.LuaLTraceback(state, null, 1);
+                    Assert.Equal(String.Join("\n", new String[] {
+                        "stack traceback:",
+                        "\t[string \"\r...\"]:3: in function 'f1'",
+                        "\t[string \"\r...\"]:6: in function 'f2'",
+                        "\t[string \"\r...\"]:8: in main chunk",
+                    }), state.LuaToString(-1));
+
+                    state.LuaLTraceback(state, null, 3);
+                    Assert.Equal(String.Join("\n", new String[] {
+                        "stack traceback:",
+                        "\t[string \"\r...\"]:8: in main chunk",
+                    }), state.LuaToString(-1));
+
+                    return 0;
+                });
+                L.DoString(@"
+function f1()
+ TestTrace()
+end
+function f2()
+ f1()
+end
+f2()
+");
+            }
+
+        }
+
+        [Fact]
+        public void TestLuaLTypeName()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                PushTestValues(L);
+
+                Assert.Equal("nil", L.LuaLTypeName(1));
+                Assert.Equal("number", L.LuaLTypeName(2));
+                Assert.Equal("number", L.LuaLTypeName(3));
+                Assert.Equal("string", L.LuaLTypeName(4));
+                Assert.Equal("string", L.LuaLTypeName(5));
+                Assert.Equal("string", L.LuaLTypeName(6));
+                Assert.Equal("string", L.LuaLTypeName(7));
+                Assert.Equal("boolean", L.LuaLTypeName(8));
+                Assert.Equal("function", L.LuaLTypeName(9));
+                Assert.Equal("function", L.LuaLTypeName(10));
+                Assert.Equal("userdata", L.LuaLTypeName(11));
+                Assert.Equal("userdata", L.LuaLTypeName(12));
+                Assert.Equal("table", L.LuaLTypeName(13));
+                Assert.Equal("thread", L.LuaLTypeName(14));
+            }
+        }
+
+        [Fact]
+        public void TestLuaLLoadBuffer()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                Assert.Equal(LuaStatus.Ok, L.LoadBuffer(Encoding.ASCII.GetBytes("return 2*7"), "name", "t"));
+                Assert.Equal(LuaType.Function, L.LuaType(-1));
+                L.LuaPushValue(-1);
+                L.LuaCall(0, 1);
+                Assert.Equal(14, L.LuaToNumber(-1));
+                L.LuaPop(1);
+
+                byte[] buffBytes;
+                using (var ms = new MemoryStream())
+                {
+                    LuaWriter wrt = (state, p, ud) =>
+                     {
+                         ms.Write(p, 0, p.Length);
+                         return 0;
+                     };
+                    L.LuaDump(wrt, null, true);
+                    buffBytes = ms.ToArray();
+                }
+
+                Assert.Equal(LuaStatus.Ok, L.LoadBuffer(buffBytes, null));
+                Assert.Equal(LuaType.Function, L.LuaType(-1));
+                L.LuaCall(0, 1);
+                Assert.Equal(14, L.LuaToNumber(-1));
+
             }
         }
 

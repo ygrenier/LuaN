@@ -189,50 +189,50 @@ namespace LuaN
         /// Push a formatted string value
         /// </summary>
         void LuaPushFString(String fmt, String arg0);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, Double arg0);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, int arg0);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, String arg0, String arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, String arg0, Double arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, String arg0, int arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, Double arg0, String arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, Double arg0, Double arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, Double arg0, int arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, int arg0, String arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, int arg0, Double arg1);
-        ///// <summary>
-        ///// Push a formatted string value
-        ///// </summary>
-        //String PushFString(String fmt, int arg0, int arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, Double arg0);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, int arg0);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, String arg0, String arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, String arg0, Double arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, String arg0, int arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, Double arg0, String arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, Double arg0, Double arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, Double arg0, int arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, int arg0, String arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, int arg0, Double arg1);
+        /// <summary>
+        /// Push a formatted string value
+        /// </summary>
+        void LuaPushFString(String fmt, int arg0, int arg1);
         /// <summary>
         /// Push a C closure
         /// </summary>
@@ -416,7 +416,7 @@ namespace LuaN
         /// <summary>
         /// Dumps a function as a binary chunk.
         /// </summary>
-        int LuaDump(LuaWriter writer, Object data, int strip);
+        int LuaDump(LuaWriter writer, Object data, bool strip);
         #endregion
 
         #region coroutine functions
@@ -643,8 +643,10 @@ namespace LuaN
         /// Calls a metamethod. 
         /// </summary>
         Boolean LuaLCallMeta(int obj, String e);
-        ////    extern static IntPtr _luaL_tolstring(lua_State L, int idx, out int len);
-        ////    public static String luaL_tolstring(lua_State L, int idx, out int len)
+        /// <summary>
+        /// Converts any Lua value at the given index to a C string in a reasonable format.
+        /// </summary>
+        String LuaLToLString(int idx, out uint len);
         ///// <summary>
         ///// Raises an error reporting a problem with argument arg of the C function that called it
         ///// </summary>
@@ -715,14 +717,14 @@ namespace LuaN
         /// Raises an error.
         /// </summary>
         void LuaLError(String message);
-        ///// <summary>
-        ///// Raises an error.
-        ///// </summary>
-        //void Error(String fmt, String arg0);
-        ///// <summary>
-        ///// Raises an error.
-        ///// </summary>
-        //void Error(String fmt, String arg0, String arg1);
+        /// <summary>
+        /// Raises an error.
+        /// </summary>
+        void LuaLError(String fmt, String arg0);
+        /// <summary>
+        /// Raises an error.
+        /// </summary>
+        void LuaLError(String fmt, String arg0, String arg1);
 
         ////    //[DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         ////    //public extern static int luaL_checkoption(lua_State L, int arg, String def, String[] lst);
@@ -745,10 +747,10 @@ namespace LuaN
         /// </remarks>
         void LuaLUnref(int table, int reference);
 
-        ///// <summary>
-        ///// Loads a file as a Lua chunk. 
-        ///// </summary>
-        //LuaStatus LuaLLoadFileX(String filename, String mode);
+        /// <summary>
+        /// Loads a file as a Lua chunk. 
+        /// </summary>
+        LuaStatus LuaLLoadFileX(String filename, String mode);
         /// <summary>
         /// Loads a file as a Lua chunk. 
         /// </summary>
@@ -756,7 +758,7 @@ namespace LuaN
         /// <summary>
         /// Loads a buffer as a Lua chunk.
         /// </summary>
-        int LuaLLoadBufferX(String buff, int sz, String name, String mode);
+        LuaStatus LuaLLoadBufferX(Byte[] buff, int sz, String name, String mode);
         /// <summary>
         /// Loads a string as a Lua chunk. 
         /// </summary>
@@ -815,13 +817,18 @@ namespace LuaN
         /// Loads and runs the given string.
         /// </summary>
         LuaStatus LuaLDoString(String s);
-        ////    public static int luaL_getmetatable(lua_State L, String n) { return lua_getfield(L, LUA_REGISTRYINDEX, (n)); }
-        ////    //public static int luaL_opt(lua_State L, lua_CFunction f, int n, int d) { return (lua_isnoneornil(L, (n)) ? (d) : f(L, (n))); }
-        ////    //#define luaL_opt(L,f,n,d)	(lua_isnoneornil(L,(n)) ? (d) : f(L,(n)))
+        /// <summary>
+        /// Pushes onto the stack the metatable associated with name tname in the registry.
+        /// </summary>
+        LuaType LuaLGetMetatable(String n);
+        /// <summary>
+        /// 
+        /// </summary>
+        int LuaLOpt(Func<ILuaState, int, int> f, int n, int d);
         /// <summary>
         /// Loads a buffer as a Lua chunk. 
         /// </summary>
-        LuaStatus LuaLLoadBuffer(String s, int sz, String n);
+        LuaStatus LuaLLoadBuffer(Byte[] s, int sz, String n);
         #endregion
 
         #region Acces to the "Abstraction Layer" for basic report of messages and errors

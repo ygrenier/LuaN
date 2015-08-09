@@ -226,7 +226,8 @@ namespace Lua
 
         static LuaStatus dostring(ILuaState L, String s, String name)
         {
-            return dochunk(L, L.LuaLLoadBuffer(s, s.Length, name));
+            var b = Encoding.UTF8.GetBytes(s);
+            return dochunk(L, L.LuaLLoadBuffer(b, b.Length, name));
         }
 
 
@@ -324,7 +325,8 @@ namespace Lua
             L.LuaPushValue(-2);  /* duplicate line */
             L.LuaConcat(2);  /* new line is "return ..." */
             line = L.LuaToLString(-1, out len);
-            if ((status = L.LuaLLoadBuffer(line, (int)len, "=stdin")) == LuaStatus.Ok)
+            var b = Encoding.UTF8.GetBytes(line);
+            if ((status = L.LuaLLoadBuffer(b, b.Length, "=stdin")) == LuaStatus.Ok)
             {
                 L.LuaRemove(-3);  /* remove original line */
                 //line += sizeof("return")/sizeof(char);  /* remove 'return' for history */
@@ -347,7 +349,8 @@ namespace Lua
             {  /* repeat until gets a complete statement */
                 uint len;
                 String line = L.LuaToLString(1, out len);  /* get what it has */
-                LuaStatus status = L.LuaLLoadBuffer(line, (int)len, "=stdin");  /* try it */
+                var b = Encoding.UTF8.GetBytes(line);
+                LuaStatus status = L.LuaLLoadBuffer(b, b.Length, "=stdin");  /* try it */
                 if (0 == incomplete(L, status) || 0 == pushline(L, false))
                 {
                     lua_saveline(L, line);  /* keep history */

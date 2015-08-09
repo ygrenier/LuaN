@@ -61,6 +61,22 @@ namespace LuaN
         {
             return L.LuaLDoString(s);
         }
+        /// <summary>
+        /// Alias to LuaLLoadBuffer
+        /// </summary>
+        public static LuaStatus LoadBuffer(this ILuaState L, byte[] buffer, String name)
+        {
+            buffer = buffer ?? new byte[0];
+            return L.LuaLLoadBuffer(buffer, buffer.Length, name);
+        }
+        /// <summary>
+        /// Alias to LuaLLoadBufferX
+        /// </summary>
+        public static LuaStatus LoadBuffer(this ILuaState L, byte[] buffer, String name, String mode)
+        {
+            buffer = buffer ?? new byte[0];
+            return L.LuaLLoadBufferX(buffer, buffer.Length, name, mode);
+        }
         #endregion
 
         #region .Net object

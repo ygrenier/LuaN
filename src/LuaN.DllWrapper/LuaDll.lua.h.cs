@@ -270,19 +270,19 @@ namespace LuaN.DllWrapper
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_pushfstring")]
         public extern static void lua_pushfstring(lua_State L, String fmt, lua_Number arg0, lua_Number arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_pushfstring")]
-        public extern static void lua_pushfstring(lua_State L, String fmt, lua_Integer arg0, lua_Number arg1);
+        public extern static void lua_pushfstring(lua_State L, String fmt, int arg0, lua_Number arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_pushfstring")]
         public extern static void lua_pushfstring(lua_State L, String fmt, String arg0, lua_Number arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_pushfstring")]
         public extern static void lua_pushfstring(lua_State L, String fmt, lua_Number arg0, lua_Integer arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_pushfstring")]
-        public extern static void lua_pushfstring(lua_State L, String fmt, lua_Integer arg0, lua_Integer arg1);
+        public extern static void lua_pushfstring(lua_State L, String fmt, int arg0, lua_Integer arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_pushfstring")]
         public extern static void lua_pushfstring(lua_State L, String fmt, String arg0, lua_Integer arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_pushfstring")]
         public extern static void lua_pushfstring(lua_State L, String fmt, lua_Number arg0, String arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_pushfstring")]
-        public extern static void lua_pushfstring(lua_State L, String fmt, lua_Integer arg0, String arg1);
+        public extern static void lua_pushfstring(lua_State L, String fmt, int arg0, String arg1);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_pushfstring")]
         public extern static void lua_pushfstring(lua_State L, String fmt, String arg0, String arg1);
         #endregion
@@ -401,7 +401,7 @@ namespace LuaN.DllWrapper
         */
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        public extern static int lua_error(lua_State L);
+        public extern static void lua_error(lua_State L);
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public extern static int lua_next(lua_State L, int idx);
@@ -501,12 +501,10 @@ namespace LuaN.DllWrapper
         /* Functions to be called by the debugger in specific events */
         [UnmanagedFunctionPointer(System.Runtime.InteropServices.CallingConvention.Cdecl)]
         public delegate void lua_Hook(lua_State L, IntPtr ar);
-        //typedef void (*lua_Hook) (lua_State *L, lua_Debug *ar);
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public extern static int lua_getstack(lua_State L, int level, IntPtr ar);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        //public extern static int lua_getinfo(lua_State L, String what, lua_Debug ar);
         public extern static int lua_getinfo(lua_State L, String what, IntPtr ar);
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, EntryPoint = "lua_getlocal")]
         extern static IntPtr _lua_getlocal(lua_State L, IntPtr ar, int n);

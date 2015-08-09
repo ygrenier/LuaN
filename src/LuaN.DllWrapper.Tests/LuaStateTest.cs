@@ -925,6 +925,19 @@ end
         }
 
         [Fact]
+        public void TestLuaPushLString()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushLString("Text", 3);
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.String, L.LuaType(-1));
+                Assert.Equal("Tex", L.LuaToString(-1));
+            }
+        }
+
+        [Fact]
         public void TestLuaPushString()
         {
             LuaState L = null;
@@ -936,42 +949,42 @@ end
             }
         }
 
-        //[Fact]
-        //public void TestPushFString()
-        //{
-        //    LuaState L = null;
-        //    using (L = new LuaState())
-        //    {
-        //        L.PushFString("-s-d-", 1234);
-        //        L.PushFString("-%s-", "Text");
-        //        L.PushFString("-%f-", 123.45);
-        //        L.PushFString("-%d-", 987);
-        //        L.PushFString("-%s-%s-", "Str", "Text");
-        //        L.PushFString("-%s-%f-", "Str", 123.45);
-        //        L.PushFString("-%s-%d-", "Str", 987);
-        //        L.PushFString("-%f-%s-", 11.22, "Text");
-        //        L.PushFString("-%f-%f-", 11.22, 123.45);
-        //        L.PushFString("-%f-%d-", 11.22, 987);
-        //        L.PushFString("-%d-%s-", 9988, "Text");
-        //        L.PushFString("-%d-%f-", 9988, 123.45);
-        //        L.PushFString("-%d-%d-", 9988, 987);
-        //        Assert.Equal(13, L.GetTop());
-        //        Assert.Equal(LuaType.String, L.Type(-1));
-        //        Assert.Equal("-s-d-", L.ToString(1));
-        //        Assert.Equal("-Text-", L.ToString(2));
-        //        Assert.Equal("-123.45-", L.ToString(3));
-        //        Assert.Equal("-987-", L.ToString(4));
-        //        Assert.Equal("-Str-Text-", L.ToString(5));
-        //        Assert.Equal("-Str-123.45-", L.ToString(6));
-        //        Assert.Equal("-Str-987-", L.ToString(7));
-        //        Assert.Equal("-11.22-Text-", L.ToString(8));
-        //        Assert.Equal("-11.22-123.45-", L.ToString(9));
-        //        Assert.Equal("-11.22-987-", L.ToString(10));
-        //        Assert.Equal("-9988-Text-", L.ToString(11));
-        //        Assert.Equal("-9988-123.45-", L.ToString(12));
-        //        Assert.Equal("-9988-987-", L.ToString(13));
-        //    }
-        //}
+        [Fact]
+        public void TestPushFString()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaPushFString("-s-d-", 1234);
+                L.LuaPushFString("-%s-", "Text");
+                L.LuaPushFString("-%f-", 123.45);
+                L.LuaPushFString("-%d-", 987);
+                L.LuaPushFString("-%s-%s-", "Str", "Text");
+                L.LuaPushFString("-%s-%f-", "Str", 123.45);
+                L.LuaPushFString("-%s-%d-", "Str", 987);
+                L.LuaPushFString("-%f-%s-", 11.22, "Text");
+                L.LuaPushFString("-%f-%f-", 11.22, 123.45);
+                L.LuaPushFString("-%f-%d-", 11.22, 987);
+                L.LuaPushFString("-%d-%s-", 9988, "Text");
+                L.LuaPushFString("-%d-%f-", 9988, 123.45);
+                L.LuaPushFString("-%d-%d-", 9988, 987);
+                //Assert.Equal(13, L.LuaGetTop());
+                Assert.Equal(LuaType.String, L.LuaType(-1));
+                Assert.Equal("-s-d-", L.LuaToString(1));
+                Assert.Equal("-Text-", L.LuaToString(2));
+                Assert.Equal("-123.45-", L.LuaToString(3));
+                Assert.Equal("-987-", L.LuaToString(4));
+                Assert.Equal("-Str-Text-", L.LuaToString(5));
+                Assert.Equal("-Str-123.45-", L.LuaToString(6));
+                Assert.Equal("-Str-987-", L.LuaToString(7));
+                Assert.Equal("-11.22-Text-", L.LuaToString(8));
+                Assert.Equal("-11.22-123.45-", L.LuaToString(9));
+                Assert.Equal("-11.22-987-", L.LuaToString(10));
+                Assert.Equal("-9988-Text-", L.LuaToString(11));
+                Assert.Equal("-9988-123.45-", L.LuaToString(12));
+                Assert.Equal("-9988-987-", L.LuaToString(13));
+            }
+        }
 
         [Fact]
         public void TestLuaPushCClosure()
@@ -1550,7 +1563,7 @@ return c..'!!'
                     dump.Add(b);
                     return 0;
                 };
-                var r = L.LuaDump(fDump, null, 0);
+                var r = L.LuaDump(fDump, null, false);
                 Assert.Equal(0, r);
                 Byte[] dumpBytes = dump.SelectMany(d => d).ToArray();
                 Assert.Equal(199, dumpBytes.Length);
