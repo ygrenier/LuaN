@@ -707,10 +707,10 @@ namespace LuaN
         ///// Pushes onto the stack a string identifying the current position of the control at level lvl in the call stack
         ///// </summary>
         //void LuaLWhere(int lvl);
-        ///// <summary>
-        ///// Raises an error.
-        ///// </summary>
-        //void LuaLError(String message);
+        /// <summary>
+        /// Raises an error.
+        /// </summary>
+        void LuaLError(String message);
         ///// <summary>
         ///// Raises an error.
         ///// </summary>
@@ -907,7 +907,14 @@ namespace LuaN
         /// Open all standard library
         /// </summary>
         void LuaOpenLibs();
-
+        /// <summary>
+        /// Write a string
+        /// </summary>
+        void LuaWriteString(String s);
+        /// <summary>
+        /// Write a new line feed
+        /// </summary>
+        void LuaWriteLine();
         #endregion
 
         ///// <summary>
@@ -915,20 +922,20 @@ namespace LuaN
         ///// </summary>
         //void Assert(bool cond);
 
-        ///// <summary>
-        ///// Event raised when "print" is called
-        ///// </summary>
-        //event EventHandler<WriteEventArgs> OnPrint;
+        /// <summary>
+        /// Event raised when "print" is called
+        /// </summary>
+        event EventHandler<WriteEventArgs> OnPrint;
 
-        ///// <summary>
-        ///// Event raised when lua_writestring is called
-        ///// </summary>
-        //event EventHandler<WriteEventArgs> OnWriteString;
+        /// <summary>
+        /// Event raised when lua_writestring is called
+        /// </summary>
+        event EventHandler<WriteEventArgs> OnWriteString;
 
-        ///// <summary>
-        ///// Event raised when lua_writeline is called
-        ///// </summary>
-        //event EventHandler<WriteEventArgs> OnWriteLine;
+        /// <summary>
+        /// Event raised when lua_writeline is called
+        /// </summary>
+        event EventHandler<WriteEventArgs> OnWriteLine;
 
         ///// <summary>
         ///// Event raised when lua_writestringerror is called

@@ -1423,10 +1423,13 @@ namespace LuaN.DllWrapper
         ///// Pushes onto the stack a string identifying the current position of the control at level lvl in the call stack
         ///// </summary>
         //ILuaState Where(int lvl);
-        ///// <summary>
-        ///// Raises an error.
-        ///// </summary>
-        //void Error(String message);
+        /// <summary>
+        /// Raises an error.
+        /// </summary>
+        public void LuaLError(String message)
+        {
+            LuaDll.luaL_error(NativeState, message);
+        }
         ///// <summary>
         ///// Raises an error.
         ///// </summary>
@@ -1594,11 +1597,66 @@ namespace LuaN.DllWrapper
         #region lualib
 
         /// <summary>
+        /// Overrided 'print' function
+        /// </summary>
+        private static int LuaPrint(ILuaState state)
+        {
+            // Get the event
+            LuaState L = state as LuaState;
+            EventHandler<WriteEventArgs> h = L != null ? L.OnPrint : null;
+
+            // Number of arguments
+            int n = state.LuaGetTop();
+            // Get the 'tostring' function
+            state.LuaGetGlobal("tostring");
+            // Loop on each argument
+            StringBuilder line = new StringBuilder();
+            for (int i = 1; i <= n; i++)
+            {
+                // Function to be called
+                state.LuaPushValue(-1);
+                // Value to print
+                state.LuaPushValue(i);
+                // Convert to string
+                state.LuaCall(1, 1);
+                // Get the result
+                var s = state.LuaToString(-1);
+                if (s == null)
+                    state.LuaLError("'tostring' must return a string to 'print'");
+
+                // Build the line
+                if (i > 1) line.Append('\t');
+                line.Append(s);
+
+                // Pop result
+                state.LuaPop(1);
+            }
+            // Call the event
+            WriteEventArgs pe = new WriteEventArgs(line.ToString()) { Handled = false };
+            if (h != null) h(L, pe);
+            // If the event is not handled, we print with the default behavior
+            if (!pe.Handled)
+            {
+                L.LuaWriteString(pe.Text);
+                L.LuaWriteLine();
+            }
+            // No result
+            return 0;
+        }
+
+        void OverridePrint()
+        {
+            LuaRegister("print", LuaPrint);
+        }
+
+        /// <summary>
         /// Open the basic library
         /// </summary>
         public int LuaOpenBase()
         {
-            return LuaDll.luaopen_base(NativeState);
+            var result=LuaDll.luaopen_base(NativeState);
+            OverridePrint();
+            return result;
         }
         /// <summary>
         /// Open the coroutine library
@@ -1676,6 +1734,33 @@ namespace LuaN.DllWrapper
         public void LuaOpenLibs()
         {
             LuaDll.luaL_openlibs(NativeState);
+            OverridePrint();
+        }
+
+        /// <summary>
+        /// Write a string
+        /// </summary>
+        public void LuaWriteString(String s)
+        {
+            var e = new WriteEventArgs(s);
+            var h = OnWriteString;
+            if (h != null)
+                h(this, e);
+            if (!e.Handled)
+                LuaDll.lua_writestring(s);
+        }
+
+        /// <summary>
+        /// Write a new line feed
+        /// </summary>
+        public void LuaWriteLine()
+        {
+            var e = new WriteEventArgs(Environment.NewLine);
+            var h = OnWriteLine;
+            if (h != null)
+                h(this, e);
+            if (!e.Handled)
+                LuaDll.lua_writeline();
         }
 
         #endregion
@@ -1697,6 +1782,21 @@ namespace LuaN.DllWrapper
         /// The user data index
         /// </summary>
         public UserDataIndex UserDataIndex { get; private set; }
+
+        /// <summary>
+        /// Event raised when "print" is called
+        /// </summary>
+        public event EventHandler<WriteEventArgs> OnPrint;
+
+        /// <summary>
+        /// Event raised when lua_writestring is called
+        /// </summary>
+        public event EventHandler<WriteEventArgs> OnWriteString;
+
+        /// <summary>
+        /// Event raised when lua_writeline is called
+        /// </summary>
+        public event EventHandler<WriteEventArgs> OnWriteLine;
 
     }
 }

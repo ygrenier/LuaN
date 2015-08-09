@@ -292,81 +292,70 @@ namespace LuaN.DllWrapper
 
         //#endif
 
-        ///*
-        //** {==================================================================
-        //** "Abstraction Layer" for basic report of messages and errors
-        //** ===================================================================
-        //*/
+        /*
+        ** {==================================================================
+        ** "Abstraction Layer" for basic report of messages and errors
+        ** ===================================================================
+        */
 
-        ///// <summary>
-        ///// Process write
-        ///// </summary>
-        //static void ProcessWrite(String s, EventHandler<LuaWriteEventArgs> h, System.IO.TextWriter w)
-        //{
-        //    LuaWriteEventArgs e = new LuaWriteEventArgs(s);
-        //    if (h != null) h(null, e);
-        //    if (!e.Handled)
-        //    {
-        //        w.Write(e.Text);
-        //        w.Flush();
-        //    }
-        //}
+        /// <summary>
+        /// Process write
+        /// </summary>
+        static void ProcessWrite(String s, EventHandler<WriteEventArgs> h, System.IO.TextWriter w)
+        {
+            WriteEventArgs e = new WriteEventArgs(s);
+            if (h != null) h(null, e);
+            if (!e.Handled)
+            {
+                w.Write(e.Text);
+                w.Flush();
+            }
+        }
 
-        ///// <summary>
-        ///// print a string
-        ///// </summary>
-        //public static void lua_writestring(String s, int l)
-        //{
-        //    ProcessWrite(s.Substring(0, l), OnWriteString, Console.Out);
-        //}
+        /// <summary>
+        /// print a string
+        /// </summary>
+        public static void lua_writestring(String s, int l)
+        {
+            ProcessWrite(s.Substring(0, l), OnWriteString, Console.Out);
+        }
 
-        ///// <summary>
-        ///// print a string
-        ///// </summary>
-        //public static void lua_writestring(String s)
-        //{ lua_writestring(s, s.Length); }
+        /// <summary>
+        /// print a string
+        /// </summary>
+        public static void lua_writestring(String s)
+        { lua_writestring(s, s.Length); }
 
-        ///// <summary>
-        ///// print a newline and flush the output
-        ///// </summary>
-        //public static void lua_writeline()
-        //{
-        //    ProcessWrite(Environment.NewLine, OnWriteLine, Console.Out);
-        //}
+        /// <summary>
+        /// print a newline and flush the output
+        /// </summary>
+        public static void lua_writeline()
+        {
+            ProcessWrite(Environment.NewLine, OnWriteLine, Console.Out);
+        }
 
-        ///// <summary>
-        ///// print an error message
-        ///// </summary>
-        //public static void lua_writestringerror(String s, String p)
-        //{
-        //    ProcessWrite(String.Format(s.Replace("%s", "{0}"), p), OnWriteStringError, Console.Error);
-        //}
+        /// <summary>
+        /// print an error message
+        /// </summary>
+        public static void lua_writestringerror(String s, String p)
+        {
+            ProcessWrite(String.Format(s.Replace("%s", "{0}"), p), OnWriteStringError, Console.Error);
+        }
 
-        ///// <summary>
-        ///// Event raised when lua_writestring is called
-        ///// </summary>
-        //public static event EventHandler<LuaWriteEventArgs> OnWriteString;
-        ///// <summary>
-        ///// Event raised when lua_writeline is called
-        ///// </summary>
-        //public static event EventHandler<LuaWriteEventArgs> OnWriteLine;
-        ///// <summary>
-        ///// Event raised when lua_writestringerror is called
-        ///// </summary>
-        //public static event EventHandler<LuaWriteEventArgs> OnWriteStringError;
+        /// <summary>
+        /// Event raised when lua_writestring is called
+        /// </summary>
+        public static event EventHandler<WriteEventArgs> OnWriteString;
+        /// <summary>
+        /// Event raised when lua_writeline is called
+        /// </summary>
+        public static event EventHandler<WriteEventArgs> OnWriteLine;
+        /// <summary>
+        /// Event raised when lua_writestringerror is called
+        /// </summary>
+        public static event EventHandler<WriteEventArgs> OnWriteStringError;
 
-        //public class LuaWriteEventArgs : EventArgs
-        //{
-        //    public LuaWriteEventArgs(String text)
-        //    {
-        //        this.Text = text;
-        //        this.Handled = false;
-        //    }
-        //    public String Text { get; private set; }
-        //    public bool Handled { get; set; }
-        //}
-
-        ///* }================================================================== */
+        /* }================================================================== */
 
         /*
         ** {============================================================

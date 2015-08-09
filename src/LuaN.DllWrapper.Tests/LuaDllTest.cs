@@ -62,7 +62,7 @@ namespace LuaN.DllWrapper.Tests
         public void Test_lua_numbertointeger()
         {
             long n;
-            Assert.Equal(true, LuaDll.lua_numbertointeger(2345,out n));
+            Assert.Equal(true, LuaDll.lua_numbertointeger(2345, out n));
             Assert.Equal(2345, n);
 
             Assert.Equal(true, LuaDll.lua_numbertointeger(2345.67, out n));
@@ -177,7 +177,8 @@ namespace LuaN.DllWrapper.Tests
         public void Test_lua_version()
         {
             var L = LuaDll.luaL_newstate();
-            try {
+            try
+            {
                 Assert.Equal(503d, LuaDll.lua_version(L));
             }
             finally
@@ -334,7 +335,7 @@ namespace LuaN.DllWrapper.Tests
                 }, 0);
                 LuaDll.lua_pushnumber(L, 3);
                 LuaDll.lua_pushnumber(L, 5);
-                var ex=Assert.Throws<ApplicationException>(() => LuaDll.lua_call(L, 2, LuaDll.LUA_MULTRET));
+                var ex = Assert.Throws<ApplicationException>(() => LuaDll.lua_call(L, 2, LuaDll.LUA_MULTRET));
                 Assert.Equal("Raise an error", ex.Message);
 
             }
@@ -1011,6 +1012,71 @@ return a * b
                 LuaDll.lua_close(L);
             }
         }
+
+        [Fact]
+        public void Test_lua_writestring_lua_writeline_lua_writestringerror()
+        {
+            List<String> output = new List<string>();
+            bool doHandled = false;
+            EventHandler<WriteEventArgs> wevnt = (s, e) =>
+            {
+                output.Add(e.Text);
+                e.Handled = doHandled;
+            };
+            EventHandler<WriteEventArgs> werrevnt = (s, e) =>
+            {
+                output.Add("ERR:" + e.Text);
+                e.Handled = doHandled;
+            };
+
+            var oldStdout = Console.Out;
+            var oldStderr = Console.Error;
+            StringBuilder stdout = new StringBuilder();
+            StringBuilder stderr = new StringBuilder();
+            Console.SetOut(new StringWriter(stdout));
+            Console.SetError(new StringWriter(stderr));
+            try
+            {
+                LuaDll.lua_writestring("First string");
+                LuaDll.lua_writeline();
+                LuaDll.lua_writestringerror("First %s", "error");
+
+                LuaDll.OnWriteString += wevnt;
+                LuaDll.OnWriteLine += wevnt;
+                LuaDll.OnWriteStringError += werrevnt;
+
+                LuaDll.lua_writestring("Second string");
+                LuaDll.lua_writeline();
+                LuaDll.lua_writestringerror("Second %s", "error");
+
+                doHandled = true;
+
+                LuaDll.lua_writestring("Third string");
+                LuaDll.lua_writeline();
+                LuaDll.lua_writestringerror("Third %s", "error");
+
+                Assert.Equal("First string" + Environment.NewLine + "Second string" + Environment.NewLine, stdout.ToString());
+                Assert.Equal("First error" + "Second error", stderr.ToString());
+                Assert.Equal(new String[]
+                {
+                        "Second string",
+                        Environment.NewLine,
+                        "ERR:Second error",
+                        "Third string",
+                        Environment.NewLine,
+                        "ERR:Third error",
+                }, output);
+            }
+            finally
+            {
+                LuaDll.OnWriteString -= wevnt;
+                LuaDll.OnWriteLine -= wevnt;
+                LuaDll.OnWriteStringError -= werrevnt;
+                Console.SetOut(oldStdout);
+                Console.SetError(oldStderr);
+            }
+        }
+
     }
 
 }

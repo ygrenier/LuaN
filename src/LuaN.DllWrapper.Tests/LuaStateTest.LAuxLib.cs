@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -257,6 +258,66 @@ namespace LuaN.DllWrapper.Tests
                 Assert.False(L.LuaGetMetatable(-1));
 
                 Assert.Throws<ArgumentNullException>(() => L.LuaLSetMetatable("  "));
+            }
+        }
+
+        [Fact]
+        public void TestLuaLError()
+        {
+            using (var L=new LuaState())
+            {
+                var ex = Assert.Throws<LuaException>(() => L.LuaLError("Error message"));
+                Assert.Equal("Error message", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestLuaWriteString_LuaWriteLine()
+        {
+            var oldStdout = Console.Out;
+            StringBuilder stdout = new StringBuilder();
+            Console.SetOut(new StringWriter(stdout));
+            try
+            {
+                using (var L = new LuaState())
+                {
+                    List<String> output = new List<string>();
+                    L.LuaWriteString("First string");
+                    L.LuaWriteLine();
+
+                    bool doHandled = false;
+                    L.OnWriteString += (s, e) =>
+                    {
+                        output.Add("W:" + e.Text);
+                        e.Handled = doHandled;
+                    };
+                    L.OnWriteLine += (s, e) =>
+                    {
+                        output.Add("WL:" + e.Text);
+                        e.Handled = doHandled;
+                    };
+
+                    L.LuaWriteString("Second string");
+                    L.LuaWriteLine();
+
+                    doHandled = true;
+
+                    L.LuaWriteString("Third string");
+                    L.LuaWriteLine();
+
+                    Assert.Equal("First string" + Environment.NewLine + "Second string" + Environment.NewLine, stdout.ToString());
+                    Assert.Equal(new String[]
+                    {
+                        "W:Second string",
+                        "WL:"+Environment.NewLine,
+                        "W:Third string",
+                        "WL:"+Environment.NewLine
+                    }, output);
+                }
+            }
+            finally
+            {
+                Console.SetOut(oldStdout);
             }
         }
 

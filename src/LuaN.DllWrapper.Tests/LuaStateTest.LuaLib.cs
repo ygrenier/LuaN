@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -140,6 +141,81 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(LuaType.Function, L.LuaGetGlobal("assert"));
                 Assert.Equal(LuaType.Table, L.LuaGetGlobal("coroutine"));
                 Assert.Equal(LuaType.Table, L.LuaGetGlobal("string"));
+            }
+        }
+
+        [Fact]
+        public void TestLuaPrint()
+        {
+            var oldStdout = Console.Out;
+            StringBuilder stdout = new StringBuilder();
+            Console.SetOut(new StringWriter(stdout));
+            try
+            {
+                using (var L = new LuaState())
+                {
+                    List<String> output = new List<string>();
+
+                    Assert.Equal(LuaStatus.ErrorRun, L.DoString("print('First line', 123.45, false)"));
+                    L.LuaOpenLibs();
+
+                    Assert.Equal(LuaStatus.Ok, L.DoString("print('First line', 123.45, false)"));
+
+                    bool doHandled = false;
+                    L.OnPrint += (s, e) =>
+                    {
+                        output.Add("P:" + e.Text);
+                        e.Handled = doHandled;
+                    };
+                    L.OnWriteString += (s, e) =>
+                    {
+                        output.Add("W:" + e.Text);
+                        e.Handled = doHandled;
+                    };
+                    L.OnWriteLine += (s, e) =>
+                    {
+                        output.Add("WL:" + e.Text);
+                        e.Handled = doHandled;
+                    };
+
+                    Assert.Equal(LuaStatus.Ok, L.DoString("print('Second line', 987.65, true)"));
+
+                    doHandled = true;
+
+                    Assert.Equal(LuaStatus.Ok, L.DoString("print('Third line', 555)"));
+
+                    Assert.Equal(
+                        "First line\t123.45\tfalse" + Environment.NewLine
+                        + "Second line\t987.65\ttrue" + Environment.NewLine
+                        , stdout.ToString());
+                    Assert.Equal(new String[]
+                    {
+                        "P:Second line\t987.65\ttrue",
+                        "W:Second line\t987.65\ttrue",
+                        "WL:"+Environment.NewLine,
+                        "P:Third line\t555",
+                    }, output);
+
+                    // Test with an error while a print
+                    L.LuaPushLightUserData(this);
+                    L.LuaPushValue(-1);
+                    L.LuaSetGlobal("ud");
+                    L.LuaNewTable();
+                    L.LuaPushCFunction(state =>
+                    {
+                        state.LuaPushString(null);
+                        return 1;
+                    });
+                    L.LuaSetField(-2, "__tostring");
+                    L.LuaSetMetatable(-2);
+                    Assert.Equal(LuaStatus.ErrorRun, L.DoString("print(ud)"));
+                    Assert.Equal("[string \"print(ud)\"]:1: 'tostring' must return a string to 'print'", L.LuaToString(-1));
+
+                }
+            }
+            finally
+            {
+                Console.SetOut(oldStdout);
             }
         }
 
