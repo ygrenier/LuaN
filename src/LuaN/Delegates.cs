@@ -26,4 +26,9 @@ namespace LuaN
     /// </summary>
     public delegate int LuaWriter(ILuaState L, Byte[] p, Object ud);
 
+    /// <summary>
+    /// Managed Hook function
+    /// </summary>
+    public delegate void LuaHook(ILuaState L, ILuaDebug ar);
+
 }

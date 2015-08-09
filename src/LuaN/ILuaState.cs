@@ -590,38 +590,38 @@ namespace LuaN
         /// Sets the value of a local variable of a given activation record. 
         /// </summary>
         String LuaSetLocal(ILuaDebug ar, int n);
-        ///// <summary>
-        ///// Gets information about the n-th upvalue of the closure at index funcindex. 
-        ///// </summary>
-        //String GetUpvalue(int funcindex, int n);
-        ///// <summary>
-        ///// Sets the value of a closure's upvalue. 
-        ///// </summary>
-        //String SetUpvalue(int funcindex, int n);
-        ///// <summary>
-        ///// Returns a unique identifier for the upvalue numbered n from the closure at index funcindex. 
-        ///// </summary>
-        //Int32 UpvalueId(int fidx, int n);
-        ///// <summary>
-        ///// Make the n1-th upvalue of the Lua closure at index funcindex1 refer to the n2-th upvalue of the Lua closure at index funcindex2. 
-        ///// </summary>
-        //void UpvalueJoin(int fidx1, int n1, int fidx2, int n2);
-        ///// <summary>
-        ///// Sets the debugging hook function. 
-        ///// </summary>
-        //void SetHook(LuaHook func, LuaHookMask mask, int count);
-        ///// <summary>
-        ///// Returns the current hook function. 
-        ///// </summary>
-        //LuaHook GetHook();
-        ///// <summary>
-        ///// Returns the current hook mask. 
-        ///// </summary>
-        //LuaHookMask GetHookMask();
-        ///// <summary>
-        ///// Returns the current hook count. 
-        ///// </summary>
-        //int GetHookCount();
+        /// <summary>
+        /// Gets information about the n-th upvalue of the closure at index funcindex. 
+        /// </summary>
+        String LuaGetUpvalue(int funcindex, int n);
+        /// <summary>
+        /// Sets the value of a closure's upvalue. 
+        /// </summary>
+        String LuaSetUpvalue(int funcindex, int n);
+        /// <summary>
+        /// Returns a unique identifier for the upvalue numbered n from the closure at index funcindex. 
+        /// </summary>
+        Int64 LuaUpvalueId(int fidx, int n);
+        /// <summary>
+        /// Make the n1-th upvalue of the Lua closure at index funcindex1 refer to the n2-th upvalue of the Lua closure at index funcindex2. 
+        /// </summary>
+        void LuaUpvalueJoin(int fidx1, int n1, int fidx2, int n2);
+        /// <summary>
+        /// Sets the debugging hook function. 
+        /// </summary>
+        void LuaSetHook(LuaHook func, LuaHookMask mask, int count);
+        /// <summary>
+        /// Returns the current hook function. 
+        /// </summary>
+        LuaHook LuaGetHook();
+        /// <summary>
+        /// Returns the current hook mask. 
+        /// </summary>
+        LuaHookMask LuaGetHookMask();
+        /// <summary>
+        /// Returns the current hook count. 
+        /// </summary>
+        int LuaGetHookCount();
         #endregion
 
         #region lauxlib

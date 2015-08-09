@@ -15,6 +15,7 @@ namespace LuaN.DllWrapper
         List<LuaKFunctionWrapper> _KFunctionWrappers = new List<LuaKFunctionWrapper>();
         List<LuaReaderWrapper> _ReaderWrappers = new List<LuaReaderWrapper>();
         List<LuaWriterWrapper> _WriterWrappers = new List<LuaWriterWrapper>();
+        List<LuaHookWrapper> _HookWrappers = new List<LuaHookWrapper>();
         IntPtr _NativeState;
         bool _OwnNativeState = true;
         LuaState _MainState;
@@ -121,6 +122,7 @@ namespace LuaN.DllWrapper
                     reader.Dispose();
                 _ReaderWrappers.Clear();
                 _WriterWrappers.Clear();
+                _HookWrappers.Clear();
                 UserDataIndex.Reset();
                 UserDataIndex = null;
                 _NativeState = IntPtr.Zero;
@@ -260,6 +262,36 @@ namespace LuaN.DllWrapper
             if (rud == null)
                 rud = UserDataIndex.Add(uData);
             return rud.Pointer;
+        }
+
+        /// <summary>
+        /// Wrap a native hook
+        /// </summary>
+        public LuaHook WrapHook(LuaDll.lua_Hook hook)
+        {
+            if (hook == null) return null;
+            var wrapper = _HookWrappers.FirstOrDefault(w => w.NativeHook == hook);
+            if (wrapper == null)
+            {
+                wrapper = new LuaHookWrapper(hook);
+                _HookWrappers.Add(wrapper);
+            }
+            return wrapper.Hook;
+        }
+
+        /// <summary>
+        /// Wrap a .Net hook function
+        /// </summary>
+        public LuaDll.lua_Hook WrapHook(LuaHook hook)
+        {
+            if (hook == null) return null;
+            var wrapper = _HookWrappers.FirstOrDefault(w => w.Hook == hook);
+            if (wrapper == null)
+            {
+                wrapper = new LuaHookWrapper(hook);
+                _HookWrappers.Add(wrapper);
+            }
+            return wrapper.NativeHook;
         }
 
         #endregion
@@ -1233,38 +1265,62 @@ namespace LuaN.DllWrapper
             if (wrapper == null) throw new ArgumentException("Invalid ILuaDebug", "ar");
             return LuaDll.lua_setlocal(NativeState, wrapper.NativePointer, n);
         }
-        ///// <summary>
-        ///// Gets information about the n-th upvalue of the closure at index funcindex. 
-        ///// </summary>
-        //String GetUpvalue(int funcindex, int n);
-        ///// <summary>
-        ///// Sets the value of a closure's upvalue. 
-        ///// </summary>
-        //String SetUpvalue(int funcindex, int n);
-        ///// <summary>
-        ///// Returns a unique identifier for the upvalue numbered n from the closure at index funcindex. 
-        ///// </summary>
-        //Int32 UpvalueId(int fidx, int n);
-        ///// <summary>
-        ///// Make the n1-th upvalue of the Lua closure at index funcindex1 refer to the n2-th upvalue of the Lua closure at index funcindex2. 
-        ///// </summary>
-        //void UpvalueJoin(int fidx1, int n1, int fidx2, int n2);
-        ///// <summary>
-        ///// Sets the debugging hook function. 
-        ///// </summary>
-        //void SetHook(LuaHook func, LuaHookMask mask, int count);
-        ///// <summary>
-        ///// Returns the current hook function. 
-        ///// </summary>
-        //LuaHook GetHook();
-        ///// <summary>
-        ///// Returns the current hook mask. 
-        ///// </summary>
-        //LuaHookMask GetHookMask();
-        ///// <summary>
-        ///// Returns the current hook count. 
-        ///// </summary>
-        //int GetHookCount();
+        /// <summary>
+        /// Gets information about the n-th upvalue of the closure at index funcindex. 
+        /// </summary>
+        public String LuaGetUpvalue(int funcindex, int n)
+        {
+            return LuaDll.lua_getupvalue(NativeState, funcindex, n);
+        }
+        /// <summary>
+        /// Sets the value of a closure's upvalue. 
+        /// </summary>
+        public String LuaSetUpvalue(int funcindex, int n)
+        {
+            return LuaDll.lua_setupvalue(NativeState, funcindex, n);
+        }
+        /// <summary>
+        /// Returns a unique identifier for the upvalue numbered n from the closure at index funcindex. 
+        /// </summary>
+        public Int64 LuaUpvalueId(int fidx, int n)
+        {
+            return LuaDll.lua_upvalueid(NativeState, fidx, n).ToInt64();
+        }
+        /// <summary>
+        /// Make the n1-th upvalue of the Lua closure at index funcindex1 refer to the n2-th upvalue of the Lua closure at index funcindex2. 
+        /// </summary>
+        public void LuaUpvalueJoin(int fidx1, int n1, int fidx2, int n2)
+        {
+            LuaDll.lua_upvaluejoin(NativeState, fidx1, n1, fidx2, n2);
+        }
+        /// <summary>
+        /// Sets the debugging hook function. 
+        /// </summary>
+        public void LuaSetHook(LuaHook func, LuaHookMask mask, int count)
+        {
+            LuaDll.lua_sethook(NativeState, WrapHook(func), (int)mask, count);
+        }
+        /// <summary>
+        /// Returns the current hook function. 
+        /// </summary>
+        public LuaHook LuaGetHook()
+        {
+            return WrapHook(LuaDll.lua_gethook(NativeState));
+        }
+        /// <summary>
+        /// Returns the current hook mask. 
+        /// </summary>
+        public LuaHookMask LuaGetHookMask()
+        {
+            return (LuaHookMask)LuaDll.lua_gethookmask(NativeState);
+        }
+        /// <summary>
+        /// Returns the current hook count. 
+        /// </summary>
+        public int LuaGetHookCount()
+        {
+            return LuaDll.lua_gethookcount(NativeState);
+        }
         #endregion
 
         #region lauxlib

@@ -111,6 +111,23 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
+        public void TestWrapKFunction()
+        {
+            using (var L = new LuaState())
+            {
+                LuaDll.lua_KFunction nativeKFunction = null;
+                LuaKFunction kfunction = null;
+
+                Assert.Null(L.WrapKFunction(kfunction));
+
+                kfunction = (s, u, c) => 0;
+                nativeKFunction = L.WrapKFunction(kfunction);
+
+                Assert.Same(nativeKFunction, L.WrapKFunction(kfunction));
+            }
+        }
+
+        [Fact]
         public void TestWrapReader()
         {
             using (var L = new LuaState())
@@ -141,6 +158,31 @@ namespace LuaN.DllWrapper.Tests
                 nativeWriter = L.WrapWriter(writer);
 
                 Assert.Same(nativeWriter, L.WrapWriter(writer));
+            }
+        }
+
+        [Fact]
+        public void TestWrapHook()
+        {
+            using (var L = new LuaState())
+            {
+                LuaDll.lua_Hook nativeHook = null;
+                LuaHook hook = null;
+
+                Assert.Null(L.WrapHook(nativeHook));
+                Assert.Null(L.WrapHook(hook));
+
+                hook = (s,p) => { };
+                nativeHook = L.WrapHook(hook);
+
+                Assert.Same(nativeHook, L.WrapHook(hook));
+                Assert.Same(hook, L.WrapHook(nativeHook));
+
+                nativeHook = (s, p) => { };
+                hook = L.WrapHook(nativeHook);
+
+                Assert.Same(nativeHook, L.WrapHook(hook));
+                Assert.Same(hook, L.WrapHook(nativeHook));
             }
         }
 
