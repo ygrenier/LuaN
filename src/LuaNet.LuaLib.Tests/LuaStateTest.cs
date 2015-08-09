@@ -521,7 +521,6 @@ namespace LuaNet.LuaLib.Tests
                     //.PushLightUserData(DateTime.Now)
                     .PushGlobalTable()
                     ;
-                // TODO Add test with Lua script function
                 Assert.False(L.IsCFunction(1));
                 Assert.False(L.IsCFunction(2));
                 Assert.False(L.IsCFunction(3));
@@ -555,7 +554,6 @@ namespace LuaNet.LuaLib.Tests
                     //.PushLightUserData(DateTime.Now)
                     .PushGlobalTable()
                     ;
-                // TODO Add test with Lua script function
                 Assert.False(L.IsFunction(1));
                 Assert.False(L.IsFunction(2));
                 Assert.False(L.IsFunction(3));
@@ -2369,7 +2367,6 @@ end
             {
                 L.PushNumber(23);
                 L.PushFunction(l => {
-                    //TODO Do test
                     //l.UpvalueJoin(0, 0, 0, 0);
                     return 0;
                 });

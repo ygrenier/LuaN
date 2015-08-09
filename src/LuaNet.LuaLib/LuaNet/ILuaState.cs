@@ -756,7 +756,6 @@ namespace LuaNet
 
         //    //[DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         //    //public extern static int luaL_checkoption(lua_State L, int arg, String def, String[] lst);
-        //    // TODO Check the String[] transmission
 
         //    [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         //    public extern static int luaL_fileresult(lua_State L, int stat, String fname);

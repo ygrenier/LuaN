@@ -460,7 +460,6 @@ namespace LuaNet.LuaLib
         {
             p = 0;
             if (String.IsNullOrWhiteSpace(s)) return 0;
-            // TODO Make an optimised strtod implementation
             String st = s.TrimStart();
             bool isNegative = false;
             p = s.Length - st.Length;

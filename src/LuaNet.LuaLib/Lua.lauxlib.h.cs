@@ -103,7 +103,6 @@ namespace LuaNet.LuaLib
 
         //[DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         //public extern static int luaL_checkoption(lua_State L, int arg, String def, String[] lst);
-        // TODO Check the String[] transmission
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public extern static int luaL_fileresult(lua_State L, int stat, String fname);
@@ -144,7 +143,6 @@ namespace LuaNet.LuaLib
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public extern static void luaL_setfuncs(lua_State L, luaL_Reg[] l, int nup);
-        // TODO Check the luaL_Reg[] transmission
 
         [DllImport(LuaDllName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         public extern static int luaL_getsubtable(lua_State L, int idx, String fname);
