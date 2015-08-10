@@ -65,6 +65,9 @@
     <Compile Include="..\LuaN.Tests\LuaTest.cs">
       <Link>LuaTest.cs</Link>
     </Compile>
+    <Compile Include="..\LuaN.Tests\LuaUserDataTest.cs">
+      <Link>LuaUserDataTest.cs</Link>
+    </Compile>
     <Compile Include="..\LuaN.Tests\LuaValueTest.cs">
       <Link>LuaValueTest.cs</Link>
     </Compile>

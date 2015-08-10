@@ -244,7 +244,7 @@ namespace LuaN
                     return State.LuaToString(idx);
                 case LuaType.LightUserData:
                 case LuaType.UserData:
-                    return State.LuaToUserData(idx);
+                    return ToUserData(idx);
                 case LuaType.Table:
                     return ToTable(idx);
                 case LuaType.Function:

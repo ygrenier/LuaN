@@ -265,32 +265,48 @@ namespace LuaN.Tests
 
                 l.Push(null);
                 mState.Verify(s => s.LuaPushNil(), Times.Once());
+
                 l.Push(true);
                 mState.Verify(s => s.LuaPushBoolean(true), Times.Exactly(2));   // First call do when Lua is created
+
                 l.Push(false);
                 mState.Verify(s => s.LuaPushBoolean(false), Times.Once());
+
                 l.Push(12f);
                 mState.Verify(s => s.LuaPushNumber(12), Times.Once());
+
                 l.Push(34.56d);
                 mState.Verify(s => s.LuaPushNumber(34.56), Times.Once());
+
                 l.Push(78.9m);
                 mState.Verify(s => s.LuaPushNumber(78.9), Times.Once());
+
                 l.Push(98);
                 mState.Verify(s => s.LuaPushInteger(98), Times.Once());
+
                 l.Push("Test");
                 mState.Verify(s => s.LuaPushString("Test"), Times.Once());
+
                 var ioex = Assert.Throws<InvalidOperationException>(() => l.Push(new Mock<ILuaNativeUserData>().Object));
                 Assert.Equal("Can't push a userdata", ioex.Message);
+
                 LuaCFunction func = st => 0;
                 l.Push(func);
                 mState.Verify(s => s.LuaPushCFunction(func), Times.Once());
+
                 l.Push(l.State);
                 mState.Verify(s => s.LuaPushThread(), Times.Once());
                 ioex = Assert.Throws<InvalidOperationException>(() => l.Push(new Mock<ILuaState>().Object));
                 Assert.Equal("Can't push a different thread", ioex.Message);
+
                 var tbl = new LuaTable(l, 9876);
                 l.Push(tbl);
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 9876), Times.Once());
+
+                var ud = new LuaUserData(l, 8765);
+                l.Push(ud);
+                mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 8765), Times.Once());
+
                 l.Push(this);
                 mState.Verify(s => s.LuaPushLightUserData(this), Times.Once());
             }
@@ -312,8 +328,10 @@ namespace LuaN.Tests
             mState.Setup(_ => _.LuaType(5)).Returns(LuaType.String);
             mState.Setup(_ => _.LuaToString(5)).Returns("Test");
             mState.Setup(_ => _.LuaType(6)).Returns(LuaType.LightUserData);
+            mState.Setup(_ => _.LuaIsUserData(6)).Returns(true);
             mState.Setup(_ => _.LuaToUserData(6)).Returns(this);
             mState.Setup(_ => _.LuaType(7)).Returns(LuaType.UserData);
+            mState.Setup(_ => _.LuaIsUserData(7)).Returns(true);
             mState.Setup(_ => _.LuaType(8)).Returns(LuaType.Table);
             mState.Setup(_ => _.LuaType(9)).Returns(LuaType.Function);
             mState.Setup(_ => _.LuaType(10)).Returns(LuaType.Thread);
@@ -330,8 +348,8 @@ namespace LuaN.Tests
                 Assert.Equal(false, l.ToValue(3));
                 Assert.Equal(123.45, l.ToValue(4));
                 Assert.Equal("Test", l.ToValue(5));
-                Assert.Same(this, l.ToValue(6));
-                Assert.Same(ud, l.ToValue(7));
+                Assert.IsAssignableFrom<ILuaUserData>(l.ToValue(6));
+                Assert.IsAssignableFrom<ILuaUserData>(l.ToValue(7));
                 var tbl = l.ToValue(8);
                 Assert.IsAssignableFrom<ILuaTable>(tbl);
                 Assert.Throws<NotImplementedException>(() => l.ToValue(9));
