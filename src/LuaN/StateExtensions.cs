@@ -162,7 +162,7 @@ namespace LuaN
                 L.LuaPushInteger(Convert.ToInt64(value));
             else if (value is Char || value is String)
                 L.LuaPushString(value.ToString());
-            else if (value is ILuaUserData)
+            else if (value is ILuaNativeUserData)
                 throw new InvalidOperationException("Can't push a userdata");
             else if (value is LuaCFunction)
                 L.LuaPushCFunction((LuaCFunction)value);

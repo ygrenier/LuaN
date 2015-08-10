@@ -842,8 +842,8 @@ end
                 Assert.Equal(null, L.LuaToUserData(9));
                 Assert.Equal(null, L.LuaToUserData(10));
                 var ud = L.LuaToUserData(11);
-                Assert.IsAssignableFrom<ILuaUserData>(ud);
-                Assert.Equal(20u, ((ILuaUserData)ud).Size);
+                Assert.IsAssignableFrom<ILuaNativeUserData>(ud);
+                Assert.Equal(20u, ((ILuaNativeUserData)ud).Size);
                 Assert.Equal(dt, L.LuaToUserData(12));
                 Assert.Equal(null, L.LuaToUserData(13));
                 Assert.Equal(null, L.LuaToUserData(14));

@@ -807,10 +807,10 @@ namespace LuaN.DllWrapper
         /// <summary>
         /// This function allocates a new block of memory with the given size, pushes onto the stack a new full userdata with the block address.
         /// </summary>
-        public ILuaUserData LuaNewUserData(UInt32 sz)
+        public ILuaNativeUserData LuaNewUserData(UInt32 sz)
         {
             var ptr = LuaDll.lua_newuserdata(NativeState, sz);
-            var result = new LuaUserData(ptr, sz);
+            var result = new LuaNativeUserData(ptr, sz);
             UserDataIndex.Add(result);
             return result;
         }

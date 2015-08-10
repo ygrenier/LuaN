@@ -30,7 +30,7 @@ namespace LuaN.DllWrapper.Tests
 
             Assert.Null(index.Add(null));
 
-            var nud = new LuaUserData(new IntPtr(12345), 123);
+            var nud = new LuaNativeUserData(new IntPtr(12345), 123);
             ud = index.Add(nud);
             Assert.Equal(new IntPtr(12345), ud.Pointer);
             Assert.Equal(2, index.Count);
@@ -41,7 +41,7 @@ namespace LuaN.DllWrapper.Tests
         {
             var index = new UserDataIndex();
 
-            var nud = new LuaUserData(new IntPtr(12345), 123);
+            var nud = new LuaNativeUserData(new IntPtr(12345), 123);
 
             Assert.Null(index.FindData(null));
             Assert.Null(index.FindData(this));
@@ -59,7 +59,7 @@ namespace LuaN.DllWrapper.Tests
         {
             var index = new UserDataIndex();
 
-            var nud = new LuaUserData(new IntPtr(12345), 123);
+            var nud = new LuaNativeUserData(new IntPtr(12345), 123);
 
             Assert.Null(index.FindPointer(IntPtr.Zero));
             Assert.Null(index.FindPointer(new IntPtr(10)));
@@ -77,7 +77,7 @@ namespace LuaN.DllWrapper.Tests
         {
             var index = new UserDataIndex();
 
-            var nud = new LuaUserData(new IntPtr(12345), 123);
+            var nud = new LuaNativeUserData(new IntPtr(12345), 123);
 
             index.Add(this);
             index.Add(nud);
@@ -94,7 +94,7 @@ namespace LuaN.DllWrapper.Tests
         {
             var index = new UserDataIndex();
 
-            var nud = new LuaUserData(new IntPtr(12345), 123);
+            var nud = new LuaNativeUserData(new IntPtr(12345), 123);
 
             var ud1 = index.Add(this);
             var ud2 = index.Add(nud);
@@ -114,7 +114,7 @@ namespace LuaN.DllWrapper.Tests
             var index = new UserDataIndex();
             Assert.Equal(new UserDataIndex.UserDataRef[0], index.GetUserDatas().ToArray());
 
-            var nud = new LuaUserData(new IntPtr(12345), 123);
+            var nud = new LuaNativeUserData(new IntPtr(12345), 123);
 
             var ud1 = index.Add(this);
             var ud2 = index.Add(nud);

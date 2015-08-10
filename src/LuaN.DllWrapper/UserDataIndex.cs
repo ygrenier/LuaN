@@ -84,12 +84,12 @@ namespace LuaN.DllWrapper
             var result = FindData(data, out lst, out hash);
             if (result == null && data != null)
             {
-                if (data is LuaUserData)
+                if (data is LuaNativeUserData)
                 {
                     result = new UserDataRef()
                     {
                         Data = data,
-                        Pointer = ((LuaUserData)data).Pointer
+                        Pointer = ((LuaNativeUserData)data).Pointer
                     };
                 }
                 else

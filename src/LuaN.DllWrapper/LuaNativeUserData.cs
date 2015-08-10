@@ -10,7 +10,7 @@ namespace LuaN.DllWrapper
     /// <summary>
     /// Wrapp the Dll user data
     /// </summary>
-    public class LuaUserData : ILuaUserData
+    public class LuaNativeUserData : ILuaNativeUserData
     {
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace LuaN.DllWrapper
         /// </summary>
         /// <param name="pointer"></param>
         /// <param name="size"></param>
-        public LuaUserData(IntPtr pointer, UInt32 size)
+        public LuaNativeUserData(IntPtr pointer, UInt32 size)
         {
             this.Pointer = pointer;
             this.Size = size;

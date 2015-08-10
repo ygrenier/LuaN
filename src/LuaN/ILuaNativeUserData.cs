@@ -6,9 +6,9 @@ using System.Text;
 namespace LuaN
 {
     /// <summary>
-    /// Represents a Lua user data managed by Lua
+    /// Represents a native Lua user data
     /// </summary>
-    public interface ILuaUserData
+    public interface ILuaNativeUserData
     {
         /// <summary>
         /// Read the raw data

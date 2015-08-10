@@ -42,7 +42,7 @@
     <Compile Include="ILuaEngine.cs" />
     <Compile Include="ILuaState.cs" />
     <Compile Include="ILuaTable.cs" />
-    <Compile Include="ILuaUserData.cs" />
+    <Compile Include="ILuaNativeUserData.cs" />
     <Compile Include="ILuaValue.cs" />
     <Compile Include="Lua.cs" />
     <Compile Include="LuaException.cs" />

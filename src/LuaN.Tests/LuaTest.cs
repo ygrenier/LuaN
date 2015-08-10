@@ -157,7 +157,7 @@ namespace LuaN.Tests
                 mState.Verify(s => s.LuaPushInteger(98), Times.Once());
                 l.Push("Test");
                 mState.Verify(s => s.LuaPushString("Test"), Times.Once());
-                var ioex = Assert.Throws<InvalidOperationException>(() => l.Push(new Mock<ILuaUserData>().Object));
+                var ioex = Assert.Throws<InvalidOperationException>(() => l.Push(new Mock<ILuaNativeUserData>().Object));
                 Assert.Equal("Can't push a userdata", ioex.Message);
                 LuaCFunction func = st => 0;
                 l.Push(func);
@@ -197,7 +197,7 @@ namespace LuaN.Tests
             mState.Setup(_ => _.LuaType(10)).Returns(LuaType.Thread);
             mState.Setup(_ => _.LuaToThread(10)).Returns(() => l.State);
 
-            var mUserData = new Mock<ILuaUserData>();
+            var mUserData = new Mock<ILuaNativeUserData>();
             var ud = mUserData.Object;
             mState.Setup(_ => _.LuaToUserData(7)).Returns(ud);
             var state = mState.Object;

@@ -308,7 +308,7 @@ namespace LuaN
         /// <summary>
         /// This function allocates a new block of memory with the given size, pushes onto the stack a new full userdata with the block address.
         /// </summary>
-        ILuaUserData LuaNewUserData(UInt32 sz);
+        ILuaNativeUserData LuaNewUserData(UInt32 sz);
         /// <summary>
         /// If the value at the given index has a metatable, the function pushes that metatable onto the stack and returns true. Otherwise, the function returns false and pushes nothing on the stack.
         /// </summary>
