@@ -19,5 +19,81 @@ namespace LuaN
             this.Reference = reference;
             this.ReferenceOwned = ownRef;
         }
+
+        /// <summary>
+        /// Access to the named fields
+        /// </summary>
+        public object this[String field]
+        {
+            get
+            {
+                var oldTop = Lua.State.LuaGetTop();
+                Lua.State.LuaPushRef(Reference);
+                Lua.State.LuaGetField(-1, field);
+                var result = Lua.ToNetObject(-1);
+                Lua.State.LuaSetTop(oldTop);
+                return result;
+            }
+            set
+            {
+                var oldTop = Lua.State.LuaGetTop();
+                Lua.State.LuaPushRef(Reference);
+                Lua.PushNetObject(value);
+                Lua.State.LuaSetField(-2, field);
+                Lua.State.LuaSetTop(oldTop);
+            }
+        }
+
+        /// <summary>
+        /// Access to integer fields
+        /// </summary>
+        public object this[int index]
+        {
+            get
+            {
+                var oldTop = Lua.State.LuaGetTop();
+                Lua.State.LuaPushRef(Reference);
+                Lua.State.LuaGetI(-1, index);
+                var result = Lua.ToNetObject(-1);
+                Lua.State.LuaSetTop(oldTop);
+                return result;
+            }
+            set
+            {
+                var oldTop = Lua.State.LuaGetTop();
+                Lua.State.LuaPushRef(Reference);
+                Lua.PushNetObject(value);
+                Lua.State.LuaSetI(-2, index);
+                Lua.State.LuaSetTop(oldTop);
+            }
+        }
+
+        /// <summary>
+        /// Access to the fields
+        /// </summary>
+        public object this[object index]
+        {
+            get
+            {
+                var oldTop = Lua.State.LuaGetTop();
+                Lua.State.LuaPushRef(Reference);
+                Lua.PushNetObject(index);
+                Lua.State.LuaGetTable(-2);
+                var result = Lua.ToNetObject(-1);
+                Lua.State.LuaSetTop(oldTop);
+                return result;
+            }
+            set
+            {
+                var oldTop = Lua.State.LuaGetTop();
+                Lua.State.LuaPushRef(Reference);
+                Lua.PushNetObject(index);
+                Lua.PushNetObject(value);
+                Lua.State.LuaSetTable(-3);
+                Lua.State.LuaSetTop(oldTop);
+            }
+        }
+
     }
+
 }

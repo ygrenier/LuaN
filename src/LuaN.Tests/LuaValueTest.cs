@@ -39,5 +39,26 @@ namespace LuaN.Tests
             mState.Verify(s => s.LuaLUnref(state.RegistryIndex, 321), Times.Never());
         }
 
+        [Fact]
+        public void TestPush()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            Lua l;
+            LuaValue v;
+            using (l = new Lua(state))
+            {
+                using (v = new LuaTable(l, 123))
+                {
+                    v.Push(l.State);
+
+                    Assert.Throws<ArgumentNullException>(() => v.Push(null));
+                    Assert.Throws<ArgumentException>(() => v.Push(new Mock<ILuaState>().Object));
+                }
+                Assert.Throws<ArgumentException>(() => v.Push(l.State));
+            }
+            mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
+        }
+
     }
 }

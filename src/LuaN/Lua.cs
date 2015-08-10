@@ -134,35 +134,74 @@ namespace LuaN
             return new LuaTable(this, vref);
         }
 
-        ///// <summary>
-        ///// Convert a Lua value to .Net object
-        ///// </summary>
-        //public Object ToNetObject(int idx)
-        //{
-        //    var tp = State.LuaType(idx);
-        //    switch (tp)
-        //    {
-        //        case LuaType.Boolean:
-        //            return State.LuaToBoolean(idx);
-        //        case LuaType.Number:
-        //            return State.LuaToNumber(idx);
-        //        case LuaType.String:
-        //            return State.LuaToString(idx);
-        //        case LuaType.LightUserData:
-        //        case LuaType.UserData:
-        //            throw new NotImplementedException();
-        //        case LuaType.Table:
-        //            throw new NotImplementedException();
-        //        case LuaType.Function:
-        //            throw new NotImplementedException();
-        //        case LuaType.Thread:
-        //            return State.LuaToThread(idx);
-        //        case LuaType.None:
-        //        case LuaType.Nil:
-        //        default:
-        //            return null;
-        //    }
-        //}
+        /// <summary>
+        /// Convert a Lua value to .Net object
+        /// </summary>
+        public virtual Object ToNetObject(int idx)
+        {
+            var tp = State.LuaType(idx);
+            switch (tp)
+            {
+                case LuaType.Boolean:
+                    return State.LuaToBoolean(idx);
+                case LuaType.Number:
+                    return State.LuaToNumber(idx);
+                case LuaType.String:
+                    return State.LuaToString(idx);
+                case LuaType.LightUserData:
+                case LuaType.UserData:
+                    return State.LuaToUserData(idx);
+                case LuaType.Table:
+                    return ToTable(idx);
+                case LuaType.Function:
+                    throw new NotImplementedException();
+                case LuaType.Thread:
+                    return State.LuaToThread(idx);
+                case LuaType.None:
+                case LuaType.Nil:
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Push a .Net object to the Lua value corresponding
+        /// </summary>
+        public virtual void PushNetObject(object value)
+        {
+            if (value == null)
+                State.LuaPushNil();
+            else if (value is Boolean)
+                State.LuaPushBoolean((Boolean)value);
+            else if (value is Single || value is Double || value is Decimal)
+                State.LuaPushNumber(Convert.ToDouble(value));
+            else if (value is SByte || value is Byte || value is Int16 || value is UInt16 || value is Int32 || value is UInt16 || value is Int64 || value is UInt64)
+                State.LuaPushInteger(Convert.ToInt64(value));
+            else if (value is Char || value is String)
+                State.LuaPushString(value.ToString());
+            else if (value is ILuaUserData)
+                throw new InvalidOperationException("Can't push a userdata");
+            else if (value is LuaCFunction)
+                State.LuaPushCFunction((LuaCFunction)value);
+            else if (value is ILuaState)
+                if (value == State)
+                    State.LuaPushThread();
+                else
+                    throw new InvalidOperationException("Can't push a different thread");
+            else if (value is ILuaValue)
+                ((ILuaValue)value).Push(State);
+            //else if (value is LuaValue)
+            //{
+            //    var lv = (LuaValue)value;
+            //    if (lv.Lua != this) throw new InvalidOperationException("This value is not hosted by this host.");
+            //    lv.Push();
+            //}
+            else
+                State.LuaPushLightUserData(value);
+            //case LuaType.LightUserData:
+            //case LuaType.UserData:
+            //    return L.LuaToUserData(idx);
+        }
 
         #endregion
 
