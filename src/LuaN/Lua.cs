@@ -120,7 +120,7 @@ namespace LuaN
         /// <summary>
         /// Get the value of the field of a referenced value
         /// </summary>
-        public virtual Object GetFieldValue(int reference, String field)
+        internal protected virtual Object GetFieldValue(int reference, String field)
         {
             var oldTop = State.LuaGetTop();
             State.LuaPushRef(reference);
@@ -133,7 +133,7 @@ namespace LuaN
         /// <summary>
         /// Set the value of the field of a referenced value
         /// </summary>
-        public virtual void SetFieldValue(int reference, String field, object value)
+        internal protected virtual void SetFieldValue(int reference, String field, object value)
         {
             var oldTop = State.LuaGetTop();
             State.LuaPushRef(reference);
@@ -145,7 +145,7 @@ namespace LuaN
         /// <summary>
         /// Get the value of the field of a referenced value
         /// </summary>
-        public virtual Object GetFieldValue(int reference, int index)
+        internal protected virtual Object GetFieldValue(int reference, int index)
         {
             var oldTop = State.LuaGetTop();
             State.LuaPushRef(reference);
@@ -158,7 +158,7 @@ namespace LuaN
         /// <summary>
         /// Set the value of the field of a referenced value
         /// </summary>
-        public virtual void SetFieldValue(int reference, int index, object value)
+        internal protected virtual void SetFieldValue(int reference, int index, object value)
         {
             var oldTop = State.LuaGetTop();
             State.LuaPushRef(reference);
@@ -170,7 +170,7 @@ namespace LuaN
         /// <summary>
         /// Get the value of the field of a referenced value
         /// </summary>
-        public virtual Object GetFieldValue(int reference, object index)
+        internal protected virtual Object GetFieldValue(int reference, object index)
         {
             var oldTop = State.LuaGetTop();
             State.LuaPushRef(reference);
@@ -184,7 +184,7 @@ namespace LuaN
         /// <summary>
         /// Set the value of the field of a referenced value
         /// </summary>
-        public virtual void SetFieldValue(int reference, object index, object value)
+        internal protected virtual void SetFieldValue(int reference, object index, object value)
         {
             var oldTop = State.LuaGetTop();
             State.LuaPushRef(reference);

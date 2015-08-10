@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Moq.Protected;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,16 @@ namespace LuaN.Tests
 {
     public class LuaTest
     {
+        class PublicLua : Lua
+        {
+            public PublicLua(ILuaState state) : base(state) { }
+            public Object PublicGetFieldValue(int reference, String field) { return GetFieldValue(reference, field); }
+            public void PublicSetFieldValue(int reference, String field, object value) { SetFieldValue(reference, field, value); }
+            public Object PublicGetFieldValue(int reference, int index) { return GetFieldValue(reference, index); }
+            public void PublicSetFieldValue(int reference, int index, object value) { SetFieldValue(reference, index, value); }
+            public Object PublicGetFieldValue(int reference, object index) { return GetFieldValue(reference, index); }
+            public void PublicSetFieldValue(int reference, object index, object value) { SetFieldValue(reference, index, value); }
+        }
 
         [Fact]
         public void TestCreateFromEngine()
@@ -103,10 +114,10 @@ namespace LuaN.Tests
         {
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
-            Lua l;
-            using (l = new Lua(state))
+            PublicLua l = null;
+            using (l = new PublicLua(state))
             {
-                l.SetFieldValue(123, "field1", 1234);
+                l.PublicSetFieldValue(123, "field1", 1234);
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
                 mState.Verify(s => s.LuaSetField(It.IsAny<int>(), "field1"), Times.Once());
             }
@@ -117,10 +128,10 @@ namespace LuaN.Tests
         {
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
-            Lua l;
-            using (l = new Lua(state))
+            PublicLua l = null;
+            using (l = new PublicLua(state))
             {
-                Assert.Equal(null, l.GetFieldValue(123, "field2"));
+                Assert.Equal(null, l.PublicGetFieldValue(123, "field2"));
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Exactly(1));
                 mState.Verify(s => s.LuaGetField(It.IsAny<int>(), "field2"), Times.Once());
             }
@@ -131,10 +142,10 @@ namespace LuaN.Tests
         {
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
-            Lua l;
-            using (l = new Lua(state))
+            PublicLua l = null;
+            using (l = new PublicLua(state))
             {
-                l.SetFieldValue(123, 777, 1234);
+                l.PublicSetFieldValue(123, 777, 1234);
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
                 mState.Verify(s => s.LuaSetI(It.IsAny<int>(), 777), Times.Once());
             }
@@ -145,10 +156,10 @@ namespace LuaN.Tests
         {
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
-            Lua l;
-            using (l = new Lua(state))
+            PublicLua l = null;
+            using (l = new PublicLua(state))
             {
-                Assert.Equal(null, l.GetFieldValue(123,888));
+                Assert.Equal(null, l.PublicGetFieldValue(123,888));
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Exactly(1));
                 mState.Verify(s => s.LuaGetI(It.IsAny<int>(), 888), Times.Once());
             }
@@ -159,10 +170,10 @@ namespace LuaN.Tests
         {
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
-            Lua l;
-            using (l = new Lua(state))
+            PublicLua l = null;
+            using (l = new PublicLua(state))
             {
-                l.SetFieldValue(123, 777.77, 1234);
+                l.PublicSetFieldValue(123, 777.77, 1234);
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
                 mState.Verify(s => s.LuaPushNumber(777.77), Times.Once());
                 //mState.Verify(s => s.LuaSetTable(It.IsAny<int>()), Times.Once());
@@ -174,10 +185,10 @@ namespace LuaN.Tests
         {
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
-            Lua l;
-            using (l = new Lua(state))
+            PublicLua l = null;
+            using (l = new PublicLua(state))
             {
-                Assert.Equal(null, l.GetFieldValue(123, 888.88));
+                Assert.Equal(null, l.PublicGetFieldValue(123, 888.88));
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Exactly(1));
                 mState.Verify(s => s.LuaPushNumber(888.88), Times.Once());
                 //mState.Verify(s => s.LuaGetTable(It.IsAny<int>()), Times.Once());
