@@ -40,6 +40,7 @@
     <Compile Include="Delegates.cs" />
     <Compile Include="ILuaDebug.cs" />
     <Compile Include="ILuaEngine.cs" />
+    <Compile Include="ILuaFunction.cs" />
     <Compile Include="ILuaState.cs" />
     <Compile Include="ILuaTable.cs" />
     <Compile Include="ILuaNativeUserData.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="Lua.cs" />
     <Compile Include="LuaException.cs" />
     <Compile Include="LuaTable.cs" />
+    <Compile Include="LuaFunction.cs" />
     <Compile Include="LuaUserData.cs" />
     <Compile Include="LuaValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

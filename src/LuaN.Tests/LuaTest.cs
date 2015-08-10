@@ -15,6 +15,7 @@ namespace LuaN.Tests
         {
             public PublicLua(ILuaState state) : base(state) { }
             public Object[] PublicCallValue(int reference, Object[] args, Type[] typedResult = null) { return CallValue(reference, args, typedResult); }
+            public Object[] PublicCallFunction(object function, Object[] args, Type[] typedResult = null) { return CallFunction(function, args, typedResult); }
             public Object PublicGetFieldValue(int reference, String field) { return GetFieldValue(reference, field); }
             public void PublicSetFieldValue(int reference, String field, object value) { SetFieldValue(reference, field, value); }
             public Object PublicGetFieldValue(int reference, int index) { return GetFieldValue(reference, index); }
@@ -316,6 +317,164 @@ namespace LuaN.Tests
         }
 
         [Fact]
+        public void TestCallFunction()
+        {
+            LuaCFunction func = s => 0;
+            // No results
+            int top = 0;
+            var mState = new Mock<ILuaState>();
+            mState.SetupGet(s => s.MultiReturns).Returns(-1);
+            mState.Setup(s => s.LuaGetTop()).Returns(() => top);
+            mState.Setup(s => s.LuaPushCFunction(func)).Callback(() => { top++; });
+            mState.Setup(s => s.LuaPCall(3, -1, 0)).Callback(() => { top = 0; });
+            var state = mState.Object;
+            using (var l = new PublicLua(state))
+            {
+                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 });
+                Assert.Equal(new Object[0], result);
+                mState.Verify(s => s.LuaPushCFunction(func), Times.Once());
+                mState.Verify(s => s.LuaPushString("field1"), Times.Once());
+                mState.Verify(s => s.LuaPushNil(), Times.Once());
+                mState.Verify(s => s.LuaPushNumber(12.34), Times.Once());
+                mState.Verify(s => s.LuaPCall(3, -1, 0), Times.Once());
+            }
+
+            // Call failed
+            top = 0;
+            mState = new Mock<ILuaState>();
+            mState.SetupGet(s => s.MultiReturns).Returns(-1);
+            mState.Setup(s => s.LuaGetTop()).Returns(() => top);
+            mState.Setup(s => s.LuaPushCFunction(func)).Callback(() => { top++; });
+            mState.Setup(s => s.LuaPCall(3, -1, 0)).Returns(() => { top = 1; return LuaStatus.ErrorRun; });
+            mState.Setup(_ => _.LuaType(-1)).Returns(LuaType.Nil);
+            state = mState.Object;
+            using (var l = new PublicLua(state))
+            {
+                var ex = Assert.Throws<LuaException>(() => l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }));
+                Assert.Equal("Unknown Lua error.", ex.Message);
+            }
+            // Call failed
+            top = 0;
+            mState = new Mock<ILuaState>();
+            mState.SetupGet(s => s.MultiReturns).Returns(-1);
+            mState.Setup(s => s.LuaGetTop()).Returns(() => top);
+            mState.Setup(s => s.LuaPushCFunction(func)).Callback(() => { top++; });
+            mState.Setup(s => s.LuaPCall(3, -1, 0)).Returns(() => { top = 1; return LuaStatus.ErrorRun; });
+            mState.Setup(_ => _.LuaType(-1)).Returns(LuaType.String);
+            mState.Setup(_ => _.LuaToString(-1)).Returns("Error in the call");
+            state = mState.Object;
+            using (var l = new PublicLua(state))
+            {
+                var ex = Assert.Throws<LuaException>(() => l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }));
+                Assert.Equal("Error in the call", ex.Message);
+            }
+
+            // Multiple results
+            top = 0;
+            mState = new Mock<ILuaState>();
+            mState.SetupGet(s => s.MultiReturns).Returns(-1);
+            mState.Setup(s => s.LuaGetTop()).Returns(() => top);
+            mState.Setup(s => s.LuaPushCFunction(func)).Callback(() => { top++; });
+            mState.Setup(s => s.LuaPCall(3, -1, 0)).Callback(() => { top = 4; });
+            mState.Setup(_ => _.LuaType(1)).Returns(LuaType.Nil);
+            mState.Setup(_ => _.LuaType(2)).Returns(LuaType.Boolean);
+            mState.Setup(_ => _.LuaToBoolean(2)).Returns(true);
+            mState.Setup(_ => _.LuaType(3)).Returns(LuaType.Number);
+            mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
+            mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
+            mState.Setup(_ => _.LuaToString(4)).Returns("Test");
+            state = mState.Object;
+            using (var l = new PublicLua(state))
+            {
+                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 });
+                Assert.Equal(new Object[] { null, true, 123.45d, "Test" }, result);
+                mState.Verify(s => s.LuaPushCFunction(func), Times.Once());
+                mState.Verify(s => s.LuaPushString("field1"), Times.Once());
+                mState.Verify(s => s.LuaPushNil(), Times.Once());
+                mState.Verify(s => s.LuaPushNumber(12.34), Times.Once());
+                mState.Verify(s => s.LuaPCall(3, -1, 0), Times.Once());
+            }
+
+            // Multiple results typed
+            top = 0;
+            mState = new Mock<ILuaState>();
+            mState.SetupGet(s => s.MultiReturns).Returns(-1);
+            mState.Setup(s => s.LuaGetTop()).Returns(() => top);
+            mState.Setup(s => s.LuaPushCFunction(func)).Callback(() => { top++; });
+            mState.Setup(s => s.LuaPCall(3, -1, 0)).Callback(() => { top = 4; });
+            mState.Setup(_ => _.LuaType(1)).Returns(LuaType.Nil);
+            mState.Setup(_ => _.LuaType(2)).Returns(LuaType.Boolean);
+            mState.Setup(_ => _.LuaToBoolean(2)).Returns(true);
+            mState.Setup(_ => _.LuaType(3)).Returns(LuaType.Number);
+            mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
+            mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
+            mState.Setup(_ => _.LuaToString(4)).Returns("Test");
+            state = mState.Object;
+            using (var l = new PublicLua(state))
+            {
+                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }, new Type[] { typeof(Lua), typeof(int) });
+                Assert.Equal(new Object[] { null, 1 }, result);
+                mState.Verify(s => s.LuaPushCFunction(func), Times.Once());
+                mState.Verify(s => s.LuaPushString("field1"), Times.Once());
+                mState.Verify(s => s.LuaPushNil(), Times.Once());
+                mState.Verify(s => s.LuaPushNumber(12.34), Times.Once());
+                mState.Verify(s => s.LuaPCall(3, -1, 0), Times.Once());
+            }
+
+            // Multiple results typed
+            top = 0;
+            mState = new Mock<ILuaState>();
+            mState.SetupGet(s => s.MultiReturns).Returns(-1);
+            mState.Setup(s => s.LuaGetTop()).Returns(() => top);
+            mState.Setup(s => s.LuaPushCFunction(func)).Callback(() => { top++; });
+            mState.Setup(s => s.LuaPCall(3, -1, 0)).Callback(() => { top = 4; });
+            mState.Setup(_ => _.LuaType(1)).Returns(LuaType.Nil);
+            mState.Setup(_ => _.LuaType(2)).Returns(LuaType.Boolean);
+            mState.Setup(_ => _.LuaToBoolean(2)).Returns(true);
+            mState.Setup(_ => _.LuaType(3)).Returns(LuaType.Number);
+            mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
+            mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
+            mState.Setup(_ => _.LuaToString(4)).Returns("Test");
+            state = mState.Object;
+            using (var l = new PublicLua(state))
+            {
+                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }, new Type[] { typeof(Lua), typeof(Lua), typeof(int), null });
+                Assert.Equal(new Object[] { null, null, 123, "Test" }, result);
+                mState.Verify(s => s.LuaPushCFunction(func), Times.Once());
+                mState.Verify(s => s.LuaPushString("field1"), Times.Once());
+                mState.Verify(s => s.LuaPushNil(), Times.Once());
+                mState.Verify(s => s.LuaPushNumber(12.34), Times.Once());
+                mState.Verify(s => s.LuaPCall(3, -1, 0), Times.Once());
+            }
+
+            // Multiple results typed
+            top = 0;
+            mState = new Mock<ILuaState>();
+            mState.SetupGet(s => s.MultiReturns).Returns(-1);
+            mState.Setup(s => s.LuaGetTop()).Returns(() => top);
+            mState.Setup(s => s.LuaPushCFunction(func)).Callback(() => { top++; });
+            mState.Setup(s => s.LuaPCall(3, -1, 0)).Callback(() => { top = 4; });
+            mState.Setup(_ => _.LuaType(1)).Returns(LuaType.Nil);
+            mState.Setup(_ => _.LuaType(2)).Returns(LuaType.Boolean);
+            mState.Setup(_ => _.LuaToBoolean(2)).Returns(true);
+            mState.Setup(_ => _.LuaType(3)).Returns(LuaType.Number);
+            mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
+            mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
+            mState.Setup(_ => _.LuaToString(4)).Returns("Test");
+            state = mState.Object;
+            using (var l = new PublicLua(state))
+            {
+                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }, new Type[] { typeof(Lua), typeof(Lua), typeof(int), typeof(DateTime), typeof(double) });
+                Assert.Equal(new Object[] { null, null, 123, DateTime.MinValue, 0d }, result);
+                mState.Verify(s => s.LuaPushCFunction(func), Times.Once());
+                mState.Verify(s => s.LuaPushString("field1"), Times.Once());
+                mState.Verify(s => s.LuaPushNil(), Times.Once());
+                mState.Verify(s => s.LuaPushNumber(12.34), Times.Once());
+                mState.Verify(s => s.LuaPCall(3, -1, 0), Times.Once());
+            }
+        }
+
+        [Fact]
         public void TestSetFieldValueByField()
         {
             var mState = new Mock<ILuaState>();
@@ -471,6 +630,59 @@ namespace LuaN.Tests
         }
 
         [Fact]
+        public void TestToFunction()
+        {
+            LuaCFunction func = s => 0;
+
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.Function);
+            mState.Setup(s => s.LuaIsFunction(1)).Returns(true);
+            mState.Setup(s => s.LuaIsCFunction(1)).Returns(true);
+            mState.Setup(s => s.LuaToCFunction(1)).Returns(func);
+            mState.Setup(s => s.LuaType(2)).Returns(LuaType.Function);
+            mState.Setup(s => s.LuaIsFunction(2)).Returns(true);
+            mState.Setup(s => s.LuaIsCFunction(2)).Returns(false);
+            mState.Setup(s => s.LuaType(3)).Returns(LuaType.String);
+            mState.Setup(s => s.LuaIsFunction(3)).Returns(false);
+            mState.Setup(s => s.LuaIsCFunction(3)).Returns(false);
+            var state = mState.Object;
+            Lua l;
+            using (l = new Lua(state))
+            {
+                // Existing c function
+                using (var function = l.ToFunction(1))
+                {
+                    Assert.IsType<LuaFunction>(function);
+                    var fn = function as LuaFunction;
+                    Assert.Same(l, fn.Lua);
+                    Assert.Same(func, fn.Function);
+                }
+                // Existing lua function
+                using (var function = l.ToFunction(2))
+                {
+                    Assert.IsType<LuaFunction>(function);
+                    var fn = function as LuaFunction;
+                    Assert.Same(l, fn.Lua);
+                }
+                // Not an LuaFunction
+                Assert.Null(l.ToFunction(3));
+            }
+
+            // Invalid ref
+            mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.Function);
+            mState.Setup(s => s.LuaIsFunction(1)).Returns(true);
+            mState.Setup(s => s.LuaIsCFunction(1)).Returns(false);
+            mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
+            state = mState.Object;
+            using (l = new Lua(state))
+            {
+                var ioex = Assert.Throws<InvalidOperationException>(() => l.ToFunction(1));
+                Assert.Equal("Can't create a reference for this value.", ioex.Message);
+            }
+        }
+
+        [Fact]
         public void TestPush()
         {
             var mState = new Mock<ILuaState>();
@@ -552,6 +764,7 @@ namespace LuaN.Tests
             mState.Setup(_ => _.LuaToUserData(7)).Returns(this);
             mState.Setup(_ => _.LuaType(8)).Returns(LuaType.Table);
             mState.Setup(_ => _.LuaType(9)).Returns(LuaType.Function);
+            mState.Setup(_ => _.LuaIsFunction(9)).Returns(true);
             mState.Setup(_ => _.LuaType(10)).Returns(LuaType.Thread);
             mState.Setup(_ => _.LuaToThread(10)).Returns(() => l.State);
 
@@ -570,7 +783,7 @@ namespace LuaN.Tests
                 Assert.IsAssignableFrom<ILuaUserData>(l.ToValue(7));
                 var tbl = l.ToValue(8);
                 Assert.IsAssignableFrom<ILuaTable>(tbl);
-                Assert.Throws<NotImplementedException>(() => l.ToValue(9));
+                Assert.IsAssignableFrom<ILuaFunction>(l.ToValue(9));
                 Assert.Same(state, l.ToValue(10));
             }
         }

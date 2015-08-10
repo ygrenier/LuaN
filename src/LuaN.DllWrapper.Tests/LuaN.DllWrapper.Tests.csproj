@@ -59,6 +59,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\LuaN.Tests\LuaFunctionTest.cs">
+      <Link>LuaFunctionTest.cs</Link>
+    </Compile>
     <Compile Include="..\LuaN.Tests\LuaTableTest.cs">
       <Link>LuaTableTest.cs</Link>
     </Compile>

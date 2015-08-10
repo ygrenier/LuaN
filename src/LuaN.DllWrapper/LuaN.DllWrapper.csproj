@@ -48,6 +48,9 @@
     <Compile Include="..\LuaN\ILuaEngine.cs">
       <Link>LuaN\ILuaEngine.cs</Link>
     </Compile>
+    <Compile Include="..\LuaN\ILuaFunction.cs">
+      <Link>LuaN\ILuaFunction.cs</Link>
+    </Compile>
     <Compile Include="..\LuaN\ILuaNativeUserData.cs">
       <Link>LuaN\ILuaNativeUserData.cs</Link>
     </Compile>
@@ -68,6 +71,9 @@
     </Compile>
     <Compile Include="..\LuaN\LuaException.cs">
       <Link>LuaN\LuaException.cs</Link>
+    </Compile>
+    <Compile Include="..\LuaN\LuaFunction.cs">
+      <Link>LuaN\LuaFunction.cs</Link>
     </Compile>
     <Compile Include="..\LuaN\LuaTable.cs">
       <Link>LuaN\LuaTable.cs</Link>

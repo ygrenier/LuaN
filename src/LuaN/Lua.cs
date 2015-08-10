@@ -144,14 +144,14 @@ namespace LuaN
             return Call(args, typedResult);
         }
 
-        ///// <summary>
-        ///// Call a function
-        ///// </summary>
-        //internal protected virtual Object[] CallFunction(Object function, Object[] args, Type[] typedResult = null)
-        //{
-        //    State.LuaPushRef(function);
-        //    return Call(args, typedResult);
-        //}
+        /// <summary>
+        /// Call a function
+        /// </summary>
+        internal protected virtual Object[] CallFunction(Object function, Object[] args, Type[] typedResult = null)
+        {
+            Push(function);
+            return Call(args, typedResult);
+        }
 
         /// <summary>
         /// Call a function pushed on the stack
@@ -332,6 +332,29 @@ namespace LuaN
         }
 
         /// <summary>
+        /// Convert a lua value to a .Net function
+        /// </summary>
+        public virtual ILuaFunction ToFunction(int idx)
+        {
+            // C function ?
+            if (State.LuaIsCFunction(idx))
+            {
+                return new LuaFunction(this, State.LuaToCFunction(idx));
+            }
+            else if (State.LuaIsFunction(idx))
+            {
+                // Create the reference
+                State.LuaPushValue(idx);
+                var vref = State.LuaRef();
+                State.LuaPop(1);
+                if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
+                    throw new InvalidOperationException("Can't create a reference for this value.");
+                return new LuaFunction(this, vref);
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Convert a Lua value to the corresponding .Net object
         /// </summary>
         public virtual Object ToValue(int idx)
@@ -352,7 +375,7 @@ namespace LuaN
                 case LuaType.Table:
                     return ToTable(idx);
                 case LuaType.Function:
-                    throw new NotImplementedException();
+                    return ToFunction(idx);
                 case LuaType.Thread:
                     return State.LuaToThread(idx);
                 case LuaType.None:
