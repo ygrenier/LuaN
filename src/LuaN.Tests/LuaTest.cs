@@ -99,6 +99,92 @@ namespace LuaN.Tests
         }
 
         [Fact]
+        public void TestSetFieldValueByField()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            Lua l;
+            using (l = new Lua(state))
+            {
+                l.SetFieldValue(123, "field1", 1234);
+                mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
+                mState.Verify(s => s.LuaSetField(It.IsAny<int>(), "field1"), Times.Once());
+            }
+        }
+
+        [Fact]
+        public void TestGetFieldValueByField()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            Lua l;
+            using (l = new Lua(state))
+            {
+                Assert.Equal(null, l.GetFieldValue(123, "field2"));
+                mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Exactly(1));
+                mState.Verify(s => s.LuaGetField(It.IsAny<int>(), "field2"), Times.Once());
+            }
+        }
+
+        [Fact]
+        public void TestSetFieldValueByInteger()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            Lua l;
+            using (l = new Lua(state))
+            {
+                l.SetFieldValue(123, 777, 1234);
+                mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
+                mState.Verify(s => s.LuaSetI(It.IsAny<int>(), 777), Times.Once());
+            }
+        }
+
+        [Fact]
+        public void TestGetFieldValueByInteger()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            Lua l;
+            using (l = new Lua(state))
+            {
+                Assert.Equal(null, l.GetFieldValue(123,888));
+                mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Exactly(1));
+                mState.Verify(s => s.LuaGetI(It.IsAny<int>(), 888), Times.Once());
+            }
+        }
+
+        [Fact]
+        public void TestSetFieldValueByObject()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            Lua l;
+            using (l = new Lua(state))
+            {
+                l.SetFieldValue(123, 777.77, 1234);
+                mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
+                mState.Verify(s => s.LuaPushNumber(777.77), Times.Once());
+                //mState.Verify(s => s.LuaSetTable(It.IsAny<int>()), Times.Once());
+            }
+        }
+
+        [Fact]
+        public void TestGetFieldValueByObject()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            Lua l;
+            using (l = new Lua(state))
+            {
+                Assert.Equal(null, l.GetFieldValue(123, 888.88));
+                mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Exactly(1));
+                mState.Verify(s => s.LuaPushNumber(888.88), Times.Once());
+                //mState.Verify(s => s.LuaGetTable(It.IsAny<int>()), Times.Once());
+            }
+        }
+
+        [Fact]
         public void TestToTable()
         {
             var mState = new Mock<ILuaState>();
@@ -127,6 +213,42 @@ namespace LuaN.Tests
             using (l = new Lua(state))
             {
                 var ioex = Assert.Throws<InvalidOperationException>(() => l.ToTable(1));
+                Assert.Equal("Can't create a reference for this value.", ioex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestToUserData()
+        {
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.UserData);
+            mState.Setup(s => s.LuaIsUserData(1)).Returns(true);
+            mState.Setup(s => s.LuaType(2)).Returns(LuaType.String);
+            mState.Setup(s => s.LuaIsUserData(2)).Returns(false);
+            var state = mState.Object;
+            Lua l;
+            using (l = new Lua(state))
+            {
+                // Existing userdata
+                using (var userdata = l.ToUserData(1))
+                {
+                    Assert.IsType<LuaUserData>(userdata);
+                    var ud = userdata as LuaUserData;
+                    Assert.Same(l, ud.Lua);
+                }
+                // Not an userdata
+                Assert.Null(l.ToUserData(2));
+            }
+
+            // Invalid ref
+            mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.UserData);
+            mState.Setup(s => s.LuaIsUserData(1)).Returns(true);
+            mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
+            state = mState.Object;
+            using (l = new Lua(state))
+            {
+                var ioex = Assert.Throws<InvalidOperationException>(() => l.ToUserData(1));
                 Assert.Equal("Can't create a reference for this value.", ioex.Message);
             }
         }

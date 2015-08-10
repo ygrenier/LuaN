@@ -57,6 +57,9 @@
     <Compile Include="..\LuaN\ILuaTable.cs">
       <Link>LuaN\ILuaTable.cs</Link>
     </Compile>
+    <Compile Include="..\LuaN\ILuaUserData.cs">
+      <Link>LuaN\ILuaUserData.cs</Link>
+    </Compile>
     <Compile Include="..\LuaN\ILuaValue.cs">
       <Link>LuaN\ILuaValue.cs</Link>
     </Compile>
@@ -68,6 +71,9 @@
     </Compile>
     <Compile Include="..\LuaN\LuaTable.cs">
       <Link>LuaN\LuaTable.cs</Link>
+    </Compile>
+    <Compile Include="..\LuaN\LuaUserData.cs">
+      <Link>LuaN\LuaUserData.cs</Link>
     </Compile>
     <Compile Include="..\LuaN\LuaValue.cs">
       <Link>LuaN\LuaValue.cs</Link>

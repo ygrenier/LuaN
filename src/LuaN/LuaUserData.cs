@@ -5,15 +5,17 @@ using System.Text;
 
 namespace LuaN
 {
+
     /// <summary>
-    /// Default ILuaTable implementation
+    /// Default ILuaUserData implementation
     /// </summary>
-    public class LuaTable : LuaValue, ILuaTable
+    public class LuaUserData : LuaValue, ILuaUserData
     {
+
         /// <summary>
-        /// Create a new table reference
+        /// Create a new userdata reference
         /// </summary>
-        public LuaTable(Lua lua, int reference, bool ownRef= true)
+        public LuaUserData(Lua lua, int reference, bool ownRef = true)
         {
             this.Lua = lua;
             this.Reference = reference;
@@ -27,15 +29,6 @@ namespace LuaN
         {
             get { return Lua.GetFieldValue(Reference, field); }
             set { Lua.SetFieldValue(Reference, field, value); }
-        }
-
-        /// <summary>
-        /// Access to integer fields
-        /// </summary>
-        public object this[int index]
-        {
-            get { return Lua.GetFieldValue(Reference, index); }
-            set { Lua.SetFieldValue(Reference, index, value); }
         }
 
         /// <summary>
