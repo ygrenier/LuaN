@@ -42,6 +42,7 @@
     <Compile Include="ILuaEngine.cs" />
     <Compile Include="ILuaState.cs" />
     <Compile Include="ILuaUserData.cs" />
+    <Compile Include="Lua.cs" />
     <Compile Include="LuaException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StateExtensions.cs" />

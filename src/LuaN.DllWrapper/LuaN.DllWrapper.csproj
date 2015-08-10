@@ -54,6 +54,9 @@
     <Compile Include="..\LuaN\ILuaUserData.cs">
       <Link>LuaN\ILuaUserData.cs</Link>
     </Compile>
+    <Compile Include="..\LuaN\Lua.cs">
+      <Link>LuaN\Lua.cs</Link>
+    </Compile>
     <Compile Include="..\LuaN\LuaException.cs">
       <Link>LuaN\LuaException.cs</Link>
     </Compile>
