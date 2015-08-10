@@ -12,10 +12,15 @@ namespace LuaN
     public interface ILuaUserData : ILuaValue, IDisposable
     {
 
-        ///// <summary>
-        ///// Call this userdata
-        ///// </summary>
-        //object[] Call(params object[] args);
+        /// <summary>
+        /// Call this userdata
+        /// </summary>
+        object[] Call(params object[] args);
+
+        /// <summary>
+        /// Call this userdata
+        /// </summary>
+        object[] Call(object[] args, Type[] typedResult);
 
         /// <summary>
         /// Access to the named fields

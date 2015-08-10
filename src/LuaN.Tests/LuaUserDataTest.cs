@@ -29,6 +29,60 @@ namespace LuaN.Tests
         }
 
         [Fact]
+        public void TestCall()
+        {
+            int top = 0;
+            var mState = new Mock<ILuaState>();
+            mState.SetupGet(s => s.MultiReturns).Returns(-1);
+            mState.Setup(s => s.LuaGetTop()).Returns(() => top);
+            mState.Setup(s => s.LuaRawGetI(It.IsAny<int>(), 123)).Callback(() => { top++; });
+            mState.Setup(s => s.LuaPCall(It.IsAny<int>(), -1, 0)).Callback(() => { top = 4; });
+            mState.Setup(_ => _.LuaType(1)).Returns(LuaType.Nil);
+            mState.Setup(_ => _.LuaType(2)).Returns(LuaType.Boolean);
+            mState.Setup(_ => _.LuaToBoolean(2)).Returns(true);
+            mState.Setup(_ => _.LuaType(3)).Returns(LuaType.Number);
+            mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
+            mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
+            mState.Setup(_ => _.LuaToString(4)).Returns("Test");
+            var state = mState.Object;
+            Lua l;
+            LuaUserData ud;
+            using (l = new Lua(state))
+            {
+                ud = new LuaUserData(l, 123, true);
+
+                Assert.Equal(new Object[] { null, true, 123.45, "Test" }, ud.Call(true, null, 1234, "Test"));
+            }
+        }
+
+        [Fact]
+        public void TestCallTyped()
+        {
+            int top = 0;
+            var mState = new Mock<ILuaState>();
+            mState.SetupGet(s => s.MultiReturns).Returns(-1);
+            mState.Setup(s => s.LuaGetTop()).Returns(() => top);
+            mState.Setup(s => s.LuaRawGetI(It.IsAny<int>(), 123)).Callback(() => { top++; });
+            mState.Setup(s => s.LuaPCall(It.IsAny<int>(), -1, 0)).Callback(() => { top = 4; });
+            mState.Setup(_ => _.LuaType(1)).Returns(LuaType.Nil);
+            mState.Setup(_ => _.LuaType(2)).Returns(LuaType.Boolean);
+            mState.Setup(_ => _.LuaToBoolean(2)).Returns(true);
+            mState.Setup(_ => _.LuaType(3)).Returns(LuaType.Number);
+            mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
+            mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
+            mState.Setup(_ => _.LuaToString(4)).Returns("Test");
+            var state = mState.Object;
+            Lua l;
+            LuaUserData ud;
+            using (l = new Lua(state))
+            {
+                ud = new LuaUserData(l, 123, true);
+
+                Assert.Equal(new Object[] { null, "True", 123 }, ud.Call(new object[] { true, null, 1234, "Test" }, new Type[] { typeof(String), typeof(String), typeof(int) }));
+            }
+        }
+
+        [Fact]
         public void TestAccesByField()
         {
             var mState = new Mock<ILuaState>();

@@ -101,6 +101,24 @@ namespace LuaN
 
         #endregion
 
+        /// <summary>
+        /// Throw an error from the stack and restore it
+        /// </summary>
+        protected void ThrowError(int restoreTop)
+        {
+            Object err = ToValue(-1);
+
+            State.LuaSetTop(restoreTop);
+
+            if (err is LuaException)
+                throw (LuaException)err;
+
+            if (err == null)
+                err = "Unknown Lua error.";
+
+            throw new LuaException(err.ToString());
+        }
+
         #region .Net objects management
 
         /// <summary>
@@ -115,6 +133,91 @@ namespace LuaN
                     State.LuaUnref(value.Reference);
                 }
             }
+        }
+
+        /// <summary>
+        /// Call the referenced value 
+        /// </summary>
+        internal protected virtual Object[] CallValue(int reference, Object[] args, Type[] typedResult = null)
+        {
+            State.LuaPushRef(reference);
+            return Call(args, typedResult);
+        }
+
+        ///// <summary>
+        ///// Call a function
+        ///// </summary>
+        //internal protected virtual Object[] CallFunction(Object function, Object[] args, Type[] typedResult = null)
+        //{
+        //    State.LuaPushRef(function);
+        //    return Call(args, typedResult);
+        //}
+
+        /// <summary>
+        /// Call a function pushed on the stack
+        /// </summary>
+        protected virtual Object[] Call(Object[] args, Type[] typedResult)
+        {
+            int nArgs = args != null ? args.Length : 0;
+
+            int oldTop = State.LuaGetTop() - 1; // -1 because the function is pushed
+
+            // Check the stack
+            State.LuaLCheckStack(nArgs + 2, "Lua stack overflow.");
+
+            // Push arguments
+            if(args!= null)
+            {
+                for (int i = 0; i < nArgs; i++)
+                    Push(args[i]);
+            }
+
+            // Call
+            if (State.LuaPCall(nArgs, State.MultiReturns, 0) != LuaStatus.Ok)
+                ThrowError(oldTop);
+
+            // Convert the result
+            List<Object> result = new List<object>();
+            int newTop = State.LuaGetTop();
+            if (newTop != oldTop)
+            {
+                int tPos = typedResult != null ? 0 : -1;
+                for (int i = oldTop + 1; i <= newTop; i++)
+                {
+                    Object val = ToValue(i);
+                    if (typedResult != null)
+                    {
+                        // If we reach the end of the typedResult we stop the conversion
+                        if (tPos >= typedResult.Length) break;
+                        // Convert
+                        Type tpConv = typedResult[tPos++];
+                        if (tpConv != null)
+                        {
+                            try {
+                                val = Convert.ChangeType(val, tpConv, System.Globalization.CultureInfo.InvariantCulture);
+                            }
+                            catch { val = tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null ? Activator.CreateInstance(tpConv) : null; }
+                        }
+                    }
+                    result.Add(val);
+                }
+                if (typedResult != null)
+                {
+                    while (tPos < typedResult.Length)
+                    {
+                        Type tpConv = typedResult[tPos++];
+                        result.Add(
+                            tpConv != null && tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null 
+                            ? Activator.CreateInstance(tpConv) 
+                            : null
+                            );
+                    }
+                }
+            }
+            // Restore the stack
+            State.LuaSetTop(oldTop);
+            // Returns the result
+            return result.ToArray();
         }
 
         /// <summary>
@@ -243,6 +346,7 @@ namespace LuaN
                 case LuaType.String:
                     return State.LuaToString(idx);
                 case LuaType.LightUserData:
+                    return State.LuaToUserData(idx);
                 case LuaType.UserData:
                     return ToUserData(idx);
                 case LuaType.Table:

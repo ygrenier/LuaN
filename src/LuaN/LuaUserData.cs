@@ -23,6 +23,22 @@ namespace LuaN
         }
 
         /// <summary>
+        /// Call this userdata
+        /// </summary>
+        public object[] Call(params object[] args)
+        {
+            return Lua.CallValue(Reference, args);
+        }
+
+        /// <summary>
+        /// Call this userdata
+        /// </summary>
+        public object[] Call(object[] args, Type[] typedResult)
+        {
+            return Lua.CallValue(Reference, args, typedResult);
+        }
+
+        /// <summary>
         /// Access to the named fields
         /// </summary>
         public object this[String field]
