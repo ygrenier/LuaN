@@ -79,6 +79,42 @@ namespace LuaN
         }
         #endregion
 
+        #region Reference management
+
+        /// <summary>
+        /// Get a reference using the registry
+        /// </summary>
+        public static int LuaRef(this ILuaState L)
+        {
+            return L.LuaLRef(L.RegistryIndex);
+        }
+
+        /// <summary>
+        /// Push the value referenced by <paramref name="reference"/> on the registry
+        /// </summary>
+        public static LuaType LuaPushRef(this ILuaState L, int reference)
+        {
+            return L.LuaRawGetI(L.RegistryIndex, reference);
+        }
+
+        /// <summary>
+        /// Push the value referenced by <paramref name="reference"/> 
+        /// </summary>
+        public static LuaType LuaPushRef(this ILuaState L, int table, int reference)
+        {
+            return L.LuaRawGetI(table, reference);
+        }
+
+        /// <summary>
+        /// Remove a reference in the registry
+        /// </summary>
+        public static void LuaUnref(this ILuaState L, int reference)
+        {
+            L.LuaLUnref(L.RegistryIndex, reference);
+        }
+
+        #endregion
+
         #region .Net object
 
         /// <summary>

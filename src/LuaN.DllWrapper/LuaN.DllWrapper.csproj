@@ -51,6 +51,9 @@
     <Compile Include="..\LuaN\ILuaState.cs">
       <Link>LuaN\ILuaState.cs</Link>
     </Compile>
+    <Compile Include="..\LuaN\ILuaTable.cs">
+      <Link>LuaN\ILuaTable.cs</Link>
+    </Compile>
     <Compile Include="..\LuaN\ILuaUserData.cs">
       <Link>LuaN\ILuaUserData.cs</Link>
     </Compile>
@@ -59,6 +62,12 @@
     </Compile>
     <Compile Include="..\LuaN\LuaException.cs">
       <Link>LuaN\LuaException.cs</Link>
+    </Compile>
+    <Compile Include="..\LuaN\LuaTable.cs">
+      <Link>LuaN\LuaTable.cs</Link>
+    </Compile>
+    <Compile Include="..\LuaN\LuaValue.cs">
+      <Link>LuaN\LuaValue.cs</Link>
     </Compile>
     <Compile Include="..\LuaN\StateExtensions.cs">
       <Link>LuaN\StateExtensions.cs</Link>

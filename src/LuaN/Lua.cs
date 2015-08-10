@@ -21,7 +21,7 @@ namespace LuaN
         {
             if (engine == null) throw new ArgumentNullException("engine");
             // Create the state
-            State = engine.NewState();
+            _State = engine.NewState();
             _StateOwned = true;
             InitState();
         }
@@ -48,7 +48,7 @@ namespace LuaN
             else
             {
                 state.LuaSetTop(-2);
-                State = state;
+                _State = state;
                 _StateOwned = ownState;
                 InitState();
             }
@@ -67,11 +67,11 @@ namespace LuaN
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (State != null)
+            if (_State != null)
             {
                 if (_StateOwned)
-                    State.Dispose();
-                State = null;
+                    _State.Dispose();
+                _State = null;
             }
         }
 
@@ -101,10 +101,84 @@ namespace LuaN
 
         #endregion
 
+        #region .Net objects management
+
+        /// <summary>
+        /// Release the resource of a LuaValue
+        /// </summary>
+        internal protected virtual void DisposeLuaValue(LuaValue value)
+        {
+            if (value != null && value.Lua == this)
+            {
+                if (value.Reference != LuaRef.RefNil && value.Reference != LuaRef.NoRef)
+                {
+                    State.LuaUnref(value.Reference);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Convert a Lua value to a .Net table
+        /// </summary>
+        public virtual ILuaTable ToTable(int idx)
+        {
+            // If the value is not a table return null
+            if (State.LuaType(idx) != LuaType.Table)
+                return null;
+            // Create the reference
+            State.LuaPushValue(idx);
+            var vref= State.LuaRef();
+            State.LuaPop(1);
+            if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
+                throw new InvalidOperationException("Can't create a reference for this value.");
+            return new LuaTable(this, vref);
+        }
+
+        ///// <summary>
+        ///// Convert a Lua value to .Net object
+        ///// </summary>
+        //public Object ToNetObject(int idx)
+        //{
+        //    var tp = State.LuaType(idx);
+        //    switch (tp)
+        //    {
+        //        case LuaType.Boolean:
+        //            return State.LuaToBoolean(idx);
+        //        case LuaType.Number:
+        //            return State.LuaToNumber(idx);
+        //        case LuaType.String:
+        //            return State.LuaToString(idx);
+        //        case LuaType.LightUserData:
+        //        case LuaType.UserData:
+        //            throw new NotImplementedException();
+        //        case LuaType.Table:
+        //            throw new NotImplementedException();
+        //        case LuaType.Function:
+        //            throw new NotImplementedException();
+        //        case LuaType.Thread:
+        //            return State.LuaToThread(idx);
+        //        case LuaType.None:
+        //        case LuaType.Nil:
+        //        default:
+        //            return null;
+        //    }
+        //}
+
+        #endregion
+
         /// <summary>
         /// Current state
         /// </summary>
-        public ILuaState State { get; private set; }
+        public ILuaState State
+        {
+            get
+            {
+                if (_State == null)
+                    throw new ObjectDisposedException("Lua");
+                return _State;
+            }
+        }
+        private ILuaState _State;
 
     }
 }
