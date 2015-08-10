@@ -30,7 +30,7 @@ namespace LuaN
                 var oldTop = Lua.State.LuaGetTop();
                 Lua.State.LuaPushRef(Reference);
                 Lua.State.LuaGetField(-1, field);
-                var result = Lua.ToNetObject(-1);
+                var result = Lua.ToValue(-1);
                 Lua.State.LuaSetTop(oldTop);
                 return result;
             }
@@ -38,7 +38,7 @@ namespace LuaN
             {
                 var oldTop = Lua.State.LuaGetTop();
                 Lua.State.LuaPushRef(Reference);
-                Lua.PushNetObject(value);
+                Lua.Push(value);
                 Lua.State.LuaSetField(-2, field);
                 Lua.State.LuaSetTop(oldTop);
             }
@@ -54,7 +54,7 @@ namespace LuaN
                 var oldTop = Lua.State.LuaGetTop();
                 Lua.State.LuaPushRef(Reference);
                 Lua.State.LuaGetI(-1, index);
-                var result = Lua.ToNetObject(-1);
+                var result = Lua.ToValue(-1);
                 Lua.State.LuaSetTop(oldTop);
                 return result;
             }
@@ -62,7 +62,7 @@ namespace LuaN
             {
                 var oldTop = Lua.State.LuaGetTop();
                 Lua.State.LuaPushRef(Reference);
-                Lua.PushNetObject(value);
+                Lua.Push(value);
                 Lua.State.LuaSetI(-2, index);
                 Lua.State.LuaSetTop(oldTop);
             }
@@ -77,9 +77,9 @@ namespace LuaN
             {
                 var oldTop = Lua.State.LuaGetTop();
                 Lua.State.LuaPushRef(Reference);
-                Lua.PushNetObject(index);
+                Lua.Push(index);
                 Lua.State.LuaGetTable(-2);
-                var result = Lua.ToNetObject(-1);
+                var result = Lua.ToValue(-1);
                 Lua.State.LuaSetTop(oldTop);
                 return result;
             }
@@ -87,8 +87,8 @@ namespace LuaN
             {
                 var oldTop = Lua.State.LuaGetTop();
                 Lua.State.LuaPushRef(Reference);
-                Lua.PushNetObject(index);
-                Lua.PushNetObject(value);
+                Lua.Push(index);
+                Lua.Push(value);
                 Lua.State.LuaSetTable(-3);
                 Lua.State.LuaSetTop(oldTop);
             }

@@ -132,7 +132,7 @@ namespace LuaN.Tests
         }
 
         [Fact]
-        public void TestPushNetObject()
+        public void TestPush()
         {
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
@@ -141,41 +141,41 @@ namespace LuaN.Tests
             {
                 mState.Verify(s => s.LuaPushBoolean(true), Times.Exactly(1));   // First call do when Lua is created
 
-                l.PushNetObject(null);
+                l.Push(null);
                 mState.Verify(s => s.LuaPushNil(), Times.Once());
-                l.PushNetObject(true);
+                l.Push(true);
                 mState.Verify(s => s.LuaPushBoolean(true), Times.Exactly(2));   // First call do when Lua is created
-                l.PushNetObject(false);
+                l.Push(false);
                 mState.Verify(s => s.LuaPushBoolean(false), Times.Once());
-                l.PushNetObject(12f);
+                l.Push(12f);
                 mState.Verify(s => s.LuaPushNumber(12), Times.Once());
-                l.PushNetObject(34.56d);
+                l.Push(34.56d);
                 mState.Verify(s => s.LuaPushNumber(34.56), Times.Once());
-                l.PushNetObject(78.9m);
+                l.Push(78.9m);
                 mState.Verify(s => s.LuaPushNumber(78.9), Times.Once());
-                l.PushNetObject(98);
+                l.Push(98);
                 mState.Verify(s => s.LuaPushInteger(98), Times.Once());
-                l.PushNetObject("Test");
+                l.Push("Test");
                 mState.Verify(s => s.LuaPushString("Test"), Times.Once());
-                var ioex = Assert.Throws<InvalidOperationException>(() => l.PushNetObject(new Mock<ILuaUserData>().Object));
+                var ioex = Assert.Throws<InvalidOperationException>(() => l.Push(new Mock<ILuaUserData>().Object));
                 Assert.Equal("Can't push a userdata", ioex.Message);
                 LuaCFunction func = st => 0;
-                l.PushNetObject(func);
+                l.Push(func);
                 mState.Verify(s => s.LuaPushCFunction(func), Times.Once());
-                l.PushNetObject(l.State);
+                l.Push(l.State);
                 mState.Verify(s => s.LuaPushThread(), Times.Once());
-                ioex = Assert.Throws<InvalidOperationException>(() => l.PushNetObject(new Mock<ILuaState>().Object));
+                ioex = Assert.Throws<InvalidOperationException>(() => l.Push(new Mock<ILuaState>().Object));
                 Assert.Equal("Can't push a different thread", ioex.Message);
                 var tbl = new LuaTable(l, 9876);
-                l.PushNetObject(tbl);
+                l.Push(tbl);
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 9876), Times.Once());
-                l.PushNetObject(this);
+                l.Push(this);
                 mState.Verify(s => s.LuaPushLightUserData(this), Times.Once());
             }
         }
 
         [Fact]
-        public void TestToNetObject()
+        public void TestToValue()
         {
             Lua l = null;
 
@@ -203,17 +203,17 @@ namespace LuaN.Tests
             var state = mState.Object;
             using (l = new Lua(state))
             {
-                Assert.Equal(null, l.ToNetObject(1));
-                Assert.Equal(true, l.ToNetObject(2));
-                Assert.Equal(false, l.ToNetObject(3));
-                Assert.Equal(123.45, l.ToNetObject(4));
-                Assert.Equal("Test", l.ToNetObject(5));
-                Assert.Same(this, l.ToNetObject(6));
-                Assert.Same(ud, l.ToNetObject(7));
-                var tbl = l.ToNetObject(8);
+                Assert.Equal(null, l.ToValue(1));
+                Assert.Equal(true, l.ToValue(2));
+                Assert.Equal(false, l.ToValue(3));
+                Assert.Equal(123.45, l.ToValue(4));
+                Assert.Equal("Test", l.ToValue(5));
+                Assert.Same(this, l.ToValue(6));
+                Assert.Same(ud, l.ToValue(7));
+                var tbl = l.ToValue(8);
                 Assert.IsAssignableFrom<ILuaTable>(tbl);
-                Assert.Throws<NotImplementedException>(() => l.ToNetObject(9));
-                Assert.Same(state, l.ToNetObject(10));
+                Assert.Throws<NotImplementedException>(() => l.ToValue(9));
+                Assert.Same(state, l.ToValue(10));
             }
         }
 

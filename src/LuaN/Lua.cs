@@ -135,9 +135,9 @@ namespace LuaN
         }
 
         /// <summary>
-        /// Convert a Lua value to .Net object
+        /// Convert a Lua value to the corresponding .Net object
         /// </summary>
-        public virtual Object ToNetObject(int idx)
+        public virtual Object ToValue(int idx)
         {
             var tp = State.LuaType(idx);
             switch (tp)
@@ -165,9 +165,9 @@ namespace LuaN
         }
 
         /// <summary>
-        /// Push a .Net object to the Lua value corresponding
+        /// Push a .Net object to the corresponding Lua value 
         /// </summary>
-        public virtual void PushNetObject(object value)
+        public virtual void Push(object value)
         {
             if (value == null)
                 State.LuaPushNil();
