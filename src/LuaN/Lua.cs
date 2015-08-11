@@ -226,11 +226,16 @@ namespace LuaN
         internal protected virtual Object GetFieldValue(int reference, String field)
         {
             var oldTop = State.LuaGetTop();
-            State.LuaPushRef(reference);
-            State.LuaGetField(-1, field);
-            var result = ToValue(-1);
-            State.LuaSetTop(oldTop);
-            return result;
+            try
+            {
+                State.LuaPushRef(reference);
+                State.LuaGetField(-1, field);
+                return ToValue(-1);
+            }
+            finally
+            {
+                State.LuaSetTop(oldTop);
+            }
         }
 
         /// <summary>
@@ -239,10 +244,16 @@ namespace LuaN
         internal protected virtual void SetFieldValue(int reference, String field, object value)
         {
             var oldTop = State.LuaGetTop();
-            State.LuaPushRef(reference);
-            Push(value);
-            State.LuaSetField(-2, field);
-            State.LuaSetTop(oldTop);
+            try
+            {
+                State.LuaPushRef(reference);
+                Push(value);
+                State.LuaSetField(-2, field);
+            }
+            finally
+            {
+                State.LuaSetTop(oldTop);
+            }
         }
 
         /// <summary>
@@ -251,11 +262,16 @@ namespace LuaN
         internal protected virtual Object GetFieldValue(int reference, int index)
         {
             var oldTop = State.LuaGetTop();
-            State.LuaPushRef(reference);
-            State.LuaGetI(-1, index);
-            var result = ToValue(-1);
-            State.LuaSetTop(oldTop);
-            return result;
+            try
+            {
+                State.LuaPushRef(reference);
+                State.LuaGetI(-1, index);
+                return ToValue(-1);
+            }
+            finally
+            {
+                State.LuaSetTop(oldTop);
+            }
         }
 
         /// <summary>
@@ -264,10 +280,16 @@ namespace LuaN
         internal protected virtual void SetFieldValue(int reference, int index, object value)
         {
             var oldTop = State.LuaGetTop();
-            State.LuaPushRef(reference);
-            Push(value);
-            State.LuaSetI(-2, index);
-            State.LuaSetTop(oldTop);
+            try
+            {
+                State.LuaPushRef(reference);
+                Push(value);
+                State.LuaSetI(-2, index);
+            }
+            finally
+            {
+                State.LuaSetTop(oldTop);
+            }
         }
 
         /// <summary>
@@ -276,12 +298,17 @@ namespace LuaN
         internal protected virtual Object GetFieldValue(int reference, object index)
         {
             var oldTop = State.LuaGetTop();
-            State.LuaPushRef(reference);
-            Push(index);
-            State.LuaGetTable(-2);
-            var result = ToValue(-1);
-            State.LuaSetTop(oldTop);
-            return result;
+            try
+            {
+                State.LuaPushRef(reference);
+                Push(index);
+                State.LuaGetTable(-2);
+                return ToValue(-1);
+            }
+            finally
+            {
+                State.LuaSetTop(oldTop);
+            }
         }
 
         /// <summary>
@@ -290,11 +317,17 @@ namespace LuaN
         internal protected virtual void SetFieldValue(int reference, object index, object value)
         {
             var oldTop = State.LuaGetTop();
-            State.LuaPushRef(reference);
-            Push(index);
-            Push(value);
-            State.LuaSetTable(-3);
-            State.LuaSetTop(oldTop);
+            try
+            {
+                State.LuaPushRef(reference);
+                Push(index);
+                Push(value);
+                State.LuaSetTable(-3);
+            }
+            finally
+            {
+                State.LuaSetTop(oldTop);
+            }
         }
 
         /// <summary>
@@ -308,9 +341,8 @@ namespace LuaN
             // Create the reference
             State.LuaPushValue(idx);
             var vref= State.LuaRef();
-            State.LuaPop(1);
-            if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
-                throw new InvalidOperationException("Can't create a reference for this value.");
+            //if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
+            //    throw new InvalidOperationException("Can't create a reference for this value.");
             return new LuaTable(this, vref);
         }
 
@@ -325,9 +357,8 @@ namespace LuaN
             // Create the reference
             State.LuaPushValue(idx);
             var vref = State.LuaRef();
-            State.LuaPop(1);
-            if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
-                throw new InvalidOperationException("Can't create a reference for this value.");
+            //if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
+            //    throw new InvalidOperationException("Can't create a reference for this value.");
             return new LuaUserData(this, vref);
         }
 
@@ -346,9 +377,8 @@ namespace LuaN
                 // Create the reference
                 State.LuaPushValue(idx);
                 var vref = State.LuaRef();
-                State.LuaPop(1);
-                if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
-                    throw new InvalidOperationException("Can't create a reference for this value.");
+                //if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
+                //    throw new InvalidOperationException("Can't create a reference for this value.");
                 return new LuaFunction(this, vref);
             }
             return null;

@@ -59,24 +59,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\LuaN.Tests\LuaFunctionTest.cs">
-      <Link>LuaFunctionTest.cs</Link>
-    </Compile>
-    <Compile Include="..\LuaN.Tests\LuaTableTest.cs">
-      <Link>LuaTableTest.cs</Link>
-    </Compile>
-    <Compile Include="..\LuaN.Tests\LuaTest.cs">
-      <Link>LuaTest.cs</Link>
-    </Compile>
-    <Compile Include="..\LuaN.Tests\LuaUserDataTest.cs">
-      <Link>LuaUserDataTest.cs</Link>
-    </Compile>
-    <Compile Include="..\LuaN.Tests\LuaValueTest.cs">
-      <Link>LuaValueTest.cs</Link>
-    </Compile>
     <Compile Include="ILuaStateExtensionsTest.cs" />
     <Compile Include="LuaHookWrapperTest.cs" />
     <Compile Include="LuaKFunctionWrapperTest.cs" />
+    <Compile Include="LuaN\LuaFunctionTest.cs" />
+    <Compile Include="LuaN\LuaTableTest.cs" />
+    <Compile Include="LuaN\LuaTest.cs" />
+    <Compile Include="LuaN\LuaUserDataTest.cs" />
+    <Compile Include="LuaN\LuaValueTest.cs" />
     <Compile Include="LuaStateTest.Debug.cs" />
     <Compile Include="LuaStateTest.LuaLib.cs" />
     <Compile Include="LuaWriterWrapperTest.cs" />

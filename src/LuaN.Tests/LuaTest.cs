@@ -582,15 +582,15 @@ namespace LuaN.Tests
             }
 
             // Invalid ref
-            mState = new Mock<ILuaState>();
-            mState.Setup(s => s.LuaType(1)).Returns(LuaType.Table);
-            mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
-            state = mState.Object;
-            using (l = new Lua(state))
-            {
-                var ioex = Assert.Throws<InvalidOperationException>(() => l.ToTable(1));
-                Assert.Equal("Can't create a reference for this value.", ioex.Message);
-            }
+            //mState = new Mock<ILuaState>();
+            //mState.Setup(s => s.LuaType(1)).Returns(LuaType.Table);
+            //mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
+            //state = mState.Object;
+            //using (l = new Lua(state))
+            //{
+            //    var ioex = Assert.Throws<InvalidOperationException>(() => l.ToTable(1));
+            //    Assert.Equal("Can't create a reference for this value.", ioex.Message);
+            //}
         }
 
         [Fact]
@@ -617,16 +617,16 @@ namespace LuaN.Tests
             }
 
             // Invalid ref
-            mState = new Mock<ILuaState>();
-            mState.Setup(s => s.LuaType(1)).Returns(LuaType.UserData);
-            mState.Setup(s => s.LuaIsUserData(1)).Returns(true);
-            mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
-            state = mState.Object;
-            using (l = new Lua(state))
-            {
-                var ioex = Assert.Throws<InvalidOperationException>(() => l.ToUserData(1));
-                Assert.Equal("Can't create a reference for this value.", ioex.Message);
-            }
+            //mState = new Mock<ILuaState>();
+            //mState.Setup(s => s.LuaType(1)).Returns(LuaType.UserData);
+            //mState.Setup(s => s.LuaIsUserData(1)).Returns(true);
+            //mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
+            //state = mState.Object;
+            //using (l = new Lua(state))
+            //{
+            //    var ioex = Assert.Throws<InvalidOperationException>(() => l.ToUserData(1));
+            //    Assert.Equal("Can't create a reference for this value.", ioex.Message);
+            //}
         }
 
         [Fact]
@@ -669,17 +669,17 @@ namespace LuaN.Tests
             }
 
             // Invalid ref
-            mState = new Mock<ILuaState>();
-            mState.Setup(s => s.LuaType(1)).Returns(LuaType.Function);
-            mState.Setup(s => s.LuaIsFunction(1)).Returns(true);
-            mState.Setup(s => s.LuaIsCFunction(1)).Returns(false);
-            mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
-            state = mState.Object;
-            using (l = new Lua(state))
-            {
-                var ioex = Assert.Throws<InvalidOperationException>(() => l.ToFunction(1));
-                Assert.Equal("Can't create a reference for this value.", ioex.Message);
-            }
+            //mState = new Mock<ILuaState>();
+            //mState.Setup(s => s.LuaType(1)).Returns(LuaType.Function);
+            //mState.Setup(s => s.LuaIsFunction(1)).Returns(true);
+            //mState.Setup(s => s.LuaIsCFunction(1)).Returns(false);
+            //mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
+            //state = mState.Object;
+            //using (l = new Lua(state))
+            //{
+            //    var ioex = Assert.Throws<InvalidOperationException>(() => l.ToFunction(1));
+            //    Assert.Equal("Can't create a reference for this value.", ioex.Message);
+            //}
         }
 
         [Fact]
