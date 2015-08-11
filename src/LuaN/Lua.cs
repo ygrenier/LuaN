@@ -119,7 +119,180 @@ namespace LuaN
             throw new LuaException(err.ToString());
         }
 
+        #region Stack management
+
+        /// <summary>
+        /// Pop the value at the top of the stack
+        /// </summary>
+        public Object Pop()
+        {
+            if (State.LuaGetTop() > 0)
+            {
+                var result = ToValue(-1);
+                State.LuaPop(1);
+                return result;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Pop the typed value at the top of the stack
+        /// </summary>
+        public T Pop<T>()
+        {
+            try
+            {
+                return (T)Convert.ChangeType(Pop(), typeof(T), System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return default(T);
+            }
+        }
+
+        /// <summary>
+        /// Pop the n values at the top of the stack
+        /// </summary>
+        public Object[] PopValues(int n)
+        {
+            List<Object> result = new List<object>();
+            if (n > 0)
+            {
+                int top = State.LuaGetTop();
+                int start = Math.Max(0, top - n);
+                result.AddRange(ToValues(start + 1, top, null));
+                while (result.Count < n) result.Add(null);
+                State.LuaSetTop(start);
+            }
+            return result.ToArray();
+        }
+
+        #endregion
+
+        #region Chunk management
+
+        /// <summary>
+        /// Load a chunk from a string and returns the function
+        /// </summary>
+        public ILuaFunction LoadString(String chunk, String name)
+        {
+            var oldTop = State.LuaGetTop();
+            if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
+                ThrowError(oldTop);
+            var result = ToFunction(-1);
+            State.LuaPop(1);
+            return result;
+        }
+
+        /// <summary>
+        /// Load a chunk from a buffer and returns the function
+        /// </summary>
+        public ILuaFunction LoadString(byte[] chunk, String name)
+        {
+            var oldTop = State.LuaGetTop();
+            if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
+                ThrowError(oldTop);
+            var result = ToFunction(-1);
+            State.LuaPop(1);
+            return result;
+        }
+
+        /// <summary>
+        /// Load a chunk from a file and returns the function
+        /// </summary>
+        public ILuaFunction LoadFile(String filename)
+        {
+            var oldTop = State.LuaGetTop();
+            if (State.LoadFile(filename) != LuaStatus.Ok)
+                ThrowError(oldTop);
+            var result = ToFunction(-1);
+            State.LuaPop(1);
+            return result;
+        }
+
+        /// <summary>
+        /// Execute a Lua chunk from a string and returns all values in an array
+        /// </summary>
+        public Object[] DoString(String chunk, String name = "script")
+        {
+            var oldTop = State.LuaGetTop();
+            if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
+                ThrowError(oldTop);
+            return this.Call(null, null);
+        }
+
+        /// <summary>
+        /// Execute a Lua chunk from a buffer and returns all values in an array
+        /// </summary>
+        public Object[] DoString(byte[] chunk, String name = "script")
+        {
+            var oldTop = State.LuaGetTop();
+            if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
+                ThrowError(oldTop);
+            return this.Call(null, null);
+        }
+
+        /// <summary>
+        /// Execute a Lua chunk from a file and returns all values in an array
+        /// </summary>
+        public Object[] DoFile(String filename)
+        {
+            var oldTop = State.LuaGetTop();
+            if (State.LoadFile(filename) != LuaStatus.Ok)
+                ThrowError(oldTop);
+            return this.Call(null, null);
+        }
+
+        #endregion
+
         #region .Net objects management
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected Object[] ToValues(int fromIdx, int toIdx, Type[] typedResult)
+        {
+            // Convert the result
+            List<Object> result = new List<object>();
+            if (toIdx != fromIdx)
+            {
+                int tPos = typedResult != null ? 0 : -1;
+                for (int i = fromIdx; i <= toIdx; i++)
+                {
+                    Object val = ToValue(i);
+                    if (typedResult != null)
+                    {
+                        // If we reach the end of the typedResult we stop the conversion
+                        if (tPos >= typedResult.Length) break;
+                        // Convert
+                        Type tpConv = typedResult[tPos++];
+                        if (tpConv != null)
+                        {
+                            try
+                            {
+                                val = Convert.ChangeType(val, tpConv, System.Globalization.CultureInfo.InvariantCulture);
+                            }
+                            catch { val = tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null ? Activator.CreateInstance(tpConv) : null; }
+                        }
+                    }
+                    result.Add(val);
+                }
+                if (typedResult != null)
+                {
+                    while (tPos < typedResult.Length)
+                    {
+                        Type tpConv = typedResult[tPos++];
+                        result.Add(
+                            tpConv != null && tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null
+                            ? Activator.CreateInstance(tpConv)
+                            : null
+                            );
+                    }
+                }
+            }
+            // Returns the result
+            return result.ToArray();
+        }
 
         /// <summary>
         /// Release the resource of a LuaValue
@@ -177,43 +350,44 @@ namespace LuaN
                 ThrowError(oldTop);
 
             // Convert the result
-            List<Object> result = new List<object>();
             int newTop = State.LuaGetTop();
-            if (newTop != oldTop)
-            {
-                int tPos = typedResult != null ? 0 : -1;
-                for (int i = oldTop + 1; i <= newTop; i++)
-                {
-                    Object val = ToValue(i);
-                    if (typedResult != null)
-                    {
-                        // If we reach the end of the typedResult we stop the conversion
-                        if (tPos >= typedResult.Length) break;
-                        // Convert
-                        Type tpConv = typedResult[tPos++];
-                        if (tpConv != null)
-                        {
-                            try {
-                                val = Convert.ChangeType(val, tpConv, System.Globalization.CultureInfo.InvariantCulture);
-                            }
-                            catch { val = tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null ? Activator.CreateInstance(tpConv) : null; }
-                        }
-                    }
-                    result.Add(val);
-                }
-                if (typedResult != null)
-                {
-                    while (tPos < typedResult.Length)
-                    {
-                        Type tpConv = typedResult[tPos++];
-                        result.Add(
-                            tpConv != null && tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null 
-                            ? Activator.CreateInstance(tpConv) 
-                            : null
-                            );
-                    }
-                }
-            }
+            var result = ToValues(oldTop+ 1, newTop, typedResult);
+            //List<Object> result = new List<object>();
+            //if (newTop != oldTop)
+            //{
+            //    int tPos = typedResult != null ? 0 : -1;
+            //    for (int i = oldTop + 1; i <= newTop; i++)
+            //    {
+            //        Object val = ToValue(i);
+            //        if (typedResult != null)
+            //        {
+            //            // If we reach the end of the typedResult we stop the conversion
+            //            if (tPos >= typedResult.Length) break;
+            //            // Convert
+            //            Type tpConv = typedResult[tPos++];
+            //            if (tpConv != null)
+            //            {
+            //                try {
+            //                    val = Convert.ChangeType(val, tpConv, System.Globalization.CultureInfo.InvariantCulture);
+            //                }
+            //                catch { val = tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null ? Activator.CreateInstance(tpConv) : null; }
+            //            }
+            //        }
+            //        result.Add(val);
+            //    }
+            //    if (typedResult != null)
+            //    {
+            //        while (tPos < typedResult.Length)
+            //        {
+            //            Type tpConv = typedResult[tPos++];
+            //            result.Add(
+            //                tpConv != null && tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null 
+            //                ? Activator.CreateInstance(tpConv) 
+            //                : null
+            //                );
+            //        }
+            //    }
+            //}
             // Restore the stack
             State.LuaSetTop(oldTop);
             // Returns the result
@@ -469,6 +643,23 @@ namespace LuaN
             }
         }
         private ILuaState _State;
+
+        /// <summary>
+        /// Global variables access
+        /// </summary>
+        public Object this[String name]
+        {
+            get
+            {
+                State.LuaGetGlobal(name);
+                return Pop();
+            }
+            set
+            {
+                Push(value);
+                State.LuaSetGlobal(name);
+            }
+        }
 
     }
 }

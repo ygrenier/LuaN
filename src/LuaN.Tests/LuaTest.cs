@@ -788,5 +788,188 @@ namespace LuaN.Tests
             }
         }
 
+        [Fact]
+        public void TestDoFile()
+        {
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaGetTop()).Returns(4);
+            mState.Setup(s => s.LuaLLoadFile("file")).Returns(LuaStatus.Ok);
+            mState.Setup(s => s.LuaLLoadFile("fileErr")).Returns(LuaStatus.ErrorRun);
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                var result = l.DoFile("file");
+                Assert.Equal(new object[] { }, result);
+
+                var ex = Assert.Throws<LuaException>(() => l.DoFile("fileErr"));
+                Assert.Equal("Unknown Lua error.", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestDoStringText()
+        {
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaGetTop()).Returns(4);
+            mState.Setup(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 6, "myScript")).Returns(LuaStatus.Ok);
+            mState.Setup(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 9, "myScript")).Returns(LuaStatus.ErrorRun);
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                var result = l.DoString("script", "myScript");
+                Assert.Equal(new object[] { }, result);
+
+                var ex = Assert.Throws<LuaException>(() => l.DoString("scriptErr", "myScript"));
+                Assert.Equal("Unknown Lua error.", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestDoStringBinary()
+        {
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 6, "myScript")).Returns(LuaStatus.Ok);
+            mState.Setup(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 9, "myScript")).Returns(LuaStatus.ErrorRun);
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                byte[] buffer = new byte[6];
+                var result = l.DoString(buffer, "myScript");
+                Assert.Equal(new object[] { }, result);
+
+                buffer = new byte[9];
+                var ex = Assert.Throws<LuaException>(() => l.DoString(buffer, "myScript"));
+                Assert.Equal("Unknown Lua error.", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestLoadFile()
+        {
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaLLoadFile("file")).Returns(LuaStatus.Ok);
+            mState.Setup(s => s.LuaIsFunction(-1)).Returns(true);
+            mState.Setup(s => s.LuaLLoadFile("fileErr")).Returns(LuaStatus.ErrorRun);
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                var function = l.LoadFile("file");
+                Assert.NotNull(function);
+                var result = function.Call();
+                Assert.Equal(new object[] {  }, result);
+
+                var ex = Assert.Throws<LuaException>(() => l.LoadFile("fileErr"));
+                Assert.Equal("Unknown Lua error.", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestLoadStringText()
+        {
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaIsFunction(-1)).Returns(true);
+            mState.Setup(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 6, "myScript")).Returns(LuaStatus.Ok);
+            mState.Setup(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 9, "myScript")).Returns(LuaStatus.ErrorRun);
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                var function = l.LoadString("script", "myScript");
+                Assert.NotNull(function);
+                var result = function.Call();
+                Assert.Equal(new object[] { }, result);
+
+                var ex = Assert.Throws<LuaException>(() => l.LoadString("scriptErr", "myScript"));
+                Assert.Equal("Unknown Lua error.", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestLoadStringBinary()
+        {
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaIsFunction(-1)).Returns(true);
+            mState.Setup(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 6, "myScript")).Returns(LuaStatus.Ok);
+            mState.Setup(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 9, "myScript")).Returns(LuaStatus.ErrorRun);
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                byte[] buffer = new byte[6];
+                var function = l.LoadString(buffer, "myScript");
+                Assert.NotNull(function);
+                var result = function.Call();
+                Assert.Equal(new object[] { }, result);
+
+                buffer = new byte[9];
+                var ex = Assert.Throws<LuaException>(() => l.LoadString(buffer, "myScript"));
+                Assert.Equal("Unknown Lua error.", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestGlobalsAccess()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                Assert.Null(l["var1"]);
+                l["Var1"] = "One";
+                l["var1"] = 123.45;
+
+                mState.Verify(s => s.LuaGetGlobal("var1"), Times.Once());
+                mState.Verify(s => s.LuaSetGlobal("var1"), Times.Once());
+                mState.Verify(s => s.LuaSetGlobal("Var1"), Times.Once());
+
+            }
+        }
+
+        [Fact]
+        public void TestPop()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                Assert.Null(l.Pop());
+                mState.Verify(s => s.LuaPop(1), Times.Never());
+
+                mState.Setup(s => s.LuaGetTop()).Returns(5);
+                Assert.Null(l.Pop());
+                mState.Verify(s => s.LuaPop(1), Times.Once());
+            }
+        }
+
+        [Fact]
+        public void TestPopGeneric()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                Assert.Null(l.Pop<String>());
+                mState.Verify(s => s.LuaPop(1), Times.Never());
+
+                mState.Setup(s => s.LuaGetTop()).Returns(5);
+                Assert.Equal(0, l.Pop<int>());
+                mState.Verify(s => s.LuaPop(1), Times.Once());
+            }
+        }
+
+        [Fact]
+        public void TestPopValues()
+        {
+            var mState = new Mock<ILuaState>();
+            var state = mState.Object;
+            using (var l = new Lua(state))
+            {
+                var res = l.PopValues(0);
+                Assert.Equal(new object[] { }, res);
+
+                res = l.PopValues(4);
+                Assert.Equal(new object[] { null, null, null, null }, res);
+
+            }
+        }
+
     }
 }

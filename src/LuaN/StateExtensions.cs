@@ -64,6 +64,14 @@ namespace LuaN
         /// <summary>
         /// Alias to LuaLLoadBuffer
         /// </summary>
+        public static LuaStatus LoadBuffer(this ILuaState L, String buffer, String name)
+        {
+            var bbuffer = Encoding.UTF8.GetBytes(buffer ?? String.Empty) ?? new byte[0];
+            return L.LuaLLoadBuffer(bbuffer, bbuffer.Length, name);
+        }
+        /// <summary>
+        /// Alias to LuaLLoadBuffer
+        /// </summary>
         public static LuaStatus LoadBuffer(this ILuaState L, byte[] buffer, String name)
         {
             buffer = buffer ?? new byte[0];

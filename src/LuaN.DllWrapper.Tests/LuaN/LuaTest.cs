@@ -1,6 +1,7 @@
 ﻿using Moq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -675,6 +676,210 @@ return test
                 Assert.IsAssignableFrom<ILuaTable>(tbl);
                 Assert.IsAssignableFrom<ILuaFunction>(l.ToValue(9));
                 Assert.Same(state, l.ToValue(10));
+            }
+        }
+
+        [Fact]
+        public void TestDoFile()
+        {
+            String filename = Path.GetTempFileName();
+            using (var l=new Lua(new LuaState()))
+            {
+                File.WriteAllText(filename, "return 12.34, nil, false, 'test'");
+                var result = l.DoFile(filename);
+                Assert.Equal(new object[] { 12.34d, null, false, "test" }, result);
+
+                File.WriteAllText(filename, "return 12.34, nil false, 'test'");
+                var ex = Assert.Throws<LuaException>(() => l.DoFile(filename));
+                Assert.Equal(filename + ":1: <eof> expected near 'false'", ex.Message);
+            }
+            File.Delete(filename);
+        }
+
+        [Fact]
+        public void TestDoStringText()
+        {
+            using (var l = new Lua(new LuaState()))
+            {
+                var result = l.DoString("return 12.34, nil, false, 'test'", "myScript");
+                Assert.Equal(new object[] { 12.34d, null, false, "test" }, result);
+
+                var ex = Assert.Throws<LuaException>(() => l.DoString("return 12.34, nil false, 'test'", "myScript"));
+                Assert.Equal("[string \"myScript\"]:1: <eof> expected near 'false'", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestDoStringBinary()
+        {
+            using (var l = new Lua(new LuaState()))
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes("return 12.34, nil, false, 'test'");
+                var result = l.DoString(bytes, "myScript");
+                Assert.Equal(new object[] { 12.34d, null, false, "test" }, result);
+
+                bytes = Encoding.UTF8.GetBytes("return 12.34, nil false, 'test'");
+                var ex = Assert.Throws<LuaException>(() => l.DoString(bytes, "myScript"));
+                Assert.Equal("[string \"myScript\"]:1: <eof> expected near 'false'", ex.Message);
+
+                // Compile
+                using (var ms = new MemoryStream())
+                {
+                    l.State.LoadString("return 12.34, nil, false, 'test'");
+                    l.State.LuaDump((s, p, c) => { ms.Write(p, 0, p.Length); return 0; }, null, true);
+                    bytes = ms.ToArray();
+                }
+                result = l.DoString(bytes, "myCompiledScript");
+                Assert.Equal(new object[] { 12.34d, null, false, "test" }, result);
+
+                ex = Assert.Throws<LuaException>(() => l.DoString(bytes.Take(6).ToArray(), "myCompiledScript"));
+                Assert.Equal("myCompiledScript: truncated precompiled chunk", ex.Message);
+
+            }
+        }
+
+        [Fact]
+        public void TestLoadFile()
+        {
+            String filename = Path.GetTempFileName();
+            using (var l = new Lua(new LuaState()))
+            {
+                File.WriteAllText(filename, "return 12.34, nil, false, 'test'");
+                var function= l.LoadFile(filename);
+                Assert.NotNull(function);
+                var result = function.Call();
+                Assert.Equal(new object[] { 12.34d, null, false, "test" }, result);
+
+                File.WriteAllText(filename, "return 12.34, nil false, 'test'");
+                var ex = Assert.Throws<LuaException>(() => l.LoadFile(filename));
+                Assert.Equal(filename + ":1: <eof> expected near 'false'", ex.Message);
+            }
+            File.Delete(filename);
+        }
+
+        [Fact]
+        public void TestLoadStringText()
+        {
+            using (var l = new Lua(new LuaState()))
+            {
+                var function = l.LoadString("return 12.34, nil, false, 'test'", "myScript");
+                Assert.NotNull(function);
+                var result = function.Call();
+                Assert.Equal(new object[] { 12.34d, null, false, "test" }, result);
+
+                var ex = Assert.Throws<LuaException>(() => l.LoadString("return 12.34, nil false, 'test'", "myScript"));
+                Assert.Equal("[string \"myScript\"]:1: <eof> expected near 'false'", ex.Message);
+            }
+        }
+
+        [Fact]
+        public void TestLoadStringBinary()
+        {
+            using (var l = new Lua(new LuaState()))
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes("return 12.34, nil, false, 'test'");
+                var function = l.LoadString(bytes, "myScript");
+                Assert.NotNull(function);
+                var result = function.Call();
+                Assert.Equal(new object[] { 12.34d, null, false, "test" }, result);
+
+                bytes = Encoding.UTF8.GetBytes("return 12.34, nil false, 'test'");
+                var ex = Assert.Throws<LuaException>(() => l.LoadString(bytes, "myScript"));
+                Assert.Equal("[string \"myScript\"]:1: <eof> expected near 'false'", ex.Message);
+
+                // Compile
+                using (var ms = new MemoryStream())
+                {
+                    l.State.LoadString("return 12.34, nil, false, 'test'");
+                    l.State.LuaDump((s, p, c) => { ms.Write(p, 0, p.Length); return 0; }, null, true);
+                    bytes = ms.ToArray();
+                }
+                function = l.LoadString(bytes, "myScript");
+                Assert.NotNull(function);
+                result = function.Call();
+                Assert.Equal(new object[] { 12.34d, null, false, "test" }, result);
+
+                ex = Assert.Throws<LuaException>(() => l.LoadString(bytes.Take(6).ToArray(), "myCompiledScript"));
+                Assert.Equal("myCompiledScript: truncated precompiled chunk", ex.Message);
+
+            }
+        }
+
+        [Fact]
+        public void TestGlobalsAccess()
+        {
+            using (var l = new Lua(new LuaState()))
+            {
+                Assert.Null(l["var1"]);
+                l["Var1"] = "One";
+                l["var1"] = 123.45;
+                Assert.Equal(123.45, l["var1"]);
+                Assert.Equal("One", l["Var1"]);
+            }
+        }
+
+        [Fact]
+        public void TestPop()
+        {
+            using (var l = new Lua(new LuaState()))
+            {
+                l.Push(123.45);
+                l.Push(this);
+                l.Push("Test");
+
+                Assert.Equal(3, l.State.LuaGetTop());
+
+                Assert.Equal("Test", l.Pop());
+                Assert.Equal(2, l.State.LuaGetTop());
+                Assert.Equal(this, l.Pop());
+                Assert.Equal(1, l.State.LuaGetTop());
+                Assert.Equal(123.45, l.Pop());
+                Assert.Equal(0, l.State.LuaGetTop());
+                Assert.Equal(null, l.Pop());
+                Assert.Equal(0, l.State.LuaGetTop());
+
+                l.Push(123.45);
+                l.Push(this);
+                l.Push("Test");
+
+                Assert.Equal(3, l.State.LuaGetTop());
+
+                Assert.Equal(0, l.Pop<int>());
+                Assert.Equal(2, l.State.LuaGetTop());
+                Assert.Equal(null, l.Pop<LuaState>());
+                Assert.Equal(1, l.State.LuaGetTop());
+                Assert.Equal("123.45", l.Pop<String>());
+                Assert.Equal(0, l.State.LuaGetTop());
+                Assert.Equal(null, l.Pop());
+                Assert.Equal(0, l.State.LuaGetTop());
+            }
+        }
+
+        [Fact]
+        public void TestPopValues()
+        {
+            using (var l = new Lua(new LuaState()))
+            {
+                l.Push(123.45);
+                l.Push(this);
+                l.Push("Test");
+                l.Push(true);
+                l.Push(987);
+                l.Push(false);
+                l.State.LuaPop(2);
+
+                Assert.Equal(4, l.State.LuaGetTop());
+
+                var res = l.PopValues(2);
+
+                Assert.Equal(2, l.State.LuaGetTop());
+                Assert.Equal(new Object[] { "Test", true }, res);
+
+                res = l.PopValues(5);
+
+                Assert.Equal(0, l.State.LuaGetTop());
+                Assert.Equal(new Object[] { 123.45, this, null, null, null }, res);
+
             }
         }
 

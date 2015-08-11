@@ -25,5 +25,28 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(DateTime.MinValue, L.ToUserData<DateTime>(-1));
             }
         }
+
+        [Fact]
+        public void TestRef()
+        {
+            using (ILuaState L = new LuaState())
+            {
+                L.LuaPushNumber(123);
+                var lref = L.LuaRef();
+
+                Assert.Equal(0, L.LuaGetTop());
+
+                Assert.Equal(LuaType.Number, L.LuaPushRef(lref));
+                Assert.Equal(123, L.LuaToNumber(-1));
+
+                Assert.Equal(LuaType.Number, L.LuaPushRef(L.RegistryIndex, lref));
+                Assert.Equal(123, L.LuaToNumber(-1));
+
+                L.LuaUnref(lref);
+
+                Assert.Equal(LuaType.Nil, L.LuaPushRef(lref));
+            }
+        }
+
     }
 }
