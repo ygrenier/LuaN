@@ -788,7 +788,11 @@ namespace LuaN
         /// If msg is not NULL it is appended at the beginning of the traceback. The level parameter tells at which level to start the traceback. 
         /// </remarks>
         void LuaLTraceback(ILuaState L1, String msg, int level);
-        ////    public extern static void luaL_requiref(lua_State L, String modname, lua_CFunction openf, int glb);
+        /// <summary>
+        /// If modname is not already present in package.loaded, calls function openf with string modname as an argument and sets the call 
+        /// result in package.loaded[modname], as if that function has been called through require. 
+        /// </summary>
+        void LuaLRequireF(String modname, LuaCFunction openf, bool registerInGlobal);
 
         #region some useful macros
         ///// <summary>

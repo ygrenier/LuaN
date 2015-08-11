@@ -1587,6 +1587,14 @@ namespace LuaN.DllWrapper
             LuaDll.luaL_traceback(NativeState, state1.NativeState, msg, level);
         }
         ////    public extern static void luaL_requiref(lua_State L, String modname, lua_CFunction openf, int glb);
+        /// <summary>
+        /// If modname is not already present in package.loaded, calls function openf with string modname as an argument and sets the call 
+        /// result in package.loaded[modname], as if that function has been called through require. 
+        /// </summary>
+        public void LuaLRequireF(String modname, LuaCFunction openf, bool registerInGlobal)
+        {
+            LuaDll.luaL_requiref(NativeState, modname, WrapFunction(openf), registerInGlobal ? 1 : 0);
+        }
 
         #region some useful macros
         ///// <summary>

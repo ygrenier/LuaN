@@ -603,5 +603,33 @@ f2()
             }
         }
 
+        [Fact]
+        public void TestLuaLRequireF()
+        {
+            LuaState L = null;
+            using (L = new LuaState())
+            {
+                L.LuaOpenLibs();
+
+                int count = 0;
+                LuaCFunction openf = s =>
+                {
+                    s.LuaNewTable();
+                    count++;
+                    return 1;
+                };
+                L.LuaLRequireF("module", openf, true);
+                Assert.Equal(1, L.LuaGetTop());
+                Assert.Equal(LuaType.Table, L.LuaType(-1));
+                Assert.Equal(1, count);
+
+                L.LuaLRequireF("module", openf, true);
+                Assert.Equal(2, L.LuaGetTop());
+                Assert.Equal(LuaType.Table, L.LuaType(-1));
+                Assert.Equal(1, count);
+
+            }
+        }
+
     }
 }
