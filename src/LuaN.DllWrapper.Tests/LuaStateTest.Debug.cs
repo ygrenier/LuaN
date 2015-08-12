@@ -282,7 +282,7 @@ end
             {
                 List<String> output = new List<string>();
                 L.OnPrint += (s, e) => output.Add(e.Text);
-                L.LuaOpenLibs();
+                L.LuaLOpenLibs();
 
                 Assert.Null(L.LuaGetHook());
                 Assert.Equal(0, L.LuaGetHookCount());
@@ -417,7 +417,7 @@ print('end')
             {
                 List<String> output = new List<string>();
                 L.OnPrint += (s, e) => output.Add(e.Text);
-                L.LuaOpenLibs();
+                L.LuaLOpenLibs();
 
                 L.DoString(@"
 function test(a,b)

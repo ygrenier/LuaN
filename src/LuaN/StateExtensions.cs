@@ -11,6 +11,15 @@ namespace LuaN
     public static class StateExtensions
     {
 
+        /// <summary>
+        /// Returns a typed service
+        /// </summary>
+        public static T GetService<T>(this ILuaState L)
+        {
+            var o = L.GetService(typeof(T));
+            return o != null ? (T)o : default(T);
+        }
+
         #region Aliases
         /// <summary>
         /// Alias to LuaToNumberX

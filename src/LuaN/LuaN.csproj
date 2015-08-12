@@ -38,7 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Delegates.cs" />
+    <Compile Include="DotnetLibrary.cs" />
     <Compile Include="ILuaDebug.cs" />
+    <Compile Include="ILuaDotnet.cs" />
     <Compile Include="ILuaEngine.cs" />
     <Compile Include="ILuaFunction.cs" />
     <Compile Include="ILuaState.cs" />
@@ -46,6 +48,7 @@
     <Compile Include="ILuaNativeUserData.cs" />
     <Compile Include="ILuaUserData.cs" />
     <Compile Include="ILuaValue.cs" />
+    <Compile Include="LibraryExtensions.cs" />
     <Compile Include="Lua.cs" />
     <Compile Include="LuaException.cs" />
     <Compile Include="LuaTable.cs" />

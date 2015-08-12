@@ -120,7 +120,7 @@ namespace LuaN.DllWrapper.Tests
         public void TestThrowError()
         {
             var state = new LuaState();
-            state.LuaOpenLibs();
+            state.LuaLOpenLibs();
             using (var l = new PublicLua(state))
             {
                 l.State.LuaSetTop(5);
@@ -134,7 +134,7 @@ namespace LuaN.DllWrapper.Tests
             }
 
             state = new LuaState();
-            state.LuaOpenLibs();
+            state.LuaLOpenLibs();
             using (var l = new PublicLua(state))
             {
                 l.State.LuaSetTop(5);
@@ -149,7 +149,7 @@ namespace LuaN.DllWrapper.Tests
 
             LuaException myEx = new LuaException("My error");
             state = new LuaState();
-            state.LuaOpenLibs();
+            state.LuaLOpenLibs();
             using (var l = new PublicLua(state))
             {
                 l.State.LuaSetTop(5);
@@ -180,7 +180,7 @@ namespace LuaN.DllWrapper.Tests
 
             // Call failed
             state = new LuaState();
-            state.LuaOpenLibs();
+            state.LuaLOpenLibs();
             using (var l = new PublicLua(state))
             {
                 l.State.LoadString("error()");
@@ -190,7 +190,7 @@ namespace LuaN.DllWrapper.Tests
             }
             // Call failed
             state = new LuaState();
-            state.LuaOpenLibs();
+            state.LuaLOpenLibs();
             using (var l = new PublicLua(state))
             {
                 l.State.LoadString("error('Error in the call')");
@@ -275,7 +275,7 @@ return test
 
             // Call failed
             state = new LuaState();
-            state.LuaOpenLibs();
+            state.LuaLOpenLibs();
             using (var l = new PublicLua(state))
             {
                 l.State.LoadString("error()");
@@ -285,7 +285,7 @@ return test
             }
             // Call failed
             state = new LuaState();
-            state.LuaOpenLibs();
+            state.LuaLOpenLibs();
             using (var l = new PublicLua(state))
             {
                 l.State.LoadString("error('Error in the call')");

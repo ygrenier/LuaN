@@ -603,7 +603,8 @@ namespace Lua
                 L.LuaSetField(L.RegistryIndex, "LUA_NOENV");
             }
             //  luaL_openlibs(L);  /* open standard libraries */
-            L.LuaOpenLibs();
+            L.LuaLOpenLibs();
+            L.OpenDotnet();
             createargtable(L, argv, argc, script);  /* create table 'arg' */
             if (0 == (args & has_E))
             {  /* no option '-E'? */

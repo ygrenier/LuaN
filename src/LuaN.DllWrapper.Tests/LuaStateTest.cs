@@ -1591,7 +1591,7 @@ return c..'!!'
             {
                 List<String> output = new List<string>();
                 L.OnPrint += (s, e) => output.Add(e.Text);
-                L.LuaOpenLibs();
+                L.LuaLOpenLibs();
                 LuaKFunction testK = (state, status, ctx) =>
                 {
                     Assert.Equal(2, state.LuaGetTop());
@@ -1667,7 +1667,7 @@ print('3:', coroutine.resume(co, 10, 12))
             {
                 List<String> output = new List<string>();
                 L.OnPrint += (s, e) => output.Add(e.Text);
-                L.LuaOpenLibs();
+                L.LuaLOpenLibs();
                 L.LuaRegister("test", (state) =>
                 {
                     Assert.Equal(2, state.LuaGetTop());

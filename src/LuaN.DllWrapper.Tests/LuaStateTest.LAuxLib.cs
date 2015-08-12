@@ -242,7 +242,7 @@ namespace LuaN.DllWrapper.Tests
         {
             using (var L = new LuaState())
             {
-                L.LuaOpenLibs();
+                L.LuaLOpenLibs();
 
                 uint len;
                 L.LuaPushNumber(1234);
@@ -503,7 +503,7 @@ namespace LuaN.DllWrapper.Tests
             LuaState L = null;
             using (L = new LuaState())
             {
-                L.LuaOpenLibs();
+                L.LuaLOpenLibs();
                 L.LuaRegister("TestTrace", state =>
                 {
                     state.LuaLTraceback(state, "The Call Trace", 0);
@@ -609,7 +609,7 @@ f2()
             LuaState L = null;
             using (L = new LuaState())
             {
-                L.LuaOpenLibs();
+                L.LuaLOpenLibs();
 
                 int count = 0;
                 LuaCFunction openf = s =>

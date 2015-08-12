@@ -56,6 +56,11 @@ namespace LuaN
         /// </summary>
         ILuaState LuaNewThread();
 
+        /// <summary>
+        /// Returns a service
+        /// </summary>
+        Object GetService(Type typeService);
+
         #endregion
 
         #region Stack management
@@ -772,10 +777,10 @@ namespace LuaN
         ///// Pushes the resulting string on the stack and returns it. 
         ///// </summary>
         //String LuaLGSub(String s, String p, String r);
-        ///// <summary>
-        ///// Registers all functions in the array l (see luaL_Reg) into the table on the top of the stack
-        ///// </summary>
-        //ILuaState LuaLSetFuncs(IEnumerable<Tuple<String, LuaFunction>> l, int nup);
+        /// <summary>
+        /// Registers all functions in the array l (see luaL_Reg) into the table on the top of the stack
+        /// </summary>
+        void LuaLSetFuncs(IEnumerable<KeyValuePair<String, LuaCFunction>> l, int nup);
         ///// <summary>
         ///// Ensures that the value t[fname], where t is the value at index idx, is a table, and pushes that table onto the stack. 
         ///// Returns true if it finds a previous table there and false if it creates a new table. 
@@ -795,14 +800,14 @@ namespace LuaN
         void LuaLRequireF(String modname, LuaCFunction openf, bool registerInGlobal);
 
         #region some useful macros
-        ///// <summary>
-        ///// Creates a new table with a size optimized to store all entries in the array l
-        ///// </summary>
-        //ILuaState LuaLNewLibTable(Tuple<String, LuaFunction>[] l);
-        ///// <summary>
-        ///// Creates a new table and registers there the functions in list l. 
-        ///// </summary>
-        //ILuaState LuaLNewLib(Tuple<String, LuaFunction>[] l);
+        /// <summary>
+        /// Creates a new table with a size optimized to store all entries in the array l
+        /// </summary>
+        void LuaLNewLibTable(IEnumerable<KeyValuePair<String, LuaCFunction>> l);
+        /// <summary>
+        /// Creates a new table and registers there the functions in list l. 
+        /// </summary>
+        void LuaLNewLib(IEnumerable<KeyValuePair<String, LuaCFunction>> l);
         ///// <summary>
         ///// Checks whether cond is true. If it is not, raises an error with a standard message 
         ///// </summary>
@@ -926,7 +931,7 @@ namespace LuaN
         /// <summary>
         /// Open all standard library
         /// </summary>
-        void LuaOpenLibs();
+        void LuaLOpenLibs();
         #endregion
 
         /// <summary>

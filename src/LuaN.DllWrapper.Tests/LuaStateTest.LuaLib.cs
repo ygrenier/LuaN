@@ -137,7 +137,7 @@ namespace LuaN.DllWrapper.Tests
         {
             using (var L = new LuaState())
             {
-                L.LuaOpenLibs();
+                L.LuaLOpenLibs();
                 Assert.Equal(LuaType.Function, L.LuaGetGlobal("assert"));
                 Assert.Equal(LuaType.Table, L.LuaGetGlobal("coroutine"));
                 Assert.Equal(LuaType.Table, L.LuaGetGlobal("string"));
@@ -157,7 +157,7 @@ namespace LuaN.DllWrapper.Tests
                     List<String> output = new List<string>();
 
                     Assert.Equal(LuaStatus.ErrorRun, L.DoString("print('First line', 123.45, false)"));
-                    L.LuaOpenLibs();
+                    L.LuaLOpenLibs();
 
                     Assert.Equal(LuaStatus.Ok, L.DoString("print('First line', 123.45, false)"));
 

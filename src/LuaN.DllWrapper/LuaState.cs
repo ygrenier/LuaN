@@ -160,6 +160,18 @@ namespace LuaN.DllWrapper
             throw new LuaException();
         }
 
+        /// <summary>
+        /// Returns a service
+        /// </summary>
+        public Object GetService(Type typeService)
+        {
+            if (typeService == null) throw new ArgumentNullException("typeService");
+            var tpThis = this.GetType();
+            if (tpThis == typeService || tpThis.IsInstanceOfType(typeService) || typeService.IsAssignableFrom(tpThis))
+                return this;
+            return null;
+        }
+
         #endregion
 
         #region Objects binding between Lua and .Net
@@ -1566,10 +1578,22 @@ namespace LuaN.DllWrapper
         ///// Pushes the resulting string on the stack and returns it. 
         ///// </summary>
         //String GSub(String s, String p, String r);
-        ///// <summary>
-        ///// Registers all functions in the array l (see luaL_Reg) into the table on the top of the stack
-        ///// </summary>
-        //ILuaState SetFuncs(IEnumerable<Tuple<String, LuaFunction>> l, int nup);
+        LuaDll.luaL_Reg[] ToRegArray(IEnumerable<KeyValuePair<String, LuaCFunction>> regs)
+        {
+            return regs.Select(k => new LuaDll.luaL_Reg
+            {
+                name = k.Key,
+                func = WrapFunction(k.Value)
+            }).Concat(new LuaDll.luaL_Reg[] { new LuaDll.luaL_Reg { name = null, func = null } }).ToArray();
+        }
+        /// <summary>
+        /// Registers all functions in the array l (see luaL_Reg) into the table on the top of the stack
+        /// </summary>
+        public void LuaLSetFuncs(IEnumerable<KeyValuePair<String, LuaCFunction>> l, int nup)
+        {
+            var regs = ToRegArray(l);
+            LuaDll.luaL_setfuncs(NativeState, regs, nup);
+        }
         ///// <summary>
         ///// Ensures that the value t[fname], where t is the value at index idx, is a table, and pushes that table onto the stack. 
         ///// Returns true if it finds a previous table there and false if it creates a new table. 
@@ -1597,14 +1621,22 @@ namespace LuaN.DllWrapper
         }
 
         #region some useful macros
-        ///// <summary>
-        ///// Creates a new table with a size optimized to store all entries in the array l
-        ///// </summary>
-        //ILuaState NewLibTable(Tuple<String, LuaFunction>[] l);
-        ///// <summary>
-        ///// Creates a new table and registers there the functions in list l. 
-        ///// </summary>
-        //ILuaState NewLib(Tuple<String, LuaFunction>[] l);
+        /// <summary>
+        /// Creates a new table with a size optimized to store all entries in the array l
+        /// </summary>
+        public void LuaLNewLibTable(IEnumerable<KeyValuePair<String, LuaCFunction>> l)
+        {
+            var regs = ToRegArray(l);
+            LuaDll.luaL_newlibtable(NativeState, regs);
+        }
+        /// <summary>
+        /// Creates a new table and registers there the functions in list l. 
+        /// </summary>
+        public void LuaLNewLib(IEnumerable<KeyValuePair<String, LuaCFunction>> l)
+        {
+            var regs = ToRegArray(l);
+            LuaDll.luaL_newlib(NativeState, regs);
+        }
         ///// <summary>
         ///// Checks whether cond is true. If it is not, raises an error with a standard message 
         ///// </summary>
@@ -1867,7 +1899,7 @@ namespace LuaN.DllWrapper
         /// <summary>
         /// Open all standard library
         /// </summary>
-        public void LuaOpenLibs()
+        public void LuaLOpenLibs()
         {
             LuaDll.luaL_openlibs(NativeState);
             OverridePrint();
