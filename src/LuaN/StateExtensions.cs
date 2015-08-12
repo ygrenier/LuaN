@@ -135,6 +135,22 @@ namespace LuaN
         #region .Net object specific methods
 
         /// <summary>
+        /// Register the .Net objet metatable
+        /// </summary>
+        public static void RegisterDotnetMetatable(this ILuaState L)
+        {
+            var ldn = L.GetService<ILuaDotnet>();
+            if (ldn != null)
+            {
+                ldn.RegisterDotnetMetatable(LuaDotnetHelper.DotnetObjectMetatableName);
+            }
+            else
+            {
+                LuaDotnetHelper.CreateDotnetObjectMetatable(L);
+            }
+        }
+
+        /// <summary>
         /// Pop the value at the top of the stack
         /// </summary>
         public static Object Pop(this ILuaState L)
@@ -274,6 +290,23 @@ namespace LuaN
         }
 
         /// <summary>
+        /// Push a value as a .Net object
+        /// </summary>
+        public static void PushNetObject(this ILuaState L, Object value)
+        {
+            var ldn = L.GetService<ILuaDotnet>();
+            if (ldn != null)
+            {
+                ldn.PushNetObject(value);
+            }
+            else
+            {
+                L.LuaPushLightUserData(value);
+                L.LuaLSetMetatable(LuaDotnetHelper.DotnetObjectMetatableName);
+            }
+        }
+
+        /// <summary>
         /// Push a .Net object value converted to the Lua value corresponding
         /// </summary>
         public static void Push(this ILuaState L, Object value)
@@ -306,14 +339,7 @@ namespace LuaN
             else if (value is ILuaValue)
                 ((ILuaValue)value).Push(L);
             else
-                L.LuaPushLightUserData(value);
-            //case LuaType.LightUserData:
-            //case LuaType.UserData:
-            //    return L.LuaToUserData(idx);
-            //case LuaType.Table:
-            //    throw new NotImplementedException();
-            //case LuaType.Function:
-            //    throw new NotImplementedException();
+                L.PushNetObject(value);
         }
 
         /// <summary>

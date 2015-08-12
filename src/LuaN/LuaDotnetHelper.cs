@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace LuaN
@@ -11,6 +12,10 @@ namespace LuaN
     /// </summary>
     public static class LuaDotnetHelper
     {
+        /// <summary>
+        /// Name for he default metatable for the .Net object managed in Lua
+        /// </summary>
+        public const String DotnetObjectMetatableName = "LuaN:DotnetObject";
 
         /// <summary>
         /// Throw an error from the stack and restore it
@@ -171,6 +176,221 @@ namespace LuaN
             return null;
         }
 
+        /// <summary>
+        /// Create the default metatable for the .Net objects
+        /// </summary>
+        public static void CreateDotnetObjectMetatable(ILuaState L)
+        {
+            var oldTop = L.LuaGetTop();
+
+            L.LuaLNewMetatable(DotnetObjectMetatableName);
+
+            L.LuaPushValue(-1);
+            L.LuaPushCFunction(DotnetObjectMeta_ToString);
+            L.LuaSetField(-2, "__tostring");
+
+            L.LuaPushValue(-1);
+            L.LuaPushCFunction(DotnetObjectMeta_Index);
+            L.LuaSetField(-2, "__index");
+
+            L.LuaPushValue(-1);
+            L.LuaPushCFunction(DotnetObjectMeta_Call);
+            L.LuaSetField(-2, "__call");
+
+            L.LuaSetTop(oldTop);
+        }
+
+        /// <summary>
+        /// Try to find the best method from the args provided.
+        /// </summary>
+        /// <typeparam name="T">Type of the MethodBase</typeparam>
+        /// <param name="methods">List of the methods</param>
+        /// <param name="args">List of the arguments</param>
+        /// <returns>The method, or null if not found.</returns>
+        /// <remarks>
+        /// If the the method is find, the list <paramref name="args"/> is rebuild whith the correct values.
+        /// </remarks>
+        public static T FindBestMethod<T>(IEnumerable<T> methods, IList<Object> args) where T : MethodBase
+        {
+            T methodFind = null;
+            IList<Object> argsFind = null;
+            // Save original args
+            var originalArgs = new List<Object>(args);
+            foreach (var mth in methods)
+            {
+                var prms = mth.GetParameters();
+                if (prms.Length != args.Count) continue;
+                // Check args and convert them
+                var newArgs = new List<Object>();
+                try
+                {
+                    for (int i = 0; i < prms.Length; i++)
+                        newArgs.Add(Convert.ChangeType(args[i], prms[i].ParameterType, System.Globalization.CultureInfo.InvariantCulture));
+                }
+                catch { continue; }
+                // Here we find our method
+                methodFind = mth;
+                argsFind = newArgs;
+                break;
+            }
+            if (methodFind != null && argsFind != null)
+            {
+                // Copy the final args
+                args.Clear();
+                foreach (var a in argsFind)
+                    args.Add(a);
+            }
+            return methodFind;
+        }
+
+        /// <summary>
+        /// __tostring
+        /// </summary>
+        public static int DotnetObjectMeta_ToString(ILuaState L)
+        {
+            var obj = L.LuaToUserData(1);
+            if (obj != null)
+            {
+                L.LuaPushString(obj.ToString());
+            }
+            else
+            {
+                L.LuaPushNil();
+            }
+            return 1;
+        }
+
+        /// <summary>
+        /// __index
+        /// </summary>
+        public static int DotnetObjectMeta_Index(ILuaState L)
+        {
+            try
+            {
+                var obj = L.LuaToUserData(1);
+                if (obj == null) L.LuaLError("Attempt to access a member of a null object.");
+                var key = L.ToObject(2);
+                if (key == null) L.LuaLError("Attempt to access a null index.");
+                var tpObj = obj.GetType();
+                // If key is 'string' try get members
+                if (L.LuaType(2) == LuaType.String)
+                {
+                    String memberName = L.LuaToString(2);
+                    var member = tpObj.GetMember(memberName).FirstOrDefault();
+                    if (member == null)
+                        L.LuaLError(String.Format("Unknown member '{0}' on object '{1}'.", memberName, tpObj.FullName));
+                    // Property or Field ?
+                    if (member is PropertyInfo)
+                    {
+                        L.Push(((PropertyInfo)member).GetValue(obj, null));
+                        return 1;
+                    }
+                    else if (member is FieldInfo)
+                    {
+                        L.Push(((FieldInfo)member).GetValue(obj));
+                        return 1;
+                    }
+                    else if (member is MethodInfo)
+                    {
+                        L.Push(new DotnetMethod(obj, tpObj.GetMember(memberName).OfType<MethodInfo>().ToArray()));
+                        return 1;
+                    }
+                    else
+                        L.LuaLError(String.Format("Not supported member '{0}' of type '{1}'", memberName, member.GetType().FullName));
+                }
+                // Search an indexed property
+                var idxProperty = tpObj.GetProperties().Where(p =>
+                {
+                    var prms = p.GetIndexParameters();
+                    if (prms.Length != 1) return false;
+                    if (prms[0].ParameterType != key.GetType()) return false;
+                    return true;
+                }).FirstOrDefault();
+                if (idxProperty == null)
+                    L.LuaLError("Attempt to access an unknown member.");
+                L.Push(idxProperty.GetValue(obj, new Object[] { key }));
+                return 1;
+            }
+            catch (LuaException) { throw; }
+            catch (Exception ex)
+            {
+                L.LuaLError(ex.Message);
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// __call
+        /// </summary>
+        public static int DotnetObjectMeta_Call(ILuaState L)
+        {
+            try
+            {
+                var obj = L.LuaToUserData(1);
+                if (obj == null) L.LuaLError("Attempt to access a member of a null object.");
+                DotnetMethod dm = obj as DotnetMethod;
+                if (dm == null && obj is Delegate)
+                {
+                    dm = new DotnetMethod(((Delegate)obj).Target, new MethodInfo[] { ((Delegate)obj).Method });
+                }
+                if (dm != null)
+                {
+                    // Build args
+                    var top = L.LuaGetTop();
+                    List<Object> args = new List<object>();
+                    for (int i = 2; i <= top; i++)
+                    {
+                        var arg = L.ToObject(i);
+                        if (!(i == 2 && arg == dm.Object))  // detect self
+                            args.Add(arg);
+                    }
+                    // Find the method
+                    var mth = FindBestMethod(dm.Methods, args);
+                    if (mth == null) L.LuaLError("Can't call the method with these arguments.");
+                    // Invoke
+                    var res = mth.Invoke(dm.Object, args.ToArray());
+                    if (mth.ReturnType != null && mth.ReturnType != typeof(void))
+                    {
+                        L.Push(res);
+                        return 1;
+                    }
+                    else
+                        return 0;
+                }
+                else
+                    L.LuaLError("Attempts to call a non delegate object.");
+            }
+            catch (LuaException) { throw; }
+            catch (Exception ex)
+            {
+                L.LuaLError(ex.Message);
+            }
+            return 0;
+        }
+
+    }
+
+    /// <summary>
+    /// Method
+    /// </summary>
+    public class DotnetMethod
+    {
+        /// <summary>
+        /// New .Net method
+        /// </summary>
+        public DotnetMethod(Object obj, MethodInfo[] methods)
+        {
+            this.Object = obj;
+            this.Methods = methods;
+        }
+        /// <summary>
+        /// Object parent
+        /// </summary>
+        public Object Object { get; private set; }
+        /// <summary>
+        /// Methods
+        /// </summary>
+        public MethodInfo[] Methods { get; private set; }
     }
 
 }
