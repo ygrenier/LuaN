@@ -144,7 +144,7 @@ namespace LuaN.Tests
         }
 
         [Fact]
-        public void TestToUserData()
+        public void TestLuaToUserData()
         {
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
@@ -190,6 +190,16 @@ namespace LuaN.Tests
             state.Push(this);
             mState.Verify(s => s.LuaPushLightUserData(this), Times.Exactly(1));
 
+            var mLuaValue = new Mock<ILuaValue>();
+            state.Push(mLuaValue.Object);
+            mLuaValue.Verify(v => v.Push(state), Times.Once());
+
+            mState = new Mock<ILuaState>();
+            var mDotnet = mState.As<ILuaDotnet>();
+            mState.Setup(s => s.GetService(typeof(ILuaDotnet))).Returns(mDotnet.Object);
+            state = mState.Object;
+            state.Push(this);
+            mDotnet.Verify(s => s.Push(this), Times.Exactly(1));
         }
 
         [Fact]
@@ -208,6 +218,7 @@ namespace LuaN.Tests
             mState.Setup(s => s.LuaType(9)).Returns(LuaType.Thread);
             var state = mState.Object;
 
+            Assert.Equal(null, StateExtensions.ToObject(null, 2));
             Assert.Equal(null, state.ToObject(1));
 
             Assert.Equal(false, state.ToObject(2));
@@ -233,6 +244,13 @@ namespace LuaN.Tests
 
             Assert.Equal(null, state.ToObject(9));
             mState.Verify(s => s.LuaToThread(9), Times.Once());
+
+            mState = new Mock<ILuaState>();
+            var mDotnet = mState.As<ILuaDotnet>();
+            mState.Setup(s => s.GetService(typeof(ILuaDotnet))).Returns(mDotnet.Object);
+            state = mState.Object;
+            state.ToValue(123);
+            mDotnet.Verify(s => s.ToValue(123), Times.Exactly(1));
 
         }
 
@@ -536,6 +554,195 @@ namespace LuaN.Tests
                 mState.Verify(s => s.LuaPCall(3, -1, 0), Times.Once());
             }
         }
+
+        [Fact]
+        public void TestToTable()
+        {
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.Table);
+            mState.Setup(s => s.LuaType(2)).Returns(LuaType.String);
+            using (var state = mState.Object)
+            {
+                // Existing table
+                using (var table = state.ToTable(1))
+                {
+                    Assert.IsType<LuaTable>(table);
+                    var tb = table as LuaTable;
+                    Assert.Same(state, tb.State);
+                }
+                // Not a table
+                Assert.Null(state.ToTable(2));
+                Assert.Null(StateExtensions.ToTable(null, 1));
+            }
+
+            ILuaTable cTable = new Mock<ILuaTable>().Object;
+            mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.Table);
+            mState.Setup(s => s.LuaType(2)).Returns(LuaType.String);
+            var mDotNet = mState.As<ILuaDotnet>();
+            mDotNet.Setup(s => s.ToTable(3)).Returns(cTable);
+            mState.Setup(s => s.GetService(typeof(ILuaDotnet))).Returns(mDotNet.Object);
+            using (var state = mState.Object)
+            {
+                // Existing table
+                using (var table = state.ToTable(3))
+                {
+                    Assert.Same(cTable, table);
+                }
+                // Not a table
+                Assert.Null(state.ToTable(2));
+                Assert.Null(StateExtensions.ToTable(null, 1));
+            }
+
+            // Invalid ref
+            //mState = new Mock<ILuaState>();
+            //mState.Setup(s => s.LuaType(1)).Returns(LuaType.Table);
+            //mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
+            //state = mState.Object;
+            //using (l = new Lua(state))
+            //{
+            //    var ioex = Assert.Throws<InvalidOperationException>(() => l.ToTable(1));
+            //    Assert.Equal("Can't create a reference for this value.", ioex.Message);
+            //}
+        }
+
+        [Fact]
+        public void TestToUserData()
+        {
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.UserData);
+            mState.Setup(s => s.LuaIsUserData(1)).Returns(true);
+            mState.Setup(s => s.LuaType(2)).Returns(LuaType.String);
+            mState.Setup(s => s.LuaIsUserData(2)).Returns(false);
+            using (var state = mState.Object)
+            {
+                // Existing userdata
+                using (var userdata = state.ToUserData(1))
+                {
+                    Assert.IsType<LuaUserData>(userdata);
+                    var ud = userdata as LuaUserData;
+                    Assert.Same(state, ud.State);
+                }
+                // Not an userdata
+                Assert.Null(state.ToUserData(2));
+                Assert.Null(StateExtensions.ToUserData(null, 2));
+            }
+
+            var cUserData = new Mock<ILuaUserData>().Object;
+            mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.UserData);
+            mState.Setup(s => s.LuaIsUserData(1)).Returns(true);
+            mState.Setup(s => s.LuaType(2)).Returns(LuaType.String);
+            mState.Setup(s => s.LuaIsUserData(2)).Returns(false);
+            var mDotNet = mState.As<ILuaDotnet>();
+            mDotNet.Setup(s => s.ToUserData(3)).Returns(cUserData);
+            mState.Setup(s => s.GetService(typeof(ILuaDotnet))).Returns(mDotNet.Object);
+            using (var state = mState.Object)
+            {
+                // Existing userdata
+                using (var userdata = state.ToUserData(3))
+                {
+                    Assert.Same(cUserData, userdata);
+                }
+                // Not an userdata
+                Assert.Null(state.ToUserData(2));
+                Assert.Null(StateExtensions.ToUserData(null, 2));
+            }
+
+            // Invalid ref
+            //mState = new Mock<ILuaState>();
+            //mState.Setup(s => s.LuaType(1)).Returns(LuaType.UserData);
+            //mState.Setup(s => s.LuaIsUserData(1)).Returns(true);
+            //mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
+            //state = mState.Object;
+            //using (l = new Lua(state))
+            //{
+            //    var ioex = Assert.Throws<InvalidOperationException>(() => l.ToUserData(1));
+            //    Assert.Equal("Can't create a reference for this value.", ioex.Message);
+            //}
+        }
+
+        [Fact]
+        public void TestToFunction()
+        {
+            LuaCFunction func = s => 0;
+
+            var mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.Function);
+            mState.Setup(s => s.LuaIsFunction(1)).Returns(true);
+            mState.Setup(s => s.LuaIsCFunction(1)).Returns(true);
+            mState.Setup(s => s.LuaToCFunction(1)).Returns(func);
+            mState.Setup(s => s.LuaType(2)).Returns(LuaType.Function);
+            mState.Setup(s => s.LuaIsFunction(2)).Returns(true);
+            mState.Setup(s => s.LuaIsCFunction(2)).Returns(false);
+            mState.Setup(s => s.LuaType(3)).Returns(LuaType.String);
+            mState.Setup(s => s.LuaIsFunction(3)).Returns(false);
+            mState.Setup(s => s.LuaIsCFunction(3)).Returns(false);
+            using (var state = mState.Object)
+            {
+                // Existing c function
+                using (var function = state.ToFunction(1))
+                {
+                    Assert.IsType<LuaFunction>(function);
+                    var fn = function as LuaFunction;
+                    Assert.Same(state, fn.State);
+                    Assert.Same(func, fn.Function);
+                }
+                // Existing lua function
+                using (var function = state.ToFunction(2))
+                {
+                    Assert.IsType<LuaFunction>(function);
+                    var fn = function as LuaFunction;
+                    Assert.Same(state, fn.State);
+                }
+                // Not an LuaFunction
+                Assert.Null(state.ToFunction(3));
+                Assert.Null(StateExtensions.ToFunction(null, 3));
+            }
+
+            var cFunction = new Mock<ILuaFunction>().Object;
+            mState = new Mock<ILuaState>();
+            mState.Setup(s => s.LuaType(1)).Returns(LuaType.Function);
+            mState.Setup(s => s.LuaIsFunction(1)).Returns(true);
+            mState.Setup(s => s.LuaIsCFunction(1)).Returns(true);
+            mState.Setup(s => s.LuaToCFunction(1)).Returns(func);
+            mState.Setup(s => s.LuaType(2)).Returns(LuaType.Function);
+            mState.Setup(s => s.LuaIsFunction(2)).Returns(true);
+            mState.Setup(s => s.LuaIsCFunction(2)).Returns(false);
+            mState.Setup(s => s.LuaType(3)).Returns(LuaType.String);
+            mState.Setup(s => s.LuaIsFunction(3)).Returns(false);
+            mState.Setup(s => s.LuaIsCFunction(3)).Returns(false);
+            var mDotNet = mState.As<ILuaDotnet>();
+            mDotNet.Setup(s => s.ToFunction(4)).Returns(cFunction);
+            mState.Setup(s => s.GetService(typeof(ILuaDotnet))).Returns(mDotNet.Object);
+            using (var state = mState.Object)
+            {
+                // Existing c function
+                using (var function = state.ToFunction(4))
+                {
+                    Assert.Same(cFunction, function);
+                }
+                // Existing lua function
+                using (var function = state.ToFunction(4))
+                {
+                    Assert.Same(cFunction, function);
+                }
+            }
+
+            // Invalid ref
+            //mState = new Mock<ILuaState>();
+            //mState.Setup(s => s.LuaType(1)).Returns(LuaType.Function);
+            //mState.Setup(s => s.LuaIsFunction(1)).Returns(true);
+            //mState.Setup(s => s.LuaIsCFunction(1)).Returns(false);
+            //mState.Setup(s => s.LuaLRef(It.IsAny<int>())).Returns(LuaRef.RefNil);
+            //state = mState.Object;
+            //using (l = new Lua(state))
+            //{
+            //    var ioex = Assert.Throws<InvalidOperationException>(() => l.ToFunction(1));
+            //    Assert.Equal("Can't create a reference for this value.", ioex.Message);
+            //}
+        }
+
 
     }
 }
