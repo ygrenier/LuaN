@@ -16,13 +16,11 @@ namespace LuaN.Tests
         public void TestCreate()
         {
             var mState = new Mock<ILuaState>();
-            var state = mState.Object;
-            Lua l;
             LuaValue v;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                v = new LuaUserData(l, 123, true);
-                Assert.Same(l, v.Lua);
+                v = new LuaUserData(state, 123, true);
+                Assert.Same(state, v.State);
                 Assert.Equal(123, v.Reference);
                 v.Dispose();
             }
@@ -44,12 +42,10 @@ namespace LuaN.Tests
             mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
             mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
             mState.Setup(_ => _.LuaToString(4)).Returns("Test");
-            var state = mState.Object;
-            Lua l;
             LuaUserData ud;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                ud = new LuaUserData(l, 123, true);
+                ud = new LuaUserData(state, 123, true);
 
                 Assert.Equal(new Object[] { null, true, 123.45, "Test" }, ud.Call(true, null, 1234, "Test"));
             }
@@ -71,12 +67,10 @@ namespace LuaN.Tests
             mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
             mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
             mState.Setup(_ => _.LuaToString(4)).Returns("Test");
-            var state = mState.Object;
-            Lua l;
             LuaUserData ud;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                ud = new LuaUserData(l, 123, true);
+                ud = new LuaUserData(state, 123, true);
 
                 Assert.Equal(new Object[] { null, "True", 123 }, ud.Call(new object[] { true, null, 1234, "Test" }, new Type[] { typeof(String), typeof(String), typeof(int) }));
             }
@@ -86,12 +80,10 @@ namespace LuaN.Tests
         public void TestAccesByField()
         {
             var mState = new Mock<ILuaState>();
-            var state = mState.Object;
-            Lua l;
             LuaUserData ud;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                ud = new LuaUserData(l, 123, true);
+                ud = new LuaUserData(state, 123, true);
                 ud["field1"] = 1234;
                 
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
@@ -109,12 +101,10 @@ namespace LuaN.Tests
         public void TestAccesByObject()
         {
             var mState = new Mock<ILuaState>();
-            var state = mState.Object;
-            Lua l;
             LuaUserData ud;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                ud = new LuaUserData(l, 123, true);
+                ud = new LuaUserData(state, 123, true);
                 ud[777.77] = 1234;
 
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());

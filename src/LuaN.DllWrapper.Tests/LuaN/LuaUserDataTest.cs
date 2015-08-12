@@ -13,13 +13,11 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestCreate()
         {
-            var state = new LuaState();
-            Lua l;
             LuaValue v;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                v = new LuaUserData(l, 123, true);
-                Assert.Same(l, v.Lua);
+                v = new LuaUserData(state, 123, true);
+                Assert.Same(state, v.State);
                 Assert.Equal(123, v.Reference);
                 v.Dispose();
             }

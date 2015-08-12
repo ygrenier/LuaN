@@ -50,6 +50,7 @@
     <Compile Include="ILuaValue.cs" />
     <Compile Include="LibraryExtensions.cs" />
     <Compile Include="Lua.cs" />
+    <Compile Include="LuaDotnetHelper.cs" />
     <Compile Include="LuaException.cs" />
     <Compile Include="LuaTable.cs" />
     <Compile Include="LuaFunction.cs" />

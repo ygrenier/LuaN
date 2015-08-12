@@ -15,14 +15,6 @@ namespace LuaN.DllWrapper.Tests
         class PublicLua : Lua
         {
             public PublicLua(ILuaState state) : base(state) { }
-            public Object[] PublicCallValue(int reference, Object[] args, Type[] typedResult = null) { return CallValue(reference, args, typedResult); }
-            public Object[] PublicCallFunction(object function, Object[] args, Type[] typedResult = null) { return CallFunction(function, args, typedResult); }
-            public Object PublicGetFieldValue(int reference, String field) { return GetFieldValue(reference, field); }
-            public void PublicSetFieldValue(int reference, String field, object value) { SetFieldValue(reference, field, value); }
-            public Object PublicGetFieldValue(int reference, int index) { return GetFieldValue(reference, index); }
-            public void PublicSetFieldValue(int reference, int index, object value) { SetFieldValue(reference, index, value); }
-            public Object PublicGetFieldValue(int reference, object index) { return GetFieldValue(reference, index); }
-            public void PublicSetFieldValue(int reference, object index, object value) { SetFieldValue(reference, index, value); }
         }
 
         [Fact]
@@ -82,41 +74,6 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestDisposeLuaValue()
-        {
-            var state = new LuaState();
-            Lua l;
-            LuaValue v;
-            using (l = new Lua(state))
-            {
-                l.State.LuaNewTable();
-                var lref = l.State.LuaRef();
-                Assert.Equal(LuaType.Table, l.State.LuaPushRef(lref));
-                l.State.LuaPop(1);
-                v = new LuaTable(l, lref, true);
-                Assert.Equal(lref, v.Reference);
-                Assert.Same(l, v.Lua);
-                v.Dispose();
-                Assert.Null(v.Lua);
-                Assert.Equal(LuaRef.NoRef, v.Reference);
-                Assert.Equal(LuaType.Nil, l.State.LuaPushRef(lref));
-                l.State.LuaPop(1);
-
-                l.State.LuaNewTable();
-                lref = l.State.LuaRef();
-                Assert.Equal(LuaType.Table, l.State.LuaPushRef(lref));
-                l.State.LuaPop(1);
-                v = new LuaTable(l, lref, false);
-                Assert.Equal(lref, v.Reference);
-                Assert.Same(l, v.Lua);
-                v.Dispose();
-                Assert.Null(v.Lua);
-                Assert.Equal(LuaRef.NoRef, v.Reference);
-                Assert.Equal(LuaType.Table, l.State.LuaPushRef(lref));
-            }
-        }
-
-        [Fact]
         public void TestThrowError()
         {
             var state = new LuaState();
@@ -166,307 +123,6 @@ namespace LuaN.DllWrapper.Tests
         }
 
         [Fact]
-        public void TestCallValue()
-        {
-            // No results
-            var state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                l.State.LoadString("a=0");
-                var lref = l.State.LuaRef();
-                var result = l.PublicCallValue(lref, new Object[] { "field1", null, 12.34 });
-                Assert.Equal(new Object[0], result);
-            }
-
-            // Call failed
-            state = new LuaState();
-            state.LuaLOpenLibs();
-            using (var l = new PublicLua(state))
-            {
-                l.State.LoadString("error()");
-                var lref = l.State.LuaRef();
-                var ex = Assert.Throws<LuaException>(() => l.PublicCallValue(lref, new Object[] { "field1", null, 12.34 }));
-                Assert.Equal("Unknown Lua error.", ex.Message);
-            }
-            // Call failed
-            state = new LuaState();
-            state.LuaLOpenLibs();
-            using (var l = new PublicLua(state))
-            {
-                l.State.LoadString("error('Error in the call')");
-                var lref = l.State.LuaRef();
-                var ex = Assert.Throws<LuaException>(() => l.PublicCallValue(lref, new Object[] { "field1", null, 12.34 }));
-                Assert.Equal("[string \"error('Error in the call')\"]:1: Error in the call", ex.Message);
-            }
-
-            // Multiple results
-            state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                l.State.DoString(@"
-function test(a,b,c,d)
- return b, d==nil, 123.45, 'Test'
-end
-return test
-");
-                var lref = l.State.LuaRef();
-                var result = l.PublicCallValue(lref, new Object[] { "field1", null, 12.34 });
-                Assert.Equal(new Object[] { null, true, 123.45d, "Test" }, result);
-            }
-
-            // Multiple results typed
-            state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                l.State.DoString(@"
-function test(a,b,c,d)
- return a, d==nil, 123.45, 'Test'
-end
-return test
-");
-                var lref = l.State.LuaRef();
-                var result = l.PublicCallValue(lref, new Object[] { "field1", null, 12.34 }, new Type[] { typeof(Lua), typeof(int) });
-                Assert.Equal(new Object[] { null, 1 }, result);
-            }
-
-            // Multiple results typed
-            state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                l.State.DoString(@"
-function test(a,b,c,d)
- return a, d==nil, 123.45, 'Test'
-end
-return test
-");
-                var lref = l.State.LuaRef();
-                var result = l.PublicCallValue(lref, new Object[] { "field1", null, 12.34 }, new Type[] { typeof(Lua), typeof(Lua), typeof(int), null });
-                Assert.Equal(new Object[] { null, null, 123, "Test" }, result);
-            }
-
-            // Multiple results typed
-            state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                l.State.DoString(@"
-function test(a,b,c,d)
- return a, d==nil, 123.45, 'Test'
-end
-return test
-");
-                var lref = l.State.LuaRef();
-                var result = l.PublicCallValue(lref, new Object[] { "field1", null, 12.34 }, new Type[] { typeof(Lua), typeof(Lua), typeof(int), typeof(DateTime), typeof(double) });
-                Assert.Equal(new Object[] { null, null, 123, DateTime.MinValue, 0d }, result);
-            }
-        }
-
-        [Fact]
-        public void TestCallFunction()
-        {
-            // No results
-            var state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                l.State.LoadString("a=0");
-                var func = l.ToFunction(-1);
-                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 });
-                Assert.Equal(new Object[0], result);
-            }
-
-            // Call failed
-            state = new LuaState();
-            state.LuaLOpenLibs();
-            using (var l = new PublicLua(state))
-            {
-                l.State.LoadString("error()");
-                var func = l.ToFunction(-1);
-                var ex = Assert.Throws<LuaException>(() => l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }));
-                Assert.Equal("Unknown Lua error.", ex.Message);
-            }
-            // Call failed
-            state = new LuaState();
-            state.LuaLOpenLibs();
-            using (var l = new PublicLua(state))
-            {
-                l.State.LoadString("error('Error in the call')");
-                var func = l.ToFunction(-1);
-                var ex = Assert.Throws<LuaException>(() => l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }));
-                Assert.Equal("[string \"error('Error in the call')\"]:1: Error in the call", ex.Message);
-            }
-
-            // Multiple results
-            state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                l.State.DoString(@"
-function test(a,b,c,d)
- return b, d==nil, 123.45, 'Test'
-end
-return test
-");
-                var func = l.ToFunction(-1);
-                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 });
-                Assert.Equal(new Object[] { null, true, 123.45d, "Test" }, result);
-            }
-
-            // Multiple results typed
-            state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                l.State.DoString(@"
-function test(a,b,c,d)
- return a, d==nil, 123.45, 'Test'
-end
-return test
-");
-                var func = l.ToFunction(-1);
-                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }, new Type[] { typeof(Lua), typeof(int) });
-                Assert.Equal(new Object[] { null, 1 }, result);
-            }
-
-            // Multiple results typed
-            state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                var func = (LuaCFunction)(st=>
-                {
-                    Assert.Equal(3, st.LuaGetTop());
-                    Assert.Equal("field1", st.LuaToString(1));
-                    Assert.True(st.LuaIsNil(2));
-                    Assert.Equal(12.34, st.LuaToNumber(3));
-
-                    st.LuaPushValue(1);
-                    st.LuaPushBoolean(true);
-                    st.LuaPushNumber(123.45);
-                    st.LuaPushString("Test");
-                    return 4;
-                });
-                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }, new Type[] { typeof(Lua), typeof(Lua), typeof(int), null });
-                Assert.Equal(new Object[] { null, null, 123, "Test" }, result);
-            }
-
-            // Multiple results typed
-            state = new LuaState();
-            using (var l = new PublicLua(state))
-            {
-                l.State.DoString(@"
-function test(a,b,c,d)
- return a, d==nil, 123.45, 'Test'
-end
-return test
-");
-                var func = l.ToFunction(-1);
-                var result = l.PublicCallFunction(func, new Object[] { "field1", null, 12.34 }, new Type[] { typeof(Lua), typeof(Lua), typeof(int), typeof(DateTime), typeof(double) });
-                Assert.Equal(new Object[] { null, null, 123, DateTime.MinValue, 0d }, result);
-            }
-
-        }
-
-        [Fact]
-        public void TestSetFieldValueByField()
-        {
-            var state = new LuaState();
-            PublicLua l = null;
-            using (l = new PublicLua(state))
-            {
-                l.State.LuaNewTable();
-                var lref = l.State.LuaRef();
-                l.PublicSetFieldValue(lref, "field1", 1234);
-
-                l.State.LuaPushRef(lref);
-                l.State.LuaGetField(-1, "field1");
-                Assert.Equal(1234, l.State.LuaToNumber(-1));
-            }
-        }
-
-        [Fact]
-        public void TestGetFieldValueByField()
-        {
-            var state = new LuaState();
-            PublicLua l = null;
-            using (l = new PublicLua(state))
-            {
-                l.State.LuaNewTable();
-                l.State.LuaPushValue(-1);
-                var lref = l.State.LuaRef();
-                l.State.LuaPushNumber(123.45);
-                l.State.LuaSetField(1, "field1");
-
-                Assert.Equal(123.45, l.PublicGetFieldValue(lref, "field1"));
-            }
-        }
-
-        [Fact]
-        public void TestSetFieldValueByInteger()
-        {
-            var state = new LuaState();
-            PublicLua l = null;
-            using (l = new PublicLua(state))
-            {
-                l.State.LuaNewTable();
-                var lref = l.State.LuaRef();
-                l.PublicSetFieldValue(lref, 24, 1234);
-
-                l.State.LuaPushRef(lref);
-                l.State.LuaGetI(-1, 24);
-                Assert.Equal(1234, l.State.LuaToNumber(-1));
-            }
-        }
-
-        [Fact]
-        public void TestGetFieldValueByInteger()
-        {
-            var state = new LuaState();
-            PublicLua l = null;
-            using (l = new PublicLua(state))
-            {
-                l.State.LuaNewTable();
-                l.State.LuaPushValue(-1);
-                var lref = l.State.LuaRef();
-                l.State.LuaPushNumber(123.45);
-                l.State.LuaSetI(1, 24);
-
-                Assert.Equal(123.45, l.PublicGetFieldValue(lref, 24));
-            }
-        }
-
-        [Fact]
-        public void TestSetFieldValueByObject()
-        {
-            var state = new LuaState();
-            PublicLua l = null;
-            using (l = new PublicLua(state))
-            {
-                l.State.LuaNewTable();
-                var lref = l.State.LuaRef();
-                l.PublicSetFieldValue(lref, 987.65, 1234);
-
-                l.State.LuaPushRef(lref);
-                l.State.LuaPushNumber(987.65);
-                l.State.LuaGetTable(-2);
-                Assert.Equal(1234, l.State.LuaToNumber(-1));
-            }
-        }
-
-        [Fact]
-        public void TestGetFieldValueByObject()
-        {
-            var state = new LuaState();
-            PublicLua l = null;
-            using (l = new PublicLua(state))
-            {
-                l.State.LuaNewTable();
-                l.State.LuaPushValue(-1);
-                var lref = l.State.LuaRef();
-                l.State.LuaPushNumber(987.65);
-                l.State.LuaPushNumber(123.45);
-                l.State.LuaSetTable(1);
-
-                Assert.Equal(123.45, l.PublicGetFieldValue(lref, 987.65));
-            }
-        }
-
-        [Fact]
         public void TestToTable()
         {
             var state = new LuaState();
@@ -480,7 +136,7 @@ return test
                 {
                     Assert.IsType<LuaTable>(table);
                     var tb = table as LuaTable;
-                    Assert.Same(l, tb.Lua);
+                    Assert.Same(l.State, tb.State);
                 }
                 // Not a table
                 Assert.Null(l.ToTable(2));
@@ -510,14 +166,14 @@ return test
                 {
                     Assert.IsType<LuaUserData>(userdata);
                     var ud = userdata as LuaUserData;
-                    Assert.Same(l, ud.Lua);
+                    Assert.Same(l.State, ud.State);
                 }
                 // Existing userdata
                 using (var userdata = l.ToUserData(2))
                 {
                     Assert.IsType<LuaUserData>(userdata);
                     var ud = userdata as LuaUserData;
-                    Assert.Same(l, ud.Lua);
+                    Assert.Same(l.State, ud.State);
                 }
                 // Not an userdata
                 Assert.Null(l.ToUserData(3));
@@ -552,7 +208,7 @@ return test
                 {
                     Assert.IsType<LuaFunction>(function);
                     var fn = function as LuaFunction;
-                    Assert.Same(l, fn.Lua);
+                    Assert.Same(l.State, fn.State);
                     Assert.Same(func, fn.Function);
                 }
                 // Existing lua function
@@ -560,7 +216,7 @@ return test
                 {
                     Assert.IsType<LuaFunction>(function);
                     var fn = function as LuaFunction;
-                    Assert.Same(l, fn.Lua);
+                    Assert.Same(l.State, fn.State);
                 }
                 // Not an LuaFunction
                 Assert.Null(l.ToFunction(3));
@@ -633,12 +289,12 @@ return test
                 Assert.Equal("Can't push a different thread", ioex.Message);
 
                 l.State.LuaNewTable();
-                var tbl = new LuaTable(l, l.State.LuaRef());
+                var tbl = new LuaTable(l.State, l.State.LuaRef());
                 l.Push(tbl);
                 Assert.Equal(LuaType.Table, l.State.LuaType(-1));
 
                 l.State.LuaNewUserData(12);
-                var ud = new LuaUserData(l, l.State.LuaRef());
+                var ud = new LuaUserData(l.State, l.State.LuaRef());
                 l.Push(ud);
                 Assert.Equal(LuaType.UserData, l.State.LuaType(-1));
 

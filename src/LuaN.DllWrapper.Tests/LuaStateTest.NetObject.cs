@@ -26,11 +26,11 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal("5D", L.ToObject(6));
                 Assert.Equal("5z", L.ToObject(7));
                 Assert.Equal(true, L.ToObject(8));
-                Assert.Throws<NotImplementedException>(() => L.ToObject(9));
-                Assert.Throws<NotImplementedException>(() => L.ToObject(10));
-                Assert.IsAssignableFrom<ILuaNativeUserData>(L.ToObject(11));
+                Assert.IsAssignableFrom<ILuaFunction>(L.ToObject(9));
+                Assert.IsAssignableFrom<ILuaFunction>(L.ToObject(10));
+                Assert.IsAssignableFrom<ILuaUserData>(L.ToObject(11));
                 Assert.Same(this, L.ToObject(12));
-                Assert.Throws<NotImplementedException>(() => L.ToObject(13));
+                Assert.IsAssignableFrom<ILuaTable>(L.ToObject(13));
                 Assert.Same(L, L.ToObject(14));
             }
         }

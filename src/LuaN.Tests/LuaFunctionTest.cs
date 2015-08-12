@@ -16,13 +16,11 @@ namespace LuaN.Tests
         public void TestCreateRef()
         {
             var mState = new Mock<ILuaState>();
-            var state = mState.Object;
-            Lua l;
             LuaFunction v;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                v = new LuaFunction(l, 123, true);
-                Assert.Same(l, v.Lua);
+                v = new LuaFunction(state, 123, true);
+                Assert.Same(state, v.State);
                 Assert.Equal(123, v.Reference);
                 Assert.Null(v.Function);
                 v.Dispose();
@@ -33,14 +31,12 @@ namespace LuaN.Tests
         public void TestCreateFunc()
         {
             var mState = new Mock<ILuaState>();
-            var state = mState.Object;
-            Lua l;
             LuaFunction v;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
                 LuaCFunction func = s => 0;
-                v = new LuaFunction(l, func);
-                Assert.Same(l, v.Lua);
+                v = new LuaFunction(state, func);
+                Assert.Same(state, v.State);
                 Assert.Equal(LuaRef.NoRef, v.Reference);
                 Assert.Same(func, v.Function);
                 v.Dispose();
@@ -63,16 +59,14 @@ namespace LuaN.Tests
             mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
             mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
             mState.Setup(_ => _.LuaToString(4)).Returns("Test");
-            var state = mState.Object;
-            Lua l;
             LuaFunction fn;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                fn = new LuaFunction(l, 123, true);
+                fn = new LuaFunction(state, 123, true);
                 Assert.Equal(new Object[] { null, true, 123.45, "Test" }, fn.Call(true, null, 1234, "Test"));
 
                 top = 1;
-                fn = new LuaFunction(l, s => 0);
+                fn = new LuaFunction(state, s => 0);
                 Assert.Equal(new Object[] { null, true, 123.45, "Test" }, fn.Call(true, null, 1234, "Test"));
             }
         }
@@ -93,16 +87,14 @@ namespace LuaN.Tests
             mState.Setup(_ => _.LuaToNumber(3)).Returns(123.45);
             mState.Setup(_ => _.LuaType(4)).Returns(LuaType.String);
             mState.Setup(_ => _.LuaToString(4)).Returns("Test");
-            var state = mState.Object;
-            Lua l;
             LuaFunction fn;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                fn = new LuaFunction(l, 123, true);
+                fn = new LuaFunction(state, 123, true);
                 Assert.Equal(new Object[] { null, "True", 123 }, fn.Call(new object[] { true, null, 1234, "Test" }, new Type[] { typeof(String), typeof(String), typeof(int) }));
 
                 top = 1;
-                fn = new LuaFunction(l, s => 0);
+                fn = new LuaFunction(state, s => 0);
                 Assert.Equal(new Object[] { null, "True", 123 }, fn.Call(new object[] { true, null, 1234, "Test" }, new Type[] { typeof(String), typeof(String), typeof(int) }));
             }
         }

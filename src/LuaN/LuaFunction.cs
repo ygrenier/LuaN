@@ -15,9 +15,9 @@ namespace LuaN
         /// <summary>
         /// Create a new function reference
         /// </summary>
-        public LuaFunction(Lua lua, int reference, bool ownRef = true)
+        public LuaFunction(ILuaState state, int reference, bool ownRef = true)
         {
-            this.Lua = lua;
+            this.State = state;
             this.Reference = reference;
             this.ReferenceOwned = ownRef;
             this.Function = null;
@@ -26,9 +26,9 @@ namespace LuaN
         /// <summary>
         /// Create a new function
         /// </summary>
-        public LuaFunction(Lua lua, LuaCFunction function)
+        public LuaFunction(ILuaState state, LuaCFunction function)
         {
-            this.Lua = lua;
+            this.State = state;
             this.Reference = LuaRef.NoRef;
             this.ReferenceOwned = false;
             this.Function = function;
@@ -39,7 +39,7 @@ namespace LuaN
         /// </summary>
         public object[] Call(params object[] args)
         {
-            return Lua.CallFunction(this, args);
+            return State.CallFunction(this, args);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace LuaN
         /// </summary>
         public object[] Call(object[] args, Type[] typedResult)
         {
-            return Lua.CallFunction(this, args, typedResult);
+            return State.CallFunction(this, args, typedResult);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace LuaN
         protected internal override void Push()
         {
             if (Function != null)
-                Lua.State.LuaPushCFunction(Function);
+                State.LuaPushCFunction(Function);
             else
                 base.Push();
         }

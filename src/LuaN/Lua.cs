@@ -106,17 +106,7 @@ namespace LuaN
         /// </summary>
         protected void ThrowError(int restoreTop)
         {
-            Object err = ToValue(-1);
-
-            State.LuaSetTop(restoreTop);
-
-            if (err is LuaException)
-                throw (LuaException)err;
-
-            if (err == null)
-                err = "Unknown Lua error.";
-
-            throw new LuaException(err.ToString());
+            LuaDotnetHelper.ThrowError(State, restoreTop);
         }
 
         #region Stack management
@@ -126,13 +116,7 @@ namespace LuaN
         /// </summary>
         public Object Pop()
         {
-            if (State.LuaGetTop() > 0)
-            {
-                var result = ToValue(-1);
-                State.LuaPop(1);
-                return result;
-            }
-            return null;
+            return State.Pop();
         }
 
         /// <summary>
@@ -140,14 +124,7 @@ namespace LuaN
         /// </summary>
         public T Pop<T>()
         {
-            try
-            {
-                return (T)Convert.ChangeType(Pop(), typeof(T), System.Globalization.CultureInfo.InvariantCulture);
-            }
-            catch
-            {
-                return default(T);
-            }
+            return State.Pop<T>();
         }
 
         /// <summary>
@@ -155,16 +132,7 @@ namespace LuaN
         /// </summary>
         public Object[] PopValues(int n)
         {
-            List<Object> result = new List<object>();
-            if (n > 0)
-            {
-                int top = State.LuaGetTop();
-                int start = Math.Max(0, top - n);
-                result.AddRange(ToValues(start + 1, top, null));
-                while (result.Count < n) result.Add(null);
-                State.LuaSetTop(start);
-            }
-            return result.ToArray();
+            return State.PopValues(n);
         }
 
         #endregion
@@ -218,7 +186,7 @@ namespace LuaN
             var oldTop = State.LuaGetTop();
             if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
                 ThrowError(oldTop);
-            return this.Call(null, null);
+            return LuaDotnetHelper.Call(State, null, null);
         }
 
         /// <summary>
@@ -229,7 +197,7 @@ namespace LuaN
             var oldTop = State.LuaGetTop();
             if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
                 ThrowError(oldTop);
-            return this.Call(null, null);
+            return LuaDotnetHelper.Call(State, null, null);
         }
 
         /// <summary>
@@ -240,7 +208,7 @@ namespace LuaN
             var oldTop = State.LuaGetTop();
             if (State.LoadFile(filename) != LuaStatus.Ok)
                 ThrowError(oldTop);
-            return this.Call(null, null);
+            return LuaDotnetHelper.Call(State, null, null);
         }
 
         #endregion
@@ -248,276 +216,11 @@ namespace LuaN
         #region .Net objects management
 
         /// <summary>
-        /// 
-        /// </summary>
-        protected Object[] ToValues(int fromIdx, int toIdx, Type[] typedResult)
-        {
-            // Convert the result
-            List<Object> result = new List<object>();
-            if (toIdx != fromIdx)
-            {
-                int tPos = typedResult != null ? 0 : -1;
-                for (int i = fromIdx; i <= toIdx; i++)
-                {
-                    Object val = ToValue(i);
-                    if (typedResult != null)
-                    {
-                        // If we reach the end of the typedResult we stop the conversion
-                        if (tPos >= typedResult.Length) break;
-                        // Convert
-                        Type tpConv = typedResult[tPos++];
-                        if (tpConv != null)
-                        {
-                            try
-                            {
-                                val = Convert.ChangeType(val, tpConv, System.Globalization.CultureInfo.InvariantCulture);
-                            }
-                            catch { val = tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null ? Activator.CreateInstance(tpConv) : null; }
-                        }
-                    }
-                    result.Add(val);
-                }
-                if (typedResult != null)
-                {
-                    while (tPos < typedResult.Length)
-                    {
-                        Type tpConv = typedResult[tPos++];
-                        result.Add(
-                            tpConv != null && tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null
-                            ? Activator.CreateInstance(tpConv)
-                            : null
-                            );
-                    }
-                }
-            }
-            // Returns the result
-            return result.ToArray();
-        }
-
-        /// <summary>
-        /// Release the resource of a LuaValue
-        /// </summary>
-        internal protected virtual void DisposeLuaValue(LuaValue value)
-        {
-            if (value != null && value.Lua == this)
-            {
-                if (value.Reference != LuaRef.RefNil && value.Reference != LuaRef.NoRef)
-                {
-                    State.LuaUnref(value.Reference);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Call the referenced value 
-        /// </summary>
-        internal protected virtual Object[] CallValue(int reference, Object[] args, Type[] typedResult = null)
-        {
-            State.LuaPushRef(reference);
-            return Call(args, typedResult);
-        }
-
-        /// <summary>
-        /// Call a function
-        /// </summary>
-        internal protected virtual Object[] CallFunction(Object function, Object[] args, Type[] typedResult = null)
-        {
-            Push(function);
-            return Call(args, typedResult);
-        }
-
-        /// <summary>
-        /// Call a function pushed on the stack
-        /// </summary>
-        protected virtual Object[] Call(Object[] args, Type[] typedResult)
-        {
-            int nArgs = args != null ? args.Length : 0;
-
-            int oldTop = State.LuaGetTop() - 1; // -1 because the function is pushed
-
-            // Check the stack
-            State.LuaLCheckStack(nArgs + 2, "Lua stack overflow.");
-
-            // Push arguments
-            if(args!= null)
-            {
-                for (int i = 0; i < nArgs; i++)
-                    Push(args[i]);
-            }
-
-            // Call
-            if (State.LuaPCall(nArgs, State.MultiReturns, 0) != LuaStatus.Ok)
-                ThrowError(oldTop);
-
-            // Convert the result
-            int newTop = State.LuaGetTop();
-            var result = ToValues(oldTop+ 1, newTop, typedResult);
-            //List<Object> result = new List<object>();
-            //if (newTop != oldTop)
-            //{
-            //    int tPos = typedResult != null ? 0 : -1;
-            //    for (int i = oldTop + 1; i <= newTop; i++)
-            //    {
-            //        Object val = ToValue(i);
-            //        if (typedResult != null)
-            //        {
-            //            // If we reach the end of the typedResult we stop the conversion
-            //            if (tPos >= typedResult.Length) break;
-            //            // Convert
-            //            Type tpConv = typedResult[tPos++];
-            //            if (tpConv != null)
-            //            {
-            //                try {
-            //                    val = Convert.ChangeType(val, tpConv, System.Globalization.CultureInfo.InvariantCulture);
-            //                }
-            //                catch { val = tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null ? Activator.CreateInstance(tpConv) : null; }
-            //            }
-            //        }
-            //        result.Add(val);
-            //    }
-            //    if (typedResult != null)
-            //    {
-            //        while (tPos < typedResult.Length)
-            //        {
-            //            Type tpConv = typedResult[tPos++];
-            //            result.Add(
-            //                tpConv != null && tpConv.IsValueType && Nullable.GetUnderlyingType(tpConv) == null 
-            //                ? Activator.CreateInstance(tpConv) 
-            //                : null
-            //                );
-            //        }
-            //    }
-            //}
-            // Restore the stack
-            State.LuaSetTop(oldTop);
-            // Returns the result
-            return result.ToArray();
-        }
-
-        /// <summary>
-        /// Get the value of the field of a referenced value
-        /// </summary>
-        internal protected virtual Object GetFieldValue(int reference, String field)
-        {
-            var oldTop = State.LuaGetTop();
-            try
-            {
-                State.LuaPushRef(reference);
-                State.LuaGetField(-1, field);
-                return ToValue(-1);
-            }
-            finally
-            {
-                State.LuaSetTop(oldTop);
-            }
-        }
-
-        /// <summary>
-        /// Set the value of the field of a referenced value
-        /// </summary>
-        internal protected virtual void SetFieldValue(int reference, String field, object value)
-        {
-            var oldTop = State.LuaGetTop();
-            try
-            {
-                State.LuaPushRef(reference);
-                Push(value);
-                State.LuaSetField(-2, field);
-            }
-            finally
-            {
-                State.LuaSetTop(oldTop);
-            }
-        }
-
-        /// <summary>
-        /// Get the value of the field of a referenced value
-        /// </summary>
-        internal protected virtual Object GetFieldValue(int reference, int index)
-        {
-            var oldTop = State.LuaGetTop();
-            try
-            {
-                State.LuaPushRef(reference);
-                State.LuaGetI(-1, index);
-                return ToValue(-1);
-            }
-            finally
-            {
-                State.LuaSetTop(oldTop);
-            }
-        }
-
-        /// <summary>
-        /// Set the value of the field of a referenced value
-        /// </summary>
-        internal protected virtual void SetFieldValue(int reference, int index, object value)
-        {
-            var oldTop = State.LuaGetTop();
-            try
-            {
-                State.LuaPushRef(reference);
-                Push(value);
-                State.LuaSetI(-2, index);
-            }
-            finally
-            {
-                State.LuaSetTop(oldTop);
-            }
-        }
-
-        /// <summary>
-        /// Get the value of the field of a referenced value
-        /// </summary>
-        internal protected virtual Object GetFieldValue(int reference, object index)
-        {
-            var oldTop = State.LuaGetTop();
-            try
-            {
-                State.LuaPushRef(reference);
-                Push(index);
-                State.LuaGetTable(-2);
-                return ToValue(-1);
-            }
-            finally
-            {
-                State.LuaSetTop(oldTop);
-            }
-        }
-
-        /// <summary>
-        /// Set the value of the field of a referenced value
-        /// </summary>
-        internal protected virtual void SetFieldValue(int reference, object index, object value)
-        {
-            var oldTop = State.LuaGetTop();
-            try
-            {
-                State.LuaPushRef(reference);
-                Push(index);
-                Push(value);
-                State.LuaSetTable(-3);
-            }
-            finally
-            {
-                State.LuaSetTop(oldTop);
-            }
-        }
-
-        /// <summary>
         /// Convert a Lua value to a .Net table
         /// </summary>
         public virtual ILuaTable ToTable(int idx)
         {
-            // If the value is not a table return null
-            if (State.LuaType(idx) != LuaType.Table)
-                return null;
-            // Create the reference
-            State.LuaPushValue(idx);
-            var vref= State.LuaRef();
-            //if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
-            //    throw new InvalidOperationException("Can't create a reference for this value.");
-            return new LuaTable(this, vref);
+            return State.ToTable(idx);
         }
 
         /// <summary>
@@ -525,15 +228,7 @@ namespace LuaN
         /// </summary>
         public virtual ILuaUserData ToUserData(int idx)
         {
-            // If the value is not a userdata return null
-            if (!State.LuaIsUserData(idx))
-                return null;
-            // Create the reference
-            State.LuaPushValue(idx);
-            var vref = State.LuaRef();
-            //if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
-            //    throw new InvalidOperationException("Can't create a reference for this value.");
-            return new LuaUserData(this, vref);
+            return State.ToUserData(idx);
         }
 
         /// <summary>
@@ -541,21 +236,7 @@ namespace LuaN
         /// </summary>
         public virtual ILuaFunction ToFunction(int idx)
         {
-            // C function ?
-            if (State.LuaIsCFunction(idx))
-            {
-                return new LuaFunction(this, State.LuaToCFunction(idx));
-            }
-            else if (State.LuaIsFunction(idx))
-            {
-                // Create the reference
-                State.LuaPushValue(idx);
-                var vref = State.LuaRef();
-                //if (vref == LuaRef.RefNil || vref == LuaRef.NoRef)
-                //    throw new InvalidOperationException("Can't create a reference for this value.");
-                return new LuaFunction(this, vref);
-            }
-            return null;
+            return State.ToFunction(idx);
         }
 
         /// <summary>

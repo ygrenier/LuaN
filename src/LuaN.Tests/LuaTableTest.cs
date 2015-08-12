@@ -16,13 +16,11 @@ namespace LuaN.Tests
         public void TestCreate()
         {
             var mState = new Mock<ILuaState>();
-            var state = mState.Object;
-            Lua l;
             LuaValue v;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                v = new LuaTable(l, 123, true);
-                Assert.Same(l, v.Lua);
+                v = new LuaTable(state, 123, true);
+                Assert.Same(state, v.State);
                 Assert.Equal(123, v.Reference);
                 v.Dispose();
             }
@@ -32,12 +30,10 @@ namespace LuaN.Tests
         public void TestAccesByField()
         {
             var mState = new Mock<ILuaState>();
-            var state = mState.Object;
-            Lua l;
             LuaTable tbl;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                tbl = new LuaTable(l, 123, true);
+                tbl = new LuaTable(state, 123, true);
                 tbl["field1"] = 1234;
                 
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
@@ -55,12 +51,10 @@ namespace LuaN.Tests
         public void TestAccesByInteger()
         {
             var mState = new Mock<ILuaState>();
-            var state = mState.Object;
-            Lua l;
             LuaTable tbl;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                tbl = new LuaTable(l, 123, true);
+                tbl = new LuaTable(state, 123, true);
                 tbl[777] = 1234;
 
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());
@@ -78,12 +72,10 @@ namespace LuaN.Tests
         public void TestAccesByObject()
         {
             var mState = new Mock<ILuaState>();
-            var state = mState.Object;
-            Lua l;
             LuaTable tbl;
-            using (l = new Lua(state))
+            using (var state = mState.Object)
             {
-                tbl = new LuaTable(l, 123, true);
+                tbl = new LuaTable(state, 123, true);
                 tbl[777.77] = 1234;
 
                 mState.Verify(s => s.LuaRawGetI(state.RegistryIndex, 123), Times.Once());

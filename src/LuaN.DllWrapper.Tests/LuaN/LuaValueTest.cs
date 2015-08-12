@@ -13,38 +13,36 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestDispose()
         {
-            var state = new LuaState();
-            Lua l;
             LuaValue v;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.State.LuaNewTable();
-                var lref = l.State.LuaRef();
-                Assert.Equal(LuaType.Table, l.State.LuaPushRef(lref));
-                l.State.LuaPop(1);
-                v = new LuaTable(l, lref, true);
+                state.LuaNewTable();
+                var lref = state.LuaRef();
+                Assert.Equal(LuaType.Table, state.LuaPushRef(lref));
+                state.LuaPop(1);
+                v = new LuaTable(state, lref, true);
                 Assert.Equal(lref, v.Reference);
-                Assert.Same(l, v.Lua);
+                Assert.Same(state, v.State);
                 v.Dispose();
-                Assert.Null(v.Lua);
+                Assert.Null(v.State);
                 Assert.Equal(LuaRef.NoRef, v.Reference);
-                Assert.Equal(LuaType.Nil, l.State.LuaPushRef(lref));
-                l.State.LuaPop(1);
+                Assert.Equal(LuaType.Nil, state.LuaPushRef(lref));
+                state.LuaPop(1);
 
-                l.State.LuaNewTable();
-                lref = l.State.LuaRef();
-                Assert.Equal(LuaType.Table, l.State.LuaPushRef(lref));
-                l.State.LuaPop(1);
-                v = new LuaTable(l, lref, false);
+                state.LuaNewTable();
+                lref = state.LuaRef();
+                Assert.Equal(LuaType.Table, state.LuaPushRef(lref));
+                state.LuaPop(1);
+                v = new LuaTable(state, lref, false);
                 Assert.Equal(lref, v.Reference);
-                Assert.Same(l, v.Lua);
+                Assert.Same(state, v.State);
                 v.Dispose();
-                Assert.Null(v.Lua);
+                Assert.Null(v.State);
                 Assert.Equal(LuaRef.NoRef, v.Reference);
-                Assert.Equal(LuaType.Table, l.State.LuaPushRef(lref));
+                Assert.Equal(LuaType.Table, state.LuaPushRef(lref));
 
                 // Create a value for testing finalize
-                v = new LuaTable(l, 555);
+                v = new LuaTable(state, 555);
             }
             // Force the finalisation of the last value
             GC.Collect();

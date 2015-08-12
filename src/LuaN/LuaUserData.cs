@@ -15,9 +15,9 @@ namespace LuaN
         /// <summary>
         /// Create a new userdata reference
         /// </summary>
-        public LuaUserData(Lua lua, int reference, bool ownRef = true)
+        public LuaUserData(ILuaState state, int reference, bool ownRef = true)
         {
-            this.Lua = lua;
+            this.State = state;
             this.Reference = reference;
             this.ReferenceOwned = ownRef;
         }
@@ -27,7 +27,7 @@ namespace LuaN
         /// </summary>
         public object[] Call(params object[] args)
         {
-            return Lua.CallValue(Reference, args);
+            return State.CallValue(Reference, args);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace LuaN
         /// </summary>
         public object[] Call(object[] args, Type[] typedResult)
         {
-            return Lua.CallValue(Reference, args, typedResult);
+            return State.CallValue(Reference, args, typedResult);
         }
 
         /// <summary>
@@ -43,8 +43,8 @@ namespace LuaN
         /// </summary>
         public object this[String field]
         {
-            get { return Lua.GetFieldValue(Reference, field); }
-            set { Lua.SetFieldValue(Reference, field, value); }
+            get { return GetFieldValue(field); }
+            set { SetFieldValue(field, value); }
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace LuaN
         /// </summary>
         public object this[object index]
         {
-            get { return Lua.GetFieldValue(Reference, index); }
-            set { Lua.SetFieldValue(Reference, index, value); }
+            get { return GetFieldValue(index); }
+            set { SetFieldValue(index, value); }
         }
 
     }

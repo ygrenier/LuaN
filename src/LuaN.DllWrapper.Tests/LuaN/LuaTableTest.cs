@@ -13,13 +13,11 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestCreate()
         {
-            var state = new LuaState();
-            Lua l;
             LuaValue v;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                v = new LuaTable(l, 123, true);
-                Assert.Same(l, v.Lua);
+                v = new LuaTable(state, 123, true);
+                Assert.Same(state, v.State);
                 Assert.Equal(123, v.Reference);
                 v.Dispose();
             }
@@ -28,16 +26,14 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestAccesByField()
         {
-            var state = new LuaState();
-            Lua l;
             ILuaTable tbl;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.State.DoString(@"
+                state.DoString(@"
 table = { field1 = 1234, ['field 2'] = 'Test' }
 ");
-                l.State.LuaGetGlobal("table");
-                using (tbl = l.ToTable(-1))
+                state.LuaGetGlobal("table");
+                using (tbl = state.ToTable(-1))
                 {
                     Assert.Equal(1234d, tbl["field1"]);
                     Assert.Equal(null, tbl["field2"]);
@@ -46,28 +42,26 @@ table = { field1 = 1234, ['field 2'] = 'Test' }
                     tbl["field1"] = null;
                     tbl["field2"] = 4321;
                 }
-                Assert.Equal(1, l.State.LuaGetTop());
-                l.State.DoString(@"return table['field1'], table.field2, table['field 2']");
-                Assert.Equal(4, l.State.LuaGetTop());
-                Assert.Equal(null, l.ToValue(-3));
-                Assert.Equal(4321d, l.ToValue(-2));
-                Assert.Equal("Test", l.ToValue(-1));
+                Assert.Equal(1, state.LuaGetTop());
+                state.DoString(@"return table['field1'], table.field2, table['field 2']");
+                Assert.Equal(4, state.LuaGetTop());
+                Assert.Equal(null, state.ToValue(-3));
+                Assert.Equal(4321d, state.ToValue(-2));
+                Assert.Equal("Test", state.ToValue(-1));
             }
         }
 
         [Fact]
         public void TestAccesByInteger()
         {
-            var state = new LuaState();
-            Lua l;
             ILuaTable tbl;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.State.DoString(@"
+                state.DoString(@"
 table = { 1234, [3] = 'Test' }
 ");
-                l.State.LuaGetGlobal("table");
-                using (tbl = l.ToTable(-1))
+                state.LuaGetGlobal("table");
+                using (tbl = state.ToTable(-1))
                 {
                     Assert.Equal(1234d, tbl[1]);
                     Assert.Equal(null, tbl[2]);
@@ -76,32 +70,30 @@ table = { 1234, [3] = 'Test' }
                     tbl[1] = null;
                     tbl[2] = 4321;
                 }
-                Assert.Equal(1, l.State.LuaGetTop());
-                l.State.DoString(@"return table[1], table[2], table[3]");
-                Assert.Equal(4, l.State.LuaGetTop());
-                Assert.Equal(null, l.ToValue(-3));
-                Assert.Equal(4321d, l.ToValue(-2));
-                Assert.Equal("Test", l.ToValue(-1));
+                Assert.Equal(1, state.LuaGetTop());
+                state.DoString(@"return table[1], table[2], table[3]");
+                Assert.Equal(4, state.LuaGetTop());
+                Assert.Equal(null, state.ToValue(-3));
+                Assert.Equal(4321d, state.ToValue(-2));
+                Assert.Equal("Test", state.ToValue(-1));
             }
         }
 
         [Fact]
         public void TestAccesByObject()
         {
-            var state = new LuaState();
-            Lua l;
             ILuaTable tbl;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.State.LuaPushLightUserData(this);
-                l.State.LuaSetGlobal("idx2");
-                l.State.DoString(@"
+                state.LuaPushLightUserData(this);
+                state.LuaSetGlobal("idx2");
+                state.DoString(@"
 idx1 = 'field1'
 idx3 = 123.45
 table = { [idx1] = 1234, [idx3] = 'Test' }
 ");
-                l.State.LuaGetGlobal("table");
-                using (tbl = l.ToTable(-1))
+                state.LuaGetGlobal("table");
+                using (tbl = state.ToTable(-1))
                 {
                     Assert.Equal(1234d, tbl["field1"]);
                     Assert.Equal(null, tbl[this]);
@@ -110,12 +102,12 @@ table = { [idx1] = 1234, [idx3] = 'Test' }
                     tbl["field1"] = null;
                     tbl[this] = 4321;
                 }
-                Assert.Equal(1, l.State.LuaGetTop());
-                l.State.DoString(@"return table[idx1], table[idx2], table[idx3]");
-                Assert.Equal(4, l.State.LuaGetTop());
-                Assert.Equal(null, l.ToValue(-3));
-                Assert.Equal(4321d, l.ToValue(-2));
-                Assert.Equal("Test", l.ToValue(-1));
+                Assert.Equal(1, state.LuaGetTop());
+                state.DoString(@"return table[idx1], table[idx2], table[idx3]");
+                Assert.Equal(4, state.LuaGetTop());
+                Assert.Equal(null, state.ToValue(-3));
+                Assert.Equal(4321d, state.ToValue(-2));
+                Assert.Equal("Test", state.ToValue(-1));
             }
         }
 

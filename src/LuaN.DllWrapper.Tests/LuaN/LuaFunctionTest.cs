@@ -13,13 +13,11 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestCreateRef()
         {
-            var state = new LuaState();
-            Lua l;
             LuaFunction v;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                v = new LuaFunction(l, 123, true);
-                Assert.Same(l, v.Lua);
+                v = new LuaFunction(state, 123, true);
+                Assert.Same(state, v.State);
                 Assert.Equal(123, v.Reference);
                 Assert.Null(v.Function);
                 v.Dispose();
@@ -29,14 +27,12 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestCreateFunc()
         {
-            var state = new LuaState();
-            Lua l;
             LuaFunction v;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
                 LuaCFunction func = s => 0;
-                v = new LuaFunction(l, func);
-                Assert.Same(l, v.Lua);
+                v = new LuaFunction(state, func);
+                Assert.Same(state, v.State);
                 Assert.Equal(LuaRef.NoRef, v.Reference);
                 Assert.Same(func, v.Function);
                 v.Dispose();
@@ -46,21 +42,19 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestCall()
         {
-            var state = new LuaState();
-            Lua l;
             ILuaFunction fn;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.State.DoString(@"
+                state.DoString(@"
 function test(a,b,c,d,e,f)
  return b, a, 123.45, d
 end
 ");
-                l.State.LuaGetGlobal("test");
-                fn = l.ToFunction(-1);
+                state.LuaGetGlobal("test");
+                fn = state.ToFunction(-1);
                 Assert.Equal(new Object[] { null, true, 123.45, "Test" }, fn.Call(true, null, 1234, "Test"));
 
-                l.State.LuaPushCFunction(s =>
+                state.LuaPushCFunction(s =>
                 {
                     Assert.Equal(4, s.LuaGetTop());
                     Assert.Equal(true, s.LuaToBoolean(1));
@@ -74,7 +68,7 @@ end
                     s.LuaPushString("Test");
                     return 4;
                 });
-                fn = l.ToFunction(-1);
+                fn = state.ToFunction(-1);
                 Assert.Equal(new Object[] { null, true, 123.45, "Test" }, fn.Call(true, null, 1234, "Test"));
             }
         }
@@ -82,24 +76,22 @@ end
         [Fact]
         public void TestCallTyped()
         {
-            var state = new LuaState();
-            Lua l;
             ILuaFunction fn;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.State.DoString(@"
+                state.DoString(@"
 function test(a,b,c,d,e,f)
  return b, a, 123.45, d
 end
 ");
-                l.State.LuaGetGlobal("test");
-                fn = l.ToFunction(-1);
+                state.LuaGetGlobal("test");
+                fn = state.ToFunction(-1);
                 Assert.Equal(
                     new Object[] { null, "True", 123 }, 
                     fn.Call(new object[] { true, null, 1234, "Test" }, new Type[] { typeof(String), typeof(String), typeof(int) })
                     );
 
-                l.State.LuaPushCFunction(s =>
+                state.LuaPushCFunction(s =>
                 {
                     Assert.Equal(4, s.LuaGetTop());
                     Assert.Equal(true, s.LuaToBoolean(1));
@@ -113,7 +105,7 @@ end
                     s.LuaPushString("Test");
                     return 4;
                 });
-                fn = l.ToFunction(-1);
+                fn = state.ToFunction(-1);
                 Assert.Equal(
                     new Object[] { null, "True", 123 }, 
                     fn.Call(new object[] { true, null, 1234, "Test" }, new Type[] { typeof(String), typeof(String), typeof(int) })
