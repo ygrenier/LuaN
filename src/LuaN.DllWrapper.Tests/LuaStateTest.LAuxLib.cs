@@ -45,7 +45,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(10d, L.LuaToNumber(-1));
 
                 System.IO.File.WriteAllText(file, "return 2*");
-                Assert.Equal(LuaStatus.ErrorSyntax, L.LoadFile(file));
+                Assert.Equal(LuaStatus.ErrorSyntax, L.LuaLoadFile(file));
                 Assert.Equal(file + ":1: unexpected symbol near <eof>", L.LuaToString(-1));
             }
             System.IO.File.Delete(file);
@@ -62,7 +62,7 @@ namespace LuaN.DllWrapper.Tests
                 L.LuaCall(0, 1);
                 Assert.Equal(10d, L.LuaToNumber(-1));
 
-                Assert.Equal(LuaStatus.ErrorSyntax, L.LoadString("return 2*"));
+                Assert.Equal(LuaStatus.ErrorSyntax, L.LuaLoadString("return 2*"));
                 Assert.Equal("[string \"return 2*\"]:1: unexpected symbol near <eof>", L.LuaToString(-1));
             }
         }
@@ -78,7 +78,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(10d, L.LuaToNumber(-1));
 
                 System.IO.File.WriteAllText(file, "return 2*");
-                Assert.Equal(LuaStatus.ErrorSyntax, L.DoFile(file));
+                Assert.Equal(LuaStatus.ErrorSyntax, L.LuaDoFile(file));
                 Assert.Equal(file + ":1: unexpected symbol near <eof>", L.LuaToString(-1));
             }
             System.IO.File.Delete(file);
@@ -92,7 +92,7 @@ namespace LuaN.DllWrapper.Tests
                 Assert.Equal(LuaStatus.Ok, L.LuaLDoString("return 2*5"));
                 Assert.Equal(10d, L.LuaToNumber(-1));
 
-                Assert.Equal(LuaStatus.ErrorSyntax, L.DoString("return 2*"));
+                Assert.Equal(LuaStatus.ErrorSyntax, L.LuaDoString("return 2*"));
                 Assert.Equal("[string \"return 2*\"]:1: unexpected symbol near <eof>", L.LuaToString(-1));
             }
         }
@@ -532,7 +532,7 @@ namespace LuaN.DllWrapper.Tests
 
                     return 0;
                 });
-                L.DoString(@"
+                L.LuaDoString(@"
 function f1()
  TestTrace()
 end
@@ -576,7 +576,7 @@ f2()
             LuaState L = null;
             using (L = new LuaState())
             {
-                Assert.Equal(LuaStatus.Ok, L.LoadBuffer(Encoding.ASCII.GetBytes("return 2*7"), "name", "t"));
+                Assert.Equal(LuaStatus.Ok, L.LuaLoadBuffer(Encoding.ASCII.GetBytes("return 2*7"), "name", "t"));
                 Assert.Equal(LuaType.Function, L.LuaType(-1));
                 L.LuaPushValue(-1);
                 L.LuaCall(0, 1);
@@ -595,7 +595,7 @@ f2()
                     buffBytes = ms.ToArray();
                 }
 
-                Assert.Equal(LuaStatus.Ok, L.LoadBuffer(buffBytes, null));
+                Assert.Equal(LuaStatus.Ok, L.LuaLoadBuffer(buffBytes, null));
                 Assert.Equal(LuaType.Function, L.LuaType(-1));
                 L.LuaCall(0, 1);
                 Assert.Equal(14, L.LuaToNumber(-1));

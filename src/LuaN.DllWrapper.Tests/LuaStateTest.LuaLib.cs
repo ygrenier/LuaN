@@ -156,10 +156,10 @@ namespace LuaN.DllWrapper.Tests
                 {
                     List<String> output = new List<string>();
 
-                    Assert.Equal(LuaStatus.ErrorRun, L.DoString("print('First line', 123.45, false)"));
+                    Assert.Equal(LuaStatus.ErrorRun, L.LuaDoString("print('First line', 123.45, false)"));
                     L.LuaLOpenLibs();
 
-                    Assert.Equal(LuaStatus.Ok, L.DoString("print('First line', 123.45, false)"));
+                    Assert.Equal(LuaStatus.Ok, L.LuaDoString("print('First line', 123.45, false)"));
 
                     bool doHandled = false;
                     L.OnPrint += (s, e) =>
@@ -178,11 +178,11 @@ namespace LuaN.DllWrapper.Tests
                         e.Handled = doHandled;
                     };
 
-                    Assert.Equal(LuaStatus.Ok, L.DoString("print('Second line', 987.65, true)"));
+                    Assert.Equal(LuaStatus.Ok, L.LuaDoString("print('Second line', 987.65, true)"));
 
                     doHandled = true;
 
-                    Assert.Equal(LuaStatus.Ok, L.DoString("print('Third line', 555)"));
+                    Assert.Equal(LuaStatus.Ok, L.LuaDoString("print('Third line', 555)"));
 
                     Assert.Equal(
                         "First line\t123.45\tfalse" + Environment.NewLine
@@ -208,7 +208,7 @@ namespace LuaN.DllWrapper.Tests
                     });
                     L.LuaSetField(-2, "__tostring");
                     L.LuaSetMetatable(-2);
-                    Assert.Equal(LuaStatus.ErrorRun, L.DoString("print(ud)"));
+                    Assert.Equal(LuaStatus.ErrorRun, L.LuaDoString("print(ud)"));
                     Assert.Equal("[string \"print(ud)\"]:1: 'tostring' must return a string to 'print'", L.LuaToString(-1));
 
                 }

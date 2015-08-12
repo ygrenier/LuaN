@@ -83,7 +83,7 @@ namespace LuaN.DllWrapper.Tests
                 l.State.LuaSetTop(5);
                 l.State.LuaPushNil();
                 l.State.LuaSetGlobal("err");
-                l.State.LoadString("error(err)");
+                l.State.LuaLoadString("error(err)");
                 var fnc = l.ToFunction(-1);
                 var ex = Assert.Throws<LuaException>(() => fnc.Call());
                 Assert.Equal("Unknown Lua error.", ex.Message);
@@ -97,7 +97,7 @@ namespace LuaN.DllWrapper.Tests
                 l.State.LuaSetTop(5);
                 l.State.LuaPushString("Custom error");
                 l.State.LuaSetGlobal("err");
-                l.State.LoadString("error(err)");
+                l.State.LuaLoadString("error(err)");
                 var fnc = l.ToFunction(-1);
                 var ex = Assert.Throws<LuaException>(() => fnc.Call());
                 Assert.Equal("[string \"error(err)\"]:1: Custom error", ex.Message);
@@ -112,7 +112,7 @@ namespace LuaN.DllWrapper.Tests
                 l.State.LuaSetTop(5);
                 l.State.LuaPushLightUserData(myEx);
                 l.State.LuaSetGlobal("err");
-                l.State.LoadString("error(err)");
+                l.State.LuaLoadString("error(err)");
                 var fnc = l.ToFunction(-1);
                 var ex = Assert.Throws<LuaException>(() => fnc.Call());
                 Assert.Equal("My error", ex.Message);
@@ -381,7 +381,7 @@ namespace LuaN.DllWrapper.Tests
                 // Compile
                 using (var ms = new MemoryStream())
                 {
-                    l.State.LoadString("return 12.34, nil, false, 'test'");
+                    l.State.LuaLoadString("return 12.34, nil, false, 'test'");
                     l.State.LuaDump((s, p, c) => { ms.Write(p, 0, p.Length); return 0; }, null, true);
                     bytes = ms.ToArray();
                 }
@@ -446,7 +446,7 @@ namespace LuaN.DllWrapper.Tests
                 // Compile
                 using (var ms = new MemoryStream())
                 {
-                    l.State.LoadString("return 12.34, nil, false, 'test'");
+                    l.State.LuaLoadString("return 12.34, nil, false, 'test'");
                     l.State.LuaDump((s, p, c) => { ms.Write(p, 0, p.Length); return 0; }, null, true);
                     bytes = ms.ToArray();
                 }

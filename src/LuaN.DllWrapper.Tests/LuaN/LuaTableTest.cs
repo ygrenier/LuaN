@@ -29,7 +29,7 @@ namespace LuaN.DllWrapper.Tests
             ILuaTable tbl;
             using (var state = new LuaState())
             {
-                state.DoString(@"
+                state.LuaDoString(@"
 table = { field1 = 1234, ['field 2'] = 'Test' }
 ");
                 state.LuaGetGlobal("table");
@@ -43,7 +43,7 @@ table = { field1 = 1234, ['field 2'] = 'Test' }
                     tbl["field2"] = 4321;
                 }
                 Assert.Equal(1, state.LuaGetTop());
-                state.DoString(@"return table['field1'], table.field2, table['field 2']");
+                state.LuaDoString(@"return table['field1'], table.field2, table['field 2']");
                 Assert.Equal(4, state.LuaGetTop());
                 Assert.Equal(null, state.ToValue(-3));
                 Assert.Equal(4321d, state.ToValue(-2));
@@ -57,7 +57,7 @@ table = { field1 = 1234, ['field 2'] = 'Test' }
             ILuaTable tbl;
             using (var state = new LuaState())
             {
-                state.DoString(@"
+                state.LuaDoString(@"
 table = { 1234, [3] = 'Test' }
 ");
                 state.LuaGetGlobal("table");
@@ -71,7 +71,7 @@ table = { 1234, [3] = 'Test' }
                     tbl[2] = 4321;
                 }
                 Assert.Equal(1, state.LuaGetTop());
-                state.DoString(@"return table[1], table[2], table[3]");
+                state.LuaDoString(@"return table[1], table[2], table[3]");
                 Assert.Equal(4, state.LuaGetTop());
                 Assert.Equal(null, state.ToValue(-3));
                 Assert.Equal(4321d, state.ToValue(-2));
@@ -87,7 +87,7 @@ table = { 1234, [3] = 'Test' }
             {
                 state.LuaPushLightUserData(this);
                 state.LuaSetGlobal("idx2");
-                state.DoString(@"
+                state.LuaDoString(@"
 idx1 = 'field1'
 idx3 = 123.45
 table = { [idx1] = 1234, [idx3] = 'Test' }
@@ -103,7 +103,7 @@ table = { [idx1] = 1234, [idx3] = 'Test' }
                     tbl[this] = 4321;
                 }
                 Assert.Equal(1, state.LuaGetTop());
-                state.DoString(@"return table[idx1], table[idx2], table[idx3]");
+                state.LuaDoString(@"return table[idx1], table[idx2], table[idx3]");
                 Assert.Equal(4, state.LuaGetTop());
                 Assert.Equal(null, state.ToValue(-3));
                 Assert.Equal(4321d, state.ToValue(-2));

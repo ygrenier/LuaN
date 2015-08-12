@@ -16,7 +16,7 @@ namespace LuaN.Tests
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
 
-            StateExtensions.DoFile(state, "test");
+            StateExtensions.LuaDoFile(state, "test");
             mState.Verify(s => s.LuaLDoFile("test"), Times.Once());
         }
 
@@ -26,7 +26,7 @@ namespace LuaN.Tests
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
 
-            StateExtensions.DoString(state, "test");
+            StateExtensions.LuaDoString(state, "test");
             mState.Verify(s => s.LuaLDoString("test"), Times.Once());
         }
 
@@ -36,7 +36,7 @@ namespace LuaN.Tests
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
 
-            StateExtensions.LoadFile(state, "test");
+            StateExtensions.LuaLoadFile(state, "test");
             mState.Verify(s => s.LuaLLoadFile("test"), Times.Once());
         }
 
@@ -46,7 +46,7 @@ namespace LuaN.Tests
             var mState = new Mock<ILuaState>();
             var state = mState.Object;
 
-            StateExtensions.LoadString(state, "test");
+            StateExtensions.LuaLoadString(state, "test");
             mState.Verify(s => s.LuaLLoadString("test"), Times.Once());
         }
 
@@ -57,24 +57,24 @@ namespace LuaN.Tests
             var state = mState.Object;
 
             var buffer = new byte[10];
-            StateExtensions.LoadBuffer(state, buffer, "test");
+            StateExtensions.LuaLoadBuffer(state, buffer, "test");
             mState.Verify(s => s.LuaLLoadBuffer(buffer, 10, "test"), Times.Once());
 
-            StateExtensions.LoadBuffer(state, buffer, "test", "mode");
+            StateExtensions.LuaLoadBuffer(state, buffer, "test", "mode");
             mState.Verify(s => s.LuaLLoadBufferX(buffer, 10, "test", "mode"), Times.Once());
 
-            StateExtensions.LoadBuffer(state, "content", "test");
+            StateExtensions.LuaLoadBuffer(state, "content", "test");
             mState.Verify(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 7, "test"), Times.Once());
 
-            StateExtensions.LoadBuffer(state, (string)null, "chunk");
+            StateExtensions.LuaLoadBuffer(state, (string)null, "chunk");
             mState.Verify(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 0, "chunk"), Times.Once());
 
             mState.ResetCalls();
-            StateExtensions.LoadBuffer(state, (byte[])null, "chunk");
+            StateExtensions.LuaLoadBuffer(state, (byte[])null, "chunk");
             mState.Verify(s => s.LuaLLoadBuffer(It.IsAny<byte[]>(), 0, "chunk"), Times.Once());
 
             mState.ResetCalls();
-            StateExtensions.LoadBuffer(state, (byte[])null, "chunk", "mode");
+            StateExtensions.LuaLoadBuffer(state, (byte[])null, "chunk", "mode");
             mState.Verify(s => s.LuaLLoadBufferX(It.IsAny<byte[]>(), 0, "chunk", "mode"), Times.Once());
         }
 

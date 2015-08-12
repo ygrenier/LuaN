@@ -45,7 +45,7 @@ namespace LuaN.DllWrapper.Tests
             ILuaFunction fn;
             using (var state = new LuaState())
             {
-                state.DoString(@"
+                state.LuaDoString(@"
 function test(a,b,c,d,e,f)
  return b, a, 123.45, d
 end
@@ -79,7 +79,7 @@ end
             ILuaFunction fn;
             using (var state = new LuaState())
             {
-                state.DoString(@"
+                state.LuaDoString(@"
 function test(a,b,c,d,e,f)
  return b, a, 123.45, d
 end

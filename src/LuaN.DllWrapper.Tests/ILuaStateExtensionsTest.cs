@@ -54,7 +54,7 @@ namespace LuaN.DllWrapper.Tests
             // No results
             using (var l = new LuaState())
             {
-                l.LoadString("a=0");
+                l.LuaLoadString("a=0");
                 var func = l.ToFunction(-1);
                 var result = l.CallFunction(func, new Object[] { "field1", null, 12.34 });
                 Assert.Equal(new Object[0], result);
@@ -64,7 +64,7 @@ namespace LuaN.DllWrapper.Tests
             using (var l = new LuaState())
             {
                 l.LuaLOpenLibs();
-                l.LoadString("error()");
+                l.LuaLoadString("error()");
                 var func = l.ToFunction(-1);
                 var ex = Assert.Throws<LuaException>(() => l.CallFunction(func, new Object[] { "field1", null, 12.34 }));
                 Assert.Equal("Unknown Lua error.", ex.Message);
@@ -73,7 +73,7 @@ namespace LuaN.DllWrapper.Tests
             using (var l = new LuaState())
             {
                 l.LuaLOpenLibs();
-                l.LoadString("error('Error in the call')");
+                l.LuaLoadString("error('Error in the call')");
                 var func = l.ToFunction(-1);
                 var ex = Assert.Throws<LuaException>(() => l.CallFunction(func, new Object[] { "field1", null, 12.34 }));
                 Assert.Equal("[string \"error('Error in the call')\"]:1: Error in the call", ex.Message);
@@ -82,7 +82,7 @@ namespace LuaN.DllWrapper.Tests
             // Multiple results
             using (var l = new LuaState())
             {
-                l.DoString(@"
+                l.LuaDoString(@"
 function test(a,b,c,d)
  return b, d==nil, 123.45, 'Test'
 end
@@ -96,7 +96,7 @@ return test
             // Multiple results typed
             using (var l = new LuaState())
             {
-                l.DoString(@"
+                l.LuaDoString(@"
 function test(a,b,c,d)
  return a, d==nil, 123.45, 'Test'
 end
@@ -130,7 +130,7 @@ return test
             // Multiple results typed
             using (var l = new LuaState())
             {
-                l.DoString(@"
+                l.LuaDoString(@"
 function test(a,b,c,d)
  return a, d==nil, 123.45, 'Test'
 end
@@ -149,7 +149,7 @@ return test
             // No results
             using (var l = new LuaState())
             {
-                l.LoadString("a=0");
+                l.LuaLoadString("a=0");
                 var lref = l.LuaRef();
                 var result = l.CallValue(lref, new Object[] { "field1", null, 12.34 });
                 Assert.Equal(new Object[0], result);
@@ -159,7 +159,7 @@ return test
             using (var l = new LuaState())
             {
                 l.LuaLOpenLibs();
-                l.LoadString("error()");
+                l.LuaLoadString("error()");
                 var lref = l.LuaRef();
                 var ex = Assert.Throws<LuaException>(() => l.CallValue(lref, new Object[] { "field1", null, 12.34 }));
                 Assert.Equal("Unknown Lua error.", ex.Message);
@@ -168,7 +168,7 @@ return test
             using (var l = new LuaState())
             {
                 l.LuaLOpenLibs();
-                l.LoadString("error('Error in the call')");
+                l.LuaLoadString("error('Error in the call')");
                 var lref = l.LuaRef();
                 var ex = Assert.Throws<LuaException>(() => l.CallValue(lref, new Object[] { "field1", null, 12.34 }));
                 Assert.Equal("[string \"error('Error in the call')\"]:1: Error in the call", ex.Message);
@@ -177,7 +177,7 @@ return test
             // Multiple results
             using (var l = new LuaState())
             {
-                l.DoString(@"
+                l.LuaDoString(@"
 function test(a,b,c,d)
  return b, d==nil, 123.45, 'Test'
 end
@@ -191,7 +191,7 @@ return test
             // Multiple results typed
             using (var l = new LuaState())
             {
-                l.DoString(@"
+                l.LuaDoString(@"
 function test(a,b,c,d)
  return a, d==nil, 123.45, 'Test'
 end
@@ -205,7 +205,7 @@ return test
             // Multiple results typed
             using (var l = new LuaState())
             {
-                l.DoString(@"
+                l.LuaDoString(@"
 function test(a,b,c,d)
  return a, d==nil, 123.45, 'Test'
 end
@@ -219,7 +219,7 @@ return test
             // Multiple results typed
             using (var l = new LuaState())
             {
-                l.DoString(@"
+                l.LuaDoString(@"
 function test(a,b,c,d)
  return a, d==nil, 123.45, 'Test'
 end

@@ -220,7 +220,7 @@ namespace Lua
 
         static LuaStatus dofile(ILuaState L, String name)
         {
-            return dochunk(L, L.LoadFile(name));
+            return dochunk(L, L.LuaLoadFile(name));
         }
 
 
@@ -448,7 +448,7 @@ namespace Lua
             String fname = argv[idx];
             if (String.Compare(fname, "-") == 0 && String.Compare(argv[idx - 1], "--") != 0)
                 fname = null;  /* stdin */
-            status = L.LoadFile(fname);
+            status = L.LuaLoadFile(fname);
             if (status == LuaStatus.Ok)
             {
                 int n = pushargs(L);  /* push arguments to script */

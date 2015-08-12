@@ -101,14 +101,6 @@ namespace LuaN
 
         #endregion
 
-        /// <summary>
-        /// Throw an error from the stack and restore it
-        /// </summary>
-        protected void ThrowError(int restoreTop)
-        {
-            LuaDotnetHelper.ThrowError(State, restoreTop);
-        }
-
         #region Stack management
 
         /// <summary>
@@ -145,8 +137,8 @@ namespace LuaN
         public ILuaFunction LoadString(String chunk, String name)
         {
             var oldTop = State.LuaGetTop();
-            if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
-                ThrowError(oldTop);
+            if (State.LuaLoadBuffer(chunk, name) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(State, oldTop);
             var result = ToFunction(-1);
             State.LuaPop(1);
             return result;
@@ -158,8 +150,8 @@ namespace LuaN
         public ILuaFunction LoadString(byte[] chunk, String name)
         {
             var oldTop = State.LuaGetTop();
-            if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
-                ThrowError(oldTop);
+            if (State.LuaLoadBuffer(chunk, name) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(State, oldTop);
             var result = ToFunction(-1);
             State.LuaPop(1);
             return result;
@@ -171,8 +163,8 @@ namespace LuaN
         public ILuaFunction LoadFile(String filename)
         {
             var oldTop = State.LuaGetTop();
-            if (State.LoadFile(filename) != LuaStatus.Ok)
-                ThrowError(oldTop);
+            if (State.LuaLoadFile(filename) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(State, oldTop);
             var result = ToFunction(-1);
             State.LuaPop(1);
             return result;
@@ -184,8 +176,8 @@ namespace LuaN
         public Object[] DoString(String chunk, String name = "script")
         {
             var oldTop = State.LuaGetTop();
-            if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
-                ThrowError(oldTop);
+            if (State.LuaLoadBuffer(chunk, name) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(State, oldTop);
             return LuaDotnetHelper.Call(State, null, null);
         }
 
@@ -195,8 +187,8 @@ namespace LuaN
         public Object[] DoString(byte[] chunk, String name = "script")
         {
             var oldTop = State.LuaGetTop();
-            if (State.LoadBuffer(chunk, name) != LuaStatus.Ok)
-                ThrowError(oldTop);
+            if (State.LuaLoadBuffer(chunk, name) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(State, oldTop);
             return LuaDotnetHelper.Call(State, null, null);
         }
 
@@ -206,8 +198,8 @@ namespace LuaN
         public Object[] DoFile(String filename)
         {
             var oldTop = State.LuaGetTop();
-            if (State.LoadFile(filename) != LuaStatus.Ok)
-                ThrowError(oldTop);
+            if (State.LuaLoadFile(filename) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(State, oldTop);
             return LuaDotnetHelper.Call(State, null, null);
         }
 

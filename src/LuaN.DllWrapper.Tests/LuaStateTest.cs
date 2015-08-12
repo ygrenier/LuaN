@@ -448,7 +448,7 @@ namespace LuaN.DllWrapper.Tests
         void PushTestValues(LuaState L, LuaCFunction f = null, Object userData = null)
         {
             var oldTop = L.LuaGetTop();
-            L.DoString(@"
+            L.LuaDoString(@"
 function test1(a,b)
  return a * b
 end
@@ -1393,7 +1393,7 @@ end
                 Assert.Equal(1, L.LuaGetTop());
                 Assert.Equal(48, L.LuaToNumber(-1));
 
-                L.DoString(@"
+                L.LuaDoString(@"
 function testA(a,b)
  return a-b
 end
@@ -1453,7 +1453,7 @@ end
                 Assert.Equal(1, L.LuaGetTop());
                 Assert.Equal(48, L.LuaToNumber(-1));
 
-                L.DoString(@"
+                L.LuaDoString(@"
 function testA(a,b)
  return a-b
 end
@@ -1612,7 +1612,7 @@ return c..'!!'
                     return 0;
                 });
 
-                Assert.Equal(LuaStatus.Ok, L.DoString(@"
+                Assert.Equal(LuaStatus.Ok, L.LuaDoString(@"
 co = coroutine.create(test)
 print('1:', coroutine.resume(co, 1, 2))
 print('2:', coroutine.resume(co, 5, 8))
@@ -1679,7 +1679,7 @@ print('3:', coroutine.resume(co, 10, 12))
                     return 0;
                 });
 
-                Assert.Equal(LuaStatus.Ok, L.DoString(@"
+                Assert.Equal(LuaStatus.Ok, L.LuaDoString(@"
 co = coroutine.create(test)
 print('1:', coroutine.resume(co, 1, 2))
 print('2:', coroutine.resume(co, 5, 8))

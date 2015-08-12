@@ -300,7 +300,7 @@ end
                 Assert.Equal(0, L.LuaGetHookCount());
                 Assert.Equal(LuaHookMask.MaskCall | LuaHookMask.MaskLine | LuaHookMask.MaskRet, L.LuaGetHookMask());
 
-                L.DoString(@"print('start')
+                L.LuaDoString(@"print('start')
 
 function test(a,b)
  local c = a + b
@@ -325,7 +325,7 @@ print('end')
                 Assert.Equal(0, L.LuaGetHookCount());
                 Assert.Equal(LuaHookMask.None, L.LuaGetHookMask());
 
-                L.DoString(@"print('test after end')");
+                L.LuaDoString(@"print('test after end')");
 
                 int sk = 0;
                 Assert.Equal(67, output.Count);
@@ -419,13 +419,13 @@ print('end')
                 L.OnPrint += (s, e) => output.Add(e.Text);
                 L.LuaLOpenLibs();
 
-                L.DoString(@"
+                L.LuaDoString(@"
 function test(a,b)
  local c = a + b
  print('test ', a, b, c)
 end
 ");
-                L.DoString(@"print('start')");
+                L.LuaDoString(@"print('start')");
 
                 L.LuaSetHook((state, ar) =>
                 {
@@ -459,7 +459,7 @@ end
                     }
 
                 }, LuaHookMask.MaskLine, 0);
-                L.DoString(@"print('Call1',test(1,2))");
+                L.LuaDoString(@"print('Call1',test(1,2))");
                 L.LuaSetHook(null, LuaHookMask.None, 0);
 
                 using (var ar = L.NewLuaDebug())
