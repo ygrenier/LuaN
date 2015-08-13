@@ -140,6 +140,82 @@ namespace LuaN
 
         #endregion
 
+        #region Chunk management
+
+        /// <summary>
+        /// Load a chunk from a string and returns the function
+        /// </summary>
+        public static ILuaFunction LoadString(this ILuaState L, String chunk, String name)
+        {
+            var oldTop = L.LuaGetTop();
+            if (L.LuaLoadBuffer(chunk, name) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(L, oldTop);
+            var result = L.ToFunction(-1);
+            L.LuaPop(1);
+            return result;
+        }
+
+        /// <summary>
+        /// Load a chunk from a buffer and returns the function
+        /// </summary>
+        public static ILuaFunction LoadString(this ILuaState L, byte[] chunk, String name)
+        {
+            var oldTop = L.LuaGetTop();
+            if (L.LuaLoadBuffer(chunk, name) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(L, oldTop);
+            var result = L.ToFunction(-1);
+            L.LuaPop(1);
+            return result;
+        }
+
+        /// <summary>
+        /// Load a chunk from a file and returns the function
+        /// </summary>
+        public static ILuaFunction LoadFile(this ILuaState L, String filename)
+        {
+            var oldTop = L.LuaGetTop();
+            if (L.LuaLoadFile(filename) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(L, oldTop);
+            var result = L.ToFunction(-1);
+            L.LuaPop(1);
+            return result;
+        }
+
+        /// <summary>
+        /// Execute a Lua chunk from a string and returns all values in an array
+        /// </summary>
+        public static Object[] DoString(this ILuaState L, String chunk, String name = "script")
+        {
+            var oldTop = L.LuaGetTop();
+            if (L.LuaLoadBuffer(chunk, name) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(L, oldTop);
+            return LuaDotnetHelper.Call(L, null, null);
+        }
+
+        /// <summary>
+        /// Execute a Lua chunk from a buffer and returns all values in an array
+        /// </summary>
+        public static Object[] DoString(this ILuaState L, byte[] chunk, String name = "script")
+        {
+            var oldTop = L.LuaGetTop();
+            if (L.LuaLoadBuffer(chunk, name) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(L, oldTop);
+            return LuaDotnetHelper.Call(L, null, null);
+        }
+
+        /// <summary>
+        /// Execute a Lua chunk from a file and returns all values in an array
+        /// </summary>
+        public static Object[] DoFile(this ILuaState L, String filename)
+        {
+            var oldTop = L.LuaGetTop();
+            if (L.LuaLoadFile(filename) != LuaStatus.Ok)
+                LuaDotnetHelper.ThrowError(L, oldTop);
+            return LuaDotnetHelper.Call(L, null, null);
+        }
+
+        #endregion
+
         #region .Net object specific methods
 
         /// <summary>

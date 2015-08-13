@@ -65,7 +65,6 @@
     <Compile Include="LuaKFunctionWrapperTest.cs" />
     <Compile Include="LuaN\LuaFunctionTest.cs" />
     <Compile Include="LuaN\LuaTableTest.cs" />
-    <Compile Include="LuaN\LuaTest.cs" />
     <Compile Include="LuaN\LuaUserDataTest.cs" />
     <Compile Include="LuaN\LuaValueTest.cs" />
     <Compile Include="LuaStateTest.Debug.cs" />

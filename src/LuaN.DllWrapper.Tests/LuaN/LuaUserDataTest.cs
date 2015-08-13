@@ -26,20 +26,18 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestCall()
         {
-            var state = new LuaState();
-            Lua l;
             ILuaUserData ud;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.Push(this);
+                state.Push(this);
 
-                using (ud = l.ToUserData(1))
+                using (ud = state.ToUserData(1))
                 {
                     var ex = Assert.Throws<LuaException>(() => ud.Call(true, null, 1234, "Test"));
                     Assert.Equal("attempt to call a userdata value", ex.Message);
 
-                    l.State.LuaNewTable();
-                    using(var mt = l.ToTable(-1))
+                    state.LuaNewTable();
+                    using(var mt = state.ToTable(-1))
                     {
                         mt["__call"] = (LuaCFunction)(s=>
                         {
@@ -57,7 +55,7 @@ namespace LuaN.DllWrapper.Tests
                             return 4;
                         });
                     }
-                    l.State.LuaSetMetatable(1);
+                    state.LuaSetMetatable(1);
 
                     Assert.Equal(new Object[] { null, true, 123.45, "Test" }, ud.Call(true, null, 1234, "Test"));
                 }
@@ -67,20 +65,18 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestCallTyped()
         {
-            var state = new LuaState();
-            Lua l;
             ILuaUserData ud;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.Push(this);
+                state.Push(this);
 
-                using (ud = l.ToUserData(1))
+                using (ud = state.ToUserData(1))
                 {
                     var ex = Assert.Throws<LuaException>(() => ud.Call(new object[] { true, null, 1234, "Test" }, new Type[] { typeof(String), typeof(String), typeof(int) }));
                     Assert.Equal("attempt to call a userdata value", ex.Message);
 
-                    l.State.LuaNewTable();
-                    using (var mt = l.ToTable(-1))
+                    state.LuaNewTable();
+                    using (var mt = state.ToTable(-1))
                     {
                         mt["__call"] = (LuaCFunction)(s =>
                         {
@@ -98,7 +94,7 @@ namespace LuaN.DllWrapper.Tests
                             return 4;
                         });
                     }
-                    l.State.LuaSetMetatable(1);
+                    state.LuaSetMetatable(1);
 
                     Assert.Equal(
                         new Object[] { null, "True", 123 }, 
@@ -111,14 +107,12 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestAccesByField()
         {
-            var state = new LuaState();
-            Lua l;
             ILuaUserData ud;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.Push(this);
+                state.Push(this);
 
-                using (ud = l.ToUserData(1))
+                using (ud = state.ToUserData(1))
                 {
                     var ex = Assert.Throws<LuaException>(() => Assert.Null(ud["field1"]));
                     Assert.Equal("attempt to index a userdata value", ex.Message);
@@ -126,19 +120,19 @@ namespace LuaN.DllWrapper.Tests
                     ex = Assert.Throws<LuaException>(() => ud["field1"] = 1234);
                     Assert.Equal("attempt to index a userdata value", ex.Message);
 
-                    l.State.LuaNewTable();
-                    using(var mt = l.ToTable(-1))
+                    state.LuaNewTable();
+                    using(var mt = state.ToTable(-1))
                     {
-                        l.State.LuaNewTable();
-                        using (var idx = l.ToTable(-1))
+                        state.LuaNewTable();
+                        using (var idx = state.ToTable(-1))
                         {
                             idx["field1"] = 9876;
                             mt["__index"] = idx;
                             mt["__newindex"] = idx;
                         }
-                        l.State.LuaPop(1);
+                        state.LuaPop(1);
                     }
-                    l.State.LuaSetMetatable(1);
+                    state.LuaSetMetatable(1);
 
                     Assert.Equal(9876d, ud["field1"]);
                     ud["field1"] = 1234d;
@@ -150,14 +144,12 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestAccesByObject()
         {
-            var state = new LuaState();
-            Lua l;
             ILuaUserData ud;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.Push(this);
+                state.Push(this);
 
-                using (ud = l.ToUserData(1))
+                using (ud = state.ToUserData(1))
                 {
                     double key = 98.76;
 
@@ -167,19 +159,19 @@ namespace LuaN.DllWrapper.Tests
                     ex = Assert.Throws<LuaException>(() => ud[key] = 1234);
                     Assert.Equal("attempt to index a userdata value", ex.Message);
 
-                    l.State.LuaNewTable();
-                    using (var mt = l.ToTable(-1))
+                    state.LuaNewTable();
+                    using (var mt = state.ToTable(-1))
                     {
-                        l.State.LuaNewTable();
-                        using (var idx = l.ToTable(-1))
+                        state.LuaNewTable();
+                        using (var idx = state.ToTable(-1))
                         {
                             idx[key] = 9876;
                             mt["__index"] = idx;
                             mt["__newindex"] = idx;
                         }
-                        l.State.LuaPop(1);
+                        state.LuaPop(1);
                     }
-                    l.State.LuaSetMetatable(1);
+                    state.LuaSetMetatable(1);
 
                     Assert.Equal(9876d, ud[key]);
                     ud[key] = 1234d;

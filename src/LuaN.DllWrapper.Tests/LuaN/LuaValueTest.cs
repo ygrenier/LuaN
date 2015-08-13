@@ -51,18 +51,16 @@ namespace LuaN.DllWrapper.Tests
         [Fact]
         public void TestPush()
         {
-            var state = new LuaState();
-            Lua l;
             LuaValue v;
-            using (l = new Lua(state))
+            using (var state = new LuaState())
             {
-                l.State.LuaNewTable();
-                using (v = (LuaValue)l.ToTable(-1))
+                state.LuaNewTable();
+                using (v = (LuaValue)state.ToTable(-1))
                 {
-                    v.Push(l.State);
-                    Assert.True(l.State.LuaCompare(1, 2, LuaRelOperator.EQ));
+                    v.Push(state);
+                    Assert.True(state.LuaCompare(1, 2, LuaRelOperator.EQ));
                 }
-                Assert.Throws<ArgumentException>(() => v.Push(l.State));
+                Assert.Throws<ArgumentException>(() => v.Push(state));
                 Assert.Throws<ArgumentNullException>(() => v.Push(null));
             }
         }
