@@ -46,6 +46,12 @@ namespace LuaN
         /// Register a specific dotnet metatable
         /// </summary>
         void RegisterDotnetMetatable(String metatableName);
+
+        /// <summary>
+        /// Call when the GC free an userdata
+        /// </summary>
+        void ReleaseUserData(int idx);
+
     }
 
 }

@@ -194,8 +194,16 @@ namespace LuaN
             L.LuaSetField(-2, "__index");
 
             L.LuaPushValue(-1);
+            L.LuaPushCFunction(DotnetObjectMeta_NewIndex);
+            L.LuaSetField(-2, "__newindex");
+
+            L.LuaPushValue(-1);
             L.LuaPushCFunction(DotnetObjectMeta_Call);
             L.LuaSetField(-2, "__call");
+
+            L.LuaPushValue(-1);
+            L.LuaPushCFunction(DotnetObjectMeta_GC);
+            L.LuaSetField(-2, "__gc");
 
             L.LuaSetTop(oldTop);
         }
@@ -277,44 +285,152 @@ namespace LuaN
                 {
                     String memberName = L.LuaToString(2);
                     var member = tpObj.GetMember(memberName).FirstOrDefault();
-                    if (member == null)
-                        L.LuaLError(String.Format("Unknown member '{0}' on object '{1}'.", memberName, tpObj.FullName));
-                    // Property or Field ?
-                    if (member is PropertyInfo)
+                    if (member != null)
                     {
-                        L.Push(((PropertyInfo)member).GetValue(obj, null));
-                        return 1;
+                        // Property or Field ?
+                        if (member is PropertyInfo)
+                        {
+                            L.Push(((PropertyInfo)member).GetValue(obj, null));
+                            return 1;
+                        }
+                        else if (member is FieldInfo)
+                        {
+                            L.Push(((FieldInfo)member).GetValue(obj));
+                            return 1;
+                        }
+                        else if (member is MethodInfo)
+                        {
+                            L.Push(new DotnetMethod(obj, tpObj.GetMember(memberName).OfType<MethodInfo>().ToArray()));
+                            return 1;
+                        }
+                        else
+                            L.LuaLError(String.Format("Not supported member '{0}' of type '{1}'", memberName, member.GetType().FullName));
                     }
-                    else if (member is FieldInfo)
-                    {
-                        L.Push(((FieldInfo)member).GetValue(obj));
-                        return 1;
-                    }
-                    else if (member is MethodInfo)
-                    {
-                        L.Push(new DotnetMethod(obj, tpObj.GetMember(memberName).OfType<MethodInfo>().ToArray()));
-                        return 1;
-                    }
-                    else
-                        L.LuaLError(String.Format("Not supported member '{0}' of type '{1}'", memberName, member.GetType().FullName));
                 }
                 // Search an indexed property
-                var idxProperty = tpObj.GetProperties().Where(p =>
+                PropertyInfo idxProperty = null;
+                Object bestKey = null;
+                int score = -1;
+                foreach (var p in tpObj.GetProperties())
                 {
                     var prms = p.GetIndexParameters();
-                    if (prms.Length != 1) return false;
-                    if (prms[0].ParameterType != key.GetType()) return false;
-                    return true;
-                }).FirstOrDefault();
+                    if (prms.Length != 1) continue;
+                    if (prms[0].ParameterType == key.GetType())
+                    {
+                        idxProperty = p;
+                        score = 1000;
+                        bestKey = key;
+                        break;
+                    };
+                    try
+                    {
+                        var fKey = Convert.ChangeType(key, prms[0].ParameterType, System.Globalization.CultureInfo.InvariantCulture);
+                        var fScore = prms[0].ParameterType == typeof(String) ? 100 : 500;
+                        if (fScore > score)
+                        {
+                            bestKey = fKey;
+                            score = fScore;
+                            idxProperty = p;
+                        }
+                    }
+                    catch { }
+                }
                 if (idxProperty == null)
                     L.LuaLError("Attempt to access an unknown member.");
-                L.Push(idxProperty.GetValue(obj, new Object[] { key }));
+                L.Push(idxProperty.GetValue(obj, new Object[] { bestKey }));
                 return 1;
             }
             catch (LuaException) { throw; }
             catch (Exception ex)
             {
-                L.LuaLError(ex.Message);
+                L.LuaLError(ex.GetBaseException().Message);
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// __newindex
+        /// </summary>
+        public static int DotnetObjectMeta_NewIndex(ILuaState L)
+        {
+            try
+            {
+                var obj = L.LuaToUserData(1);
+                if (obj == null) L.LuaLError("Attempt to set a member of a null object.");
+                var key = L.ToObject(2);
+                if (key == null) L.LuaLError("Attempt to set a null index.");
+                var value = L.ToValue(3);
+                var tpObj = obj.GetType();
+                // If key is 'string' try get members
+                if (L.LuaType(2) == LuaType.String)
+                {
+                    String memberName = L.LuaToString(2);
+                    var member = tpObj.GetMember(memberName).FirstOrDefault();
+                    if (member != null)
+                    {
+                        // Property or Field ?
+                        if (member is PropertyInfo)
+                        {
+                            if (!((PropertyInfo)member).CanWrite)
+                                L.LuaLError(String.Format("Attempt to set the readonly '{0}' property on object '{1}'.", memberName, tpObj.FullName));
+                            value = Convert.ChangeType(value, ((PropertyInfo)member).PropertyType, System.Globalization.CultureInfo.InvariantCulture);
+                            ((PropertyInfo)member).SetValue(obj, value, null);
+                            return 0;
+                        }
+                        else if (member is FieldInfo)
+                        {
+                            value = Convert.ChangeType(value, ((FieldInfo)member).FieldType, System.Globalization.CultureInfo.InvariantCulture);
+                            ((FieldInfo)member).SetValue(obj, value);
+                            return 0;
+                        }
+                        else if (member is MethodInfo)
+                        {
+                            L.LuaLError("Attempt to set a mathod.");
+                        }
+                        else
+                            L.LuaLError(String.Format("Not supported member '{0}' of type '{1}'", memberName, member.GetType().FullName));
+                    }
+                }
+                // Search an indexed property
+                PropertyInfo idxProperty = null;
+                Object bestKey = null;
+                int score = -1;
+                foreach (var p in tpObj.GetProperties())
+                {
+                    var prms = p.GetIndexParameters();
+                    if (prms.Length != 1) continue;
+                    if (prms[0].ParameterType == key.GetType())
+                    {
+                        idxProperty = p;
+                        score = 1000;
+                        bestKey = key;
+                        break;
+                    };
+                    try
+                    {
+                        var fKey = Convert.ChangeType(key, prms[0].ParameterType, System.Globalization.CultureInfo.InvariantCulture);
+                        var fScore = prms[0].ParameterType == typeof(String) ? 100 : 500;
+                        if (fScore > score)
+                        {
+                            bestKey = fKey;
+                            score = fScore;
+                            idxProperty = p;
+                        }
+                    }
+                    catch { }
+                }
+                if (idxProperty == null)
+                    L.LuaLError("Attempt to set an unknown member.");
+                if (!idxProperty.CanWrite)
+                    L.LuaLError(String.Format("Attempt to set the readonly indexed property."));
+                value = Convert.ChangeType(value, idxProperty.PropertyType, System.Globalization.CultureInfo.InvariantCulture);
+                idxProperty.SetValue(obj, value, new Object[] { bestKey });
+                return 0;
+            }
+            catch (LuaException) { throw; }
+            catch (Exception ex)
+            {
+                L.LuaLError(ex.GetBaseException().Message);
             }
             return 0;
         }
@@ -363,7 +479,26 @@ namespace LuaN
             catch (LuaException) { throw; }
             catch (Exception ex)
             {
-                L.LuaLError(ex.Message);
+                L.LuaLError(ex.GetBaseException().Message);
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// __gc
+        /// </summary>
+        public static int DotnetObjectMeta_GC(ILuaState L)
+        {
+            try
+            {
+                var ldn = L.GetService<ILuaDotnet>();
+                if (ldn != null)
+                    ldn.ReleaseUserData(1);
+            }
+            catch (LuaException) { throw; }
+            catch (Exception ex)
+            {
+                L.LuaLError(ex.GetBaseException().Message);
             }
             return 0;
         }

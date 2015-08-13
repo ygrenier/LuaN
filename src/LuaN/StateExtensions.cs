@@ -22,6 +22,14 @@ namespace LuaN
 
         #region Aliases
         /// <summary>
+        /// Alias to LuaLToLString
+        /// </summary>
+        public static String LuaLToString(this ILuaState L, int idx)
+        {
+            uint len;
+            return L.LuaLToLString(idx, out len);
+        }
+        /// <summary>
         /// Alias to LuaToNumberX
         /// </summary>
         public static Double LuaToNumber(this ILuaState L, int idx, out Boolean isnum)

@@ -52,6 +52,11 @@ namespace LuaN.DllWrapper.Tests
 
             ud = index.Add(nud);
             Assert.Same(ud, index.FindData(nud));
+
+            DateTime dt = DateTime.Now;
+            ud = index.Add(dt);
+            Assert.Same(ud, index.FindData(dt));
+
         }
 
         [Fact]

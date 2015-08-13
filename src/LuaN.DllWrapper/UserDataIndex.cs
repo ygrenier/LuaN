@@ -50,7 +50,7 @@ namespace LuaN.DllWrapper
             hash = (SByte)(data.GetHashCode() >> 24);
             if (!_DataIndex.TryGetValue(hash, out lst))
                 return null;
-            return lst.FirstOrDefault(u => u.Data == data);
+            return lst.FirstOrDefault(u => Object.Equals(u.Data, data));
         }
 
         /// <summary>
