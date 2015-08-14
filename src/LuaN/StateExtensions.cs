@@ -307,7 +307,7 @@ namespace LuaN
             var ldn = L.GetService<ILuaDotnet>();
             if (ldn != null)
                 return ldn.ToTable(idx);
-            return LuaDotnetHelper.ToTable(L, idx);
+            return LuaDotnetHelper.DefaultToTable(L, idx);
         }
 
         /// <summary>
@@ -319,7 +319,7 @@ namespace LuaN
             var ldn = L.GetService<ILuaDotnet>();
             if (ldn != null)
                 return ldn.ToUserData(idx);
-            return LuaDotnetHelper.ToUserData(L, idx);
+            return LuaDotnetHelper.DefaultToUserData(L, idx);
         }
 
         /// <summary>
@@ -331,46 +331,19 @@ namespace LuaN
             var ldn = L.GetService<ILuaDotnet>();
             if (ldn != null)
                 return ldn.ToFunction(idx);
-            return LuaDotnetHelper.ToFunction(L, idx);
+            return LuaDotnetHelper.DefaultToFunction(L, idx);
         }
 
         /// <summary>
         /// Convert the Lua value at the index to a .Net object corresponding
         /// </summary>
-        public static Object ToObject(this ILuaState L, int idx)
-        {
-            return L.ToValue(idx);
-        }
         public static Object ToValue(this ILuaState L, int idx)
         {
             if (L == null) return null;
             var ldn = L.GetService<ILuaDotnet>();
             if (ldn != null)
                 return ldn.ToValue(idx);
-            var tp = L.LuaType(idx);
-            switch (tp)
-            {
-                case LuaType.Boolean:
-                    return L.LuaToBoolean(idx);
-                case LuaType.Number:
-                    return L.LuaToNumber(idx);
-                case LuaType.String:
-                    return L.LuaToString(idx);
-                case LuaType.LightUserData:
-                    return L.LuaToUserData(idx);
-                case LuaType.UserData:
-                    return L.ToUserData(idx);
-                case LuaType.Table:
-                    return L.ToTable(idx);
-                case LuaType.Function:
-                    return L.ToFunction(idx);
-                case LuaType.Thread:
-                    return L.LuaToThread(idx);
-                case LuaType.None:
-                case LuaType.Nil:
-                default:
-                    return null;
-            }
+            return LuaDotnetHelper.DefaultToValue(L, idx);
         }
 
         /// <summary>
@@ -385,8 +358,7 @@ namespace LuaN
             }
             else
             {
-                L.LuaPushLightUserData(value);
-                L.LuaLSetMetatable(LuaDotnetHelper.DotnetObjectMetatableName);
+                LuaDotnetHelper.DefaultPushNetObject(L, value);
             }
         }
 
@@ -401,29 +373,7 @@ namespace LuaN
                 ldn.Push(value);
                 return;
             }
-            if (value == null)
-                L.LuaPushNil();
-            else if (value is Boolean)
-                L.LuaPushBoolean((Boolean)value);
-            else if (value is Single || value is Double || value is Decimal)
-                L.LuaPushNumber(Convert.ToDouble(value));
-            else if (value is SByte || value is Byte || value is Int16 || value is UInt16 || value is Int32 || value is UInt16 || value is Int64 || value is UInt64)
-                L.LuaPushInteger(Convert.ToInt64(value));
-            else if (value is Char || value is String)
-                L.LuaPushString(value.ToString());
-            else if (value is ILuaNativeUserData)
-                throw new InvalidOperationException("Can't push a userdata");
-            else if (value is LuaCFunction)
-                L.LuaPushCFunction((LuaCFunction)value);
-            else if (value is ILuaState)
-                if (value == L)
-                    L.LuaPushThread();
-                else
-                    throw new InvalidOperationException("Can't push a different thread");
-            else if (value is ILuaValue)
-                ((ILuaValue)value).Push(L);
-            else
-                L.PushNetObject(value);
+            LuaDotnetHelper.DefaultPush(L, value);
         }
 
         /// <summary>

@@ -46,7 +46,7 @@ namespace LuaN
 
                 List<Object> args = new List<object>();
                 for (int i = 2; i <= oldTop; i++)
-                    args.Add(L.ToObject(i));
+                    args.Add(L.ToValue(i));
                 var ctor = LuaDotnetHelper.FindBestMethod(tp.GetConstructors(), args);
                 Object obj = null;
                 if (ctor != null)
@@ -76,7 +76,7 @@ namespace LuaN
         static int Lib_Each(ILuaState L)
         {
             try {
-                var obj = L.ToObject(1);
+                var obj = L.ToValue(1);
                 IEnumerable enObj = obj as IEnumerable;
                 if (enObj == null) L.LuaLError("Not an enumerable");
                 L.LuaPushCFunction(EachNext);
@@ -93,7 +93,7 @@ namespace LuaN
         {
             try
             {
-                var obj = L.ToObject(1);
+                var obj = L.ToValue(1);
                 IEnumerator enObj = obj as IEnumerator;
                 if (enObj != null)
                 {
@@ -119,7 +119,7 @@ namespace LuaN
                 var top = L.LuaGetTop();
                 for (int i = 1; i <= top; i++)
                 {
-                    var val = L.ToObject(i);
+                    var val = L.ToValue(i);
                     if (val == null) L.LuaPushNil();
                     else L.PushNetObject(val.GetType());
                 }

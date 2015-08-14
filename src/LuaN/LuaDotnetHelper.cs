@@ -18,6 +18,77 @@ namespace LuaN
         public const String DotnetObjectMetatableName = "LuaN:DotnetObject";
 
         /// <summary>
+        /// Default Push
+        /// </summary>
+        public static void DefaultPush(ILuaState L, Object value)
+        {
+            if (value == null)
+                L.LuaPushNil();
+            else if (value is Boolean)
+                L.LuaPushBoolean((Boolean)value);
+            else if (value is Single || value is Double || value is Decimal)
+                L.LuaPushNumber(Convert.ToDouble(value));
+            else if (value is SByte || value is Byte || value is Int16 || value is UInt16 || value is Int32 || value is UInt16 || value is Int64 || value is UInt64)
+                L.LuaPushInteger(Convert.ToInt64(value));
+            else if (value is Char || value is String)
+                L.LuaPushString(value.ToString());
+            else if (value is ILuaNativeUserData)
+                throw new InvalidOperationException("Can't push a userdata");
+            else if (value is LuaCFunction)
+                L.LuaPushCFunction((LuaCFunction)value);
+            else if (value is ILuaState)
+                if (value == L)
+                    L.LuaPushThread();
+                else
+                    throw new InvalidOperationException("Can't push a different thread");
+            else if (value is ILuaValue)
+                ((ILuaValue)value).Push(L);
+            else
+                L.PushNetObject(value);
+        }
+
+        /// <summary>
+        /// Default ToValue
+        /// </summary>
+        public static Object DefaultToValue(ILuaState L, int idx)
+        {
+            if (L == null) return null;
+            var tp = L.LuaType(idx);
+            switch (tp)
+            {
+                case LuaType.Boolean:
+                    return L.LuaToBoolean(idx);
+                case LuaType.Number:
+                    return L.LuaToNumber(idx);
+                case LuaType.String:
+                    return L.LuaToString(idx);
+                case LuaType.LightUserData:
+                    return L.LuaToUserData(idx);
+                case LuaType.UserData:
+                    return L.ToUserData(idx);
+                case LuaType.Table:
+                    return L.ToTable(idx);
+                case LuaType.Function:
+                    return L.ToFunction(idx);
+                case LuaType.Thread:
+                    return L.LuaToThread(idx);
+                case LuaType.None:
+                case LuaType.Nil:
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Default push a value as a .Net object
+        /// </summary>
+        public static void DefaultPushNetObject(ILuaState L, Object value)
+        {
+            L.LuaPushLightUserData(value);
+            L.LuaLSetMetatable(LuaDotnetHelper.DotnetObjectMetatableName);
+        }
+
+        /// <summary>
         /// Throw an error from the stack and restore it
         /// </summary>
         public static void ThrowError(ILuaState L, int restoreTop)
@@ -122,7 +193,7 @@ namespace LuaN
         /// <summary>
         /// Convert a Lua value to a .Net table
         /// </summary>
-        public static ILuaTable ToTable(ILuaState L, int idx)
+        public static ILuaTable DefaultToTable(ILuaState L, int idx)
         {
             if (L == null) return null;
             // If the value is not a table return null
@@ -139,7 +210,7 @@ namespace LuaN
         /// <summary>
         /// Convert a lua value to a .Net userdata
         /// </summary>
-        public static ILuaUserData ToUserData(ILuaState L, int idx)
+        public static ILuaUserData DefaultToUserData(ILuaState L, int idx)
         {
             if (L == null) return null;
             // If the value is not a userdata return null
@@ -156,7 +227,7 @@ namespace LuaN
         /// <summary>
         /// Convert a lua value to a .Net function
         /// </summary>
-        public static ILuaFunction ToFunction(ILuaState L, int idx)
+        public static ILuaFunction DefaultToFunction(ILuaState L, int idx)
         {
             if (L == null) return null;
             // C function ?
@@ -179,11 +250,13 @@ namespace LuaN
         /// <summary>
         /// Create the default metatable for the .Net objects
         /// </summary>
-        public static void CreateDotnetObjectMetatable(ILuaState L)
+        public static void CreateDotnetObjectMetatable(ILuaState L, String metatableName = null)
         {
             var oldTop = L.LuaGetTop();
 
-            L.LuaLNewMetatable(DotnetObjectMetatableName);
+            if (String.IsNullOrWhiteSpace(metatableName))
+                metatableName = DotnetObjectMetatableName;
+            L.LuaLNewMetatable(metatableName);
 
             L.LuaPushValue(-1);
             L.LuaPushCFunction(DotnetObjectMeta_ToString);
@@ -277,7 +350,7 @@ namespace LuaN
             {
                 var obj = L.LuaToUserData(1);
                 if (obj == null) L.LuaLError("Attempt to access a member of a null object.");
-                var key = L.ToObject(2);
+                var key = L.ToValue(2);
                 if (key == null) L.LuaLError("Attempt to access a null index.");
                 var tpObj = obj.GetType();
                 // If key is 'string' try get members
@@ -357,7 +430,7 @@ namespace LuaN
             {
                 var obj = L.LuaToUserData(1);
                 if (obj == null) L.LuaLError("Attempt to set a member of a null object.");
-                var key = L.ToObject(2);
+                var key = L.ToValue(2);
                 if (key == null) L.LuaLError("Attempt to set a null index.");
                 var value = L.ToValue(3);
                 var tpObj = obj.GetType();
@@ -456,7 +529,7 @@ namespace LuaN
                     List<Object> args = new List<object>();
                     for (int i = 2; i <= top; i++)
                     {
-                        var arg = L.ToObject(i);
+                        var arg = L.ToValue(i);
                         if (!(i == 2 && arg == dm.Object))  // detect self
                             args.Add(arg);
                     }
@@ -493,7 +566,7 @@ namespace LuaN
             {
                 var ldn = L.GetService<ILuaDotnet>();
                 if (ldn != null)
-                    ldn.ReleaseUserData(1);
+                    ldn.CollectUserData(1);
             }
             catch (LuaException) { throw; }
             catch (Exception ex)

@@ -27,12 +27,6 @@ namespace LuaN
         ILuaUserData ToUserData(int idx);
 
         /// <summary>
-        /// Push a value as a .Net object 
-        /// </summary>
-        /// <param name="value"></param>
-        void PushNetObject(Object value);
-
-        /// <summary>
         /// Convert the Lua value at the index to a .Net object corresponding
         /// </summary>
         Object ToValue(int idx);
@@ -48,9 +42,15 @@ namespace LuaN
         void RegisterDotnetMetatable(String metatableName);
 
         /// <summary>
-        /// Call when the GC free an userdata
+        /// Push a value as a .Net object 
         /// </summary>
-        void ReleaseUserData(int idx);
+        /// <param name="value"></param>
+        void PushNetObject(Object value);
+
+        /// <summary>
+        /// Called when GC free an userdata used as .Net object
+        /// </summary>
+        void CollectUserData(int idx);
 
     }
 

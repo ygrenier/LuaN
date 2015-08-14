@@ -11,27 +11,27 @@ namespace LuaN.DllWrapper.Tests
     {
 
 		[Fact]
-		public void TestToObject()
+		public void TestToValue()
         {
             LuaState L = null;
             using (L = new LuaState())
             {
                 PushTestValues(L);
 
-                Assert.Equal(null, L.ToObject(1));
-                Assert.Equal(123.45d, L.ToObject(2));
-                Assert.Equal(987d, L.ToObject(3));
-                Assert.Equal("Test", L.ToObject(4));
-                Assert.Equal("5.6", L.ToObject(5));
-                Assert.Equal("5D", L.ToObject(6));
-                Assert.Equal("5z", L.ToObject(7));
-                Assert.Equal(true, L.ToObject(8));
-                Assert.IsAssignableFrom<ILuaFunction>(L.ToObject(9));
-                Assert.IsAssignableFrom<ILuaFunction>(L.ToObject(10));
-                Assert.IsAssignableFrom<ILuaUserData>(L.ToObject(11));
-                Assert.Same(this, L.ToObject(12));
-                Assert.IsAssignableFrom<ILuaTable>(L.ToObject(13));
-                Assert.Same(L, L.ToObject(14));
+                Assert.Equal(null, L.ToValue(1));
+                Assert.Equal(123.45d, L.ToValue(2));
+                Assert.Equal(987d, L.ToValue(3));
+                Assert.Equal("Test", L.ToValue(4));
+                Assert.Equal("5.6", L.ToValue(5));
+                Assert.Equal("5D", L.ToValue(6));
+                Assert.Equal("5z", L.ToValue(7));
+                Assert.Equal(true, L.ToValue(8));
+                Assert.IsAssignableFrom<ILuaFunction>(L.ToValue(9));
+                Assert.IsAssignableFrom<ILuaFunction>(L.ToValue(10));
+                Assert.IsAssignableFrom<ILuaUserData>(L.ToValue(11));
+                Assert.Same(this, L.ToValue(12));
+                Assert.IsAssignableFrom<ILuaTable>(L.ToValue(13));
+                Assert.Same(L, L.ToValue(14));
             }
         }
 

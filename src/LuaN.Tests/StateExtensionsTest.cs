@@ -203,7 +203,7 @@ namespace LuaN.Tests
         }
 
         [Fact]
-        public void TestToObject()
+        public void TestToValue()
         {
             var mState = new Mock<ILuaState>();
             mState.Setup(s => s.LuaType(1)).Returns(LuaType.Nil);
@@ -216,42 +216,84 @@ namespace LuaN.Tests
             mState.Setup(s => s.LuaType(7)).Returns(LuaType.Table);
             mState.Setup(s => s.LuaType(8)).Returns(LuaType.Function);
             mState.Setup(s => s.LuaType(9)).Returns(LuaType.Thread);
-            var state = mState.Object;
+            using (var state = mState.Object)
+            {
+                Assert.Equal(null, StateExtensions.ToValue(null, 2));
+                Assert.Equal(null, state.ToValue(1));
 
-            Assert.Equal(null, StateExtensions.ToObject(null, 2));
-            Assert.Equal(null, state.ToObject(1));
+                Assert.Equal(false, state.ToValue(2));
+                mState.Verify(s => s.LuaToBoolean(2), Times.Once());
 
-            Assert.Equal(false, state.ToObject(2));
-            mState.Verify(s => s.LuaToBoolean(2), Times.Once());
+                Assert.Equal(0d, state.ToValue(3));
+                mState.Verify(s => s.LuaToNumber(3), Times.Once());
 
-            Assert.Equal(0d, state.ToObject(3));
-            mState.Verify(s => s.LuaToNumber(3), Times.Once());
+                Assert.Equal(null, state.ToValue(4));
+                mState.Verify(s => s.LuaToString(4), Times.Once());
 
-            Assert.Equal(null, state.ToObject(4));
-            mState.Verify(s => s.LuaToString(4), Times.Once());
+                Assert.Equal(null, state.ToValue(5));
+                mState.Verify(s => s.LuaToUserData(5), Times.Once());
 
-            Assert.Equal(null, state.ToObject(5));
-            mState.Verify(s => s.LuaToUserData(5), Times.Once());
+                Assert.IsAssignableFrom<ILuaUserData>(state.ToValue(6));
+                //mState.Verify(s => s.LuaToUserData(6), Times.Once());
 
-            Assert.IsAssignableFrom<ILuaUserData>(state.ToObject(6));
-            //mState.Verify(s => s.LuaToUserData(6), Times.Once());
+                Assert.IsAssignableFrom<ILuaTable>(state.ToValue(7));
+                //mState.Verify(s => s.LuaToUserData(7), Times.Once());
 
-            Assert.IsAssignableFrom<ILuaTable>(state.ToObject(7));
-            //mState.Verify(s => s.LuaToUserData(7), Times.Once());
+                Assert.Equal(null, state.ToValue(8));
+                //mState.Verify(s => s.LuaToUserData(8), Times.Once());
 
-            Assert.Equal(null, state.ToObject(8));
-            //mState.Verify(s => s.LuaToUserData(8), Times.Once());
-
-            Assert.Equal(null, state.ToObject(9));
-            mState.Verify(s => s.LuaToThread(9), Times.Once());
+                Assert.Equal(null, state.ToValue(9));
+                mState.Verify(s => s.LuaToThread(9), Times.Once());
+            }
 
             mState = new Mock<ILuaState>();
             var mDotnet = mState.As<ILuaDotnet>();
             mState.Setup(s => s.GetService(typeof(ILuaDotnet))).Returns(mDotnet.Object);
-            state = mState.Object;
-            state.ToValue(123);
-            mDotnet.Verify(s => s.ToValue(123), Times.Exactly(1));
+            using (var state = mState.Object)
+            {
+                state.ToValue(123);
+                mDotnet.Verify(s => s.ToValue(123), Times.Exactly(1));
+            }
 
+            mState = new Mock<ILuaState>();
+            mState.Setup(_ => _.LuaType(1)).Returns(LuaType.Nil);
+            mState.Setup(_ => _.LuaType(2)).Returns(LuaType.Boolean);
+            mState.Setup(_ => _.LuaToBoolean(2)).Returns(true);
+            mState.Setup(_ => _.LuaType(3)).Returns(LuaType.Boolean);
+            mState.Setup(_ => _.LuaToBoolean(3)).Returns(false);
+            mState.Setup(_ => _.LuaType(4)).Returns(LuaType.Number);
+            mState.Setup(_ => _.LuaToNumber(4)).Returns(123.45);
+            mState.Setup(_ => _.LuaType(5)).Returns(LuaType.String);
+            mState.Setup(_ => _.LuaToString(5)).Returns("Test");
+            mState.Setup(_ => _.LuaType(6)).Returns(LuaType.LightUserData);
+            mState.Setup(_ => _.LuaIsUserData(6)).Returns(true);
+            mState.Setup(_ => _.LuaToUserData(6)).Returns(this);
+            mState.Setup(_ => _.LuaType(7)).Returns(LuaType.UserData);
+            mState.Setup(_ => _.LuaIsUserData(7)).Returns(true);
+            mState.Setup(_ => _.LuaToUserData(7)).Returns(this);
+            mState.Setup(_ => _.LuaType(8)).Returns(LuaType.Table);
+            mState.Setup(_ => _.LuaType(9)).Returns(LuaType.Function);
+            mState.Setup(_ => _.LuaIsFunction(9)).Returns(true);
+            mState.Setup(_ => _.LuaType(10)).Returns(LuaType.Thread);
+            mState.Setup(_ => _.LuaToThread(10)).Returns(() => mState.Object);
+
+            var mUserData = new Mock<ILuaNativeUserData>();
+            var ud = mUserData.Object;
+            mState.Setup(_ => _.LuaToUserData(7)).Returns(ud);
+            using (var state = mState.Object)
+            {
+                Assert.Equal(null, state.ToValue(1));
+                Assert.Equal(true, state.ToValue(2));
+                Assert.Equal(false, state.ToValue(3));
+                Assert.Equal(123.45, state.ToValue(4));
+                Assert.Equal("Test", state.ToValue(5));
+                Assert.Same(this, state.ToValue(6));
+                Assert.IsAssignableFrom<ILuaUserData>(state.ToValue(7));
+                var tbl = state.ToValue(8);
+                Assert.IsAssignableFrom<ILuaTable>(tbl);
+                Assert.IsAssignableFrom<ILuaFunction>(state.ToValue(9));
+                Assert.Same(state, state.ToValue(10));
+            }
         }
 
         [Fact]
@@ -784,50 +826,6 @@ namespace LuaN.Tests
 
                 res = state.PopValues(4);
                 Assert.Equal(new object[] { null, null, null, null }, res);
-            }
-        }
-
-        [Fact]
-        public void TestToValue()
-        {
-            var mState = new Mock<ILuaState>();
-            mState.Setup(_ => _.LuaType(1)).Returns(LuaType.Nil);
-            mState.Setup(_ => _.LuaType(2)).Returns(LuaType.Boolean);
-            mState.Setup(_ => _.LuaToBoolean(2)).Returns(true);
-            mState.Setup(_ => _.LuaType(3)).Returns(LuaType.Boolean);
-            mState.Setup(_ => _.LuaToBoolean(3)).Returns(false);
-            mState.Setup(_ => _.LuaType(4)).Returns(LuaType.Number);
-            mState.Setup(_ => _.LuaToNumber(4)).Returns(123.45);
-            mState.Setup(_ => _.LuaType(5)).Returns(LuaType.String);
-            mState.Setup(_ => _.LuaToString(5)).Returns("Test");
-            mState.Setup(_ => _.LuaType(6)).Returns(LuaType.LightUserData);
-            mState.Setup(_ => _.LuaIsUserData(6)).Returns(true);
-            mState.Setup(_ => _.LuaToUserData(6)).Returns(this);
-            mState.Setup(_ => _.LuaType(7)).Returns(LuaType.UserData);
-            mState.Setup(_ => _.LuaIsUserData(7)).Returns(true);
-            mState.Setup(_ => _.LuaToUserData(7)).Returns(this);
-            mState.Setup(_ => _.LuaType(8)).Returns(LuaType.Table);
-            mState.Setup(_ => _.LuaType(9)).Returns(LuaType.Function);
-            mState.Setup(_ => _.LuaIsFunction(9)).Returns(true);
-            mState.Setup(_ => _.LuaType(10)).Returns(LuaType.Thread);
-            mState.Setup(_ => _.LuaToThread(10)).Returns(() => mState.Object);
-
-            var mUserData = new Mock<ILuaNativeUserData>();
-            var ud = mUserData.Object;
-            mState.Setup(_ => _.LuaToUserData(7)).Returns(ud);
-            using (var state = mState.Object)
-            {
-                Assert.Equal(null, state.ToValue(1));
-                Assert.Equal(true, state.ToValue(2));
-                Assert.Equal(false, state.ToValue(3));
-                Assert.Equal(123.45, state.ToValue(4));
-                Assert.Equal("Test", state.ToValue(5));
-                Assert.Same(this, state.ToValue(6));
-                Assert.IsAssignableFrom<ILuaUserData>(state.ToValue(7));
-                var tbl = state.ToValue(8);
-                Assert.IsAssignableFrom<ILuaTable>(tbl);
-                Assert.IsAssignableFrom<ILuaFunction>(state.ToValue(9));
-                Assert.Same(state, state.ToValue(10));
             }
         }
 
