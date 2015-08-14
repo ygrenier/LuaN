@@ -22,6 +22,13 @@ namespace LuaN.Studio
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = AppContext.Current.ServiceLocator.GetService<ViewModels.ShellViewModel>();
         }
+
+        /// <summary>
+        /// Current viewmodel
+        /// </summary>
+        public ViewModels.ShellViewModel ViewModel { get { return (ViewModels.ShellViewModel)DataContext; } }
+
     }
 }

@@ -12,5 +12,17 @@ namespace LuaN.Studio
     /// </summary>
     public partial class App : Application
     {
+
+        /// <summary>
+        /// Startup the application
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            AppContext.DefineCurrent(new Services.ServiceLocator());
+        }
+        
     }
 }

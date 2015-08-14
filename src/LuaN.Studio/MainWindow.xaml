@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LuaN.Studio"
         mc:Ignorable="d"
-        Title="LuaN Studio" Height="350" Width="525">
+        Title="LuaN Studio" 
+        WindowState="Maximized"
+        Height="350" Width="525"
+        >
     <Grid>
         
     </Grid>
