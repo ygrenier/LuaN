@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -32,7 +33,7 @@ namespace LuaN.Studio.Services
                 .AsImplementedInterfaces()
                 .SingleInstance()
                 ;
-
+            
             // Reference all ViewModels
             builder.RegisterAssemblyTypes(typeof(ViewModels.ViewModel).Assembly)
                 .Where(tp => tp.Name.EndsWith("ViewModel") && !tp.Name.StartsWith("Dt"))
@@ -48,7 +49,7 @@ namespace LuaN.Studio.Services
 
             // Reference the service locator
             builder.RegisterInstance<IServiceLocator>(this);
-
+            
             // Create the container
             Container = builder.Build();
         }
@@ -62,8 +63,22 @@ namespace LuaN.Studio.Services
         }
 
         /// <summary>
+        /// Get services based on a type
+        /// </summary>
+        public IEnumerable<T> GetServices<T>()
+        {
+            return Container.ComponentRegistry
+                .Registrations
+                .Where(r => r.Activator.LimitType.IsSubclassOf(typeof(T)) || typeof(T).IsAssignableFrom(r.Activator.LimitType))
+                .Select(r => Container.Resolve(r.Activator.LimitType))
+                .OfType<T>()
+                ;
+        }
+
+        /// <summary>
         /// Container
         /// </summary>
         public IContainer Container { get; private set; }
+
     }
 }

@@ -15,6 +15,12 @@ namespace LuaN.Studio.Services
         /// Get a service
         /// </summary>
         T GetService<T>() where T : class;
+
+        /// <summary>
+        /// Get services based on a type
+        /// </summary>
+        IEnumerable<T> GetServices<T>();
+
     }
 
 }

@@ -3,13 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dt="clr-namespace:LuaN.Studio.DesignTime"
         xmlns:local="clr-namespace:LuaN.Studio"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=dt:DtShellViewModel, IsDesignTimeCreatable=True}"
         Title="LuaN Studio" 
         WindowState="Maximized"
         Height="350" Width="525"
         >
     <Grid>
-        
     </Grid>
 </Window>
