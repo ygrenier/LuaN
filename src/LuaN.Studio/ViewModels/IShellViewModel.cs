@@ -11,6 +11,7 @@ namespace LuaN.Studio.ViewModels
     /// </summary>
     public interface IShellViewModel
     {
+
         /// <summary>
         /// List of opened documents
         /// </summary>

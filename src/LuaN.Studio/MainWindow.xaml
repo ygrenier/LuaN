@@ -1,10 +1,13 @@
-﻿<Window x:Class="LuaN.Studio.MainWindow"
+﻿<fluent:RibbonWindow 
+        x:Class="LuaN.Studio.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dt="clr-namespace:LuaN.Studio.DesignTime"
         xmlns:local="clr-namespace:LuaN.Studio"
+        xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
+        xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=dt:DtShellViewModel, IsDesignTimeCreatable=True}"
         Title="LuaN Studio" 
@@ -12,5 +15,24 @@
         Height="350" Width="525"
         >
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <fluent:Ribbon 
+            x:Name="rbMenu"
+            KeyboardNavigation.IsTabStop="False" 
+            KeyboardNavigation.TabNavigation="None"
+            >
+        </fluent:Ribbon>
+
+        <dock:DockingManager
+            x:Name="dmDock"
+            Grid.Row="1"
+            >
+            
+        </dock:DockingManager>
+        
     </Grid>
-</Window>
+</fluent:RibbonWindow>
