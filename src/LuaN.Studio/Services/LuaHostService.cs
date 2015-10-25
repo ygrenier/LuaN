@@ -66,15 +66,40 @@ namespace LuaN.Studio.Services
             _Lua.PushNetObject(_Services.GetService<IAppService>());
             _Lua.LuaSetGlobal("app");
 
-            // Print copyright
+            // Register the help command
+            _Lua.LuaRegister("help", HelpFunction);
+
+            // Print copyright & help
+            StringBuilder msg = new StringBuilder()
+                .AppendLine(_Lua.Engine.LuaCopyright)
+                .AppendLine("For display help type: help()")
+                .AppendLine()
+                ;
             _Lua.LuaGetGlobal("print");
-            _Lua.LuaPushString(_Lua.Engine.LuaCopyright);
+            _Lua.LuaPushString(msg.ToString());
             _Lua.LuaPCall(1, 0, 0);
 
             // Raise event
             var h = Started;
             if (h != null)
                 h(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Help function
+        /// </summary>
+        private int HelpFunction(ILuaState state)
+        {
+            StringBuilder usage = new StringBuilder()
+                .AppendLine("Lua Interactive Help")
+                .AppendLine("- app : Access to the LuaN.Studio application object")
+                .AppendLine(" * app.Shell : Access to the shell object")
+                ;
+            _Lua.LuaGetGlobal("print");
+            _Lua.LuaPushString(usage.ToString());
+            _Lua.LuaPCall(1, 0, 0);
+
+            return 0;
         }
 
         /// <summary>

@@ -30,7 +30,27 @@
         <dock:DockingManager
             x:Name="dmDock"
             Grid.Row="1"
+            DocumentsSource="{Binding Documents}"
+            AnchorablesSource="{Binding Tools}"
             >
+            <dock:DockingManager.AnchorableHeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Content.Title}" />
+                </DataTemplate>
+            </dock:DockingManager.AnchorableHeaderTemplate>
+            <dock:DockingManager.AnchorableTitleTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Content.Title}" />
+                </DataTemplate>
+            </dock:DockingManager.AnchorableTitleTemplate>
+            <dock:DockingManager.DocumentHeaderTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Content.Title}"></TextBlock>
+                        <TextBlock Text="*" Visibility="{Binding Path=Content.IsDirty, Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </dock:DockingManager.DocumentHeaderTemplate>
             
         </dock:DockingManager>
         

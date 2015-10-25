@@ -65,18 +65,36 @@ namespace LuaN.Studio.Controls
 
         private void Lines_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+            // Update ?
+            if (e.NewStartingIndex == e.OldStartingIndex)
             {
+                int pidx = e.NewStartingIndex;
                 foreach (ConsoleLine item in e.NewItems)
-                    AddConsoleLine(item);
-            }
-            if (e.OldItems != null)
-            {
-                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove && e.OldStartingIndex == 0)
                 {
-                    foreach (ConsoleLine item in e.OldItems)
+                    var p = consoleView.Document.Blocks.ElementAtOrDefault(pidx) as Paragraph;
+                    if (p != null && p.Inlines.Count > 0)
                     {
-                        consoleView.Document.Blocks.Remove(consoleView.Document.Blocks.FirstBlock);
+                        p.Inlines.Remove(p.Inlines.Last());
+                        p.Inlines.Add(item.Line);
+                    }
+                    pidx++;
+                }
+            }
+            else
+            {
+                if (e.NewItems != null)
+                {
+                    foreach (ConsoleLine item in e.NewItems)
+                        AddConsoleLine(item);
+                }
+                if (e.OldItems != null)
+                {
+                    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove && e.OldStartingIndex == 0)
+                    {
+                        foreach (ConsoleLine item in e.OldItems)
+                        {
+                            consoleView.Document.Blocks.Remove(consoleView.Document.Blocks.FirstBlock);
+                        }
                     }
                 }
             }
