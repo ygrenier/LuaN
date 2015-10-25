@@ -120,6 +120,7 @@
     <Compile Include="Services\IServiceLocator.cs" />
     <Compile Include="Services\LuaHostService.cs" />
     <Compile Include="Services\ServiceLocator.cs" />
+    <Compile Include="Services\ShellProxy.cs" />
     <Compile Include="ViewModels\DocumentViewModel.cs" />
     <Compile Include="ViewModels\IShellViewModel.cs" />
     <Compile Include="ViewModels\IToolViewModel.cs" />

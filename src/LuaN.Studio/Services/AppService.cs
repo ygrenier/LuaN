@@ -32,7 +32,7 @@ namespace LuaN.Studio.Services
         /// <summary>
         /// Shell
         /// </summary>
-        public IShell Shell { get { return _Shell ?? (_Shell = _Services.GetService<IShell>()); } }
+        public IShell Shell { get { return _Shell ?? (_Shell = new ShellProxy(_Services.GetService<IShell>())); } }
 
     }
 
