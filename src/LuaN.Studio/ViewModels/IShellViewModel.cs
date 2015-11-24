@@ -23,6 +23,11 @@ namespace LuaN.Studio.ViewModels
         ReadOnlyObservableCollection<IToolViewModel> Tools { get; }
 
         /// <summary>
+        /// The current active document 
+        /// </summary>
+        DocumentViewModel CurrentDocument { get; set; }
+
+        /// <summary>
         /// Command for the new script action
         /// </summary>
         RelayCommand NewScriptCommand { get; }

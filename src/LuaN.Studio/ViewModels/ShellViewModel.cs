@@ -13,6 +13,8 @@ namespace LuaN.Studio.ViewModels
     /// </summary>
     public class ShellViewModel : ViewModel, IShellViewModel, IShell
     {
+        private DocumentViewModel _CurrentDocument;
+
         /// <summary>
         /// Source of the documents list
         /// </summary>
@@ -84,6 +86,7 @@ namespace LuaN.Studio.ViewModels
         {
             var result = new Documents.LuaScriptDocumentViewModel();
             this.SourceDocuments.Add(result);
+            this.CurrentDocument = result;
             return result;
         }
 
@@ -101,6 +104,14 @@ namespace LuaN.Studio.ViewModels
         /// List of the tools
         /// </summary>
         public ReadOnlyObservableCollection<IToolViewModel> Tools { get; }
+
+        /// <summary>
+        /// The current active document 
+        /// </summary>
+        public DocumentViewModel CurrentDocument {
+            get { return _CurrentDocument; }
+            set { SetProperty(ref _CurrentDocument, value, () => CurrentDocument); }
+        }
 
         /// <summary>
         /// Command for the new script action

@@ -42,6 +42,7 @@
             Grid.Row="1"
             DocumentsSource="{Binding Documents}"
             AnchorablesSource="{Binding Tools}"
+            ActiveContent="{Binding CurrentDocument, Mode=TwoWay}"
             >
             <dock:DockingManager.AnchorableHeaderTemplate>
                 <DataTemplate>

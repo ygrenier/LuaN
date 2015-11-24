@@ -25,6 +25,7 @@ namespace LuaN.Studio.DesignTime
         protected ObservableCollection<IToolViewModel> SourceTools { get; private set; }
         public ReadOnlyObservableCollection<DocumentViewModel> Documents { get; private set; }
         public ReadOnlyObservableCollection<IToolViewModel> Tools { get; private set; }
+        public DocumentViewModel CurrentDocument { get; set; }
         public RelayCommand NewScriptCommand { get; private set; }
     }
 }
