@@ -9,7 +9,7 @@ namespace LuaN.Studio.ViewModels.Documents
     /// <summary>
     /// Lua script document viewmodel
     /// </summary>
-    public class LuaScriptDocumentViewModel : DocumentViewModel, ILuaScriptDocumentViewModel
+    public class LuaScriptDocumentViewModel : TextEditorViewModel, ILuaScriptDocumentViewModel
     {
         private String _FileName;
 

@@ -16,11 +16,6 @@ namespace LuaN.Studio.Models
         String Title { get; }
 
         /// <summary>
-        /// Current file name
-        /// </summary>
-        String FileName { get; }
-
-        /// <summary>
         /// Indicates if the document have changes
         /// </summary>
         bool IsDirty { get; }

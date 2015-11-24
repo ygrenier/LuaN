@@ -16,16 +16,12 @@ namespace LuaN.Studio.ViewModels
         private bool _IsDirty;
         private string _Title;
 
-        protected readonly int NumDocument;
-        private string _FileName;
-
         /// <summary>
         /// New document
         /// </summary>
         public DocumentViewModel()
         {
-            NumDocument = numdoc++;
-            Title = "New document " + NumDocument.ToString();
+            Title = "New document";
             IsDirty = false;
         }
 
@@ -35,14 +31,6 @@ namespace LuaN.Studio.ViewModels
         public virtual String Title {
             get { return _Title; }
             protected set { SetProperty(ref _Title, value, () => Title); }
-        }
-
-        /// <summary>
-        /// Current file name
-        /// </summary>
-        public virtual String FileName {
-            get { return _FileName; }
-            protected set { SetProperty(ref _FileName, value, () => FileName); }
         }
 
         /// <summary>

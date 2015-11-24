@@ -121,6 +121,7 @@
     <Compile Include="Services\LuaHostService.cs" />
     <Compile Include="Services\ServiceLocator.cs" />
     <Compile Include="Services\ShellProxy.cs" />
+    <Compile Include="ViewModels\Documents\TextEditorViewModel.cs" />
     <Compile Include="ViewModels\Documents\ILuaScriptDocumentViewModel.cs" />
     <Compile Include="ViewModels\Documents\LuaScriptDocumentViewModel.cs" />
     <Compile Include="ViewModels\DocumentViewModel.cs" />
