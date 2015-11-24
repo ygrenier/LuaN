@@ -21,5 +21,11 @@ namespace LuaN.Studio.ViewModels
         /// List of the tools
         /// </summary>
         ReadOnlyObservableCollection<IToolViewModel> Tools { get; }
+
+        /// <summary>
+        /// Command for the new script action
+        /// </summary>
+        RelayCommand NewScriptCommand { get; }
+
     }
 }

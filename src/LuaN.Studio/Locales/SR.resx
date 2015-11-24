@@ -121,4 +121,12 @@
     <value>Home</value>
     <comment>Home menu bar caption</comment>
   </data>
+  <data name="HomeMenuBar_FileGroup_Caption" xml:space="preserve">
+    <value>File</value>
+    <comment>"File" group caption in the home menu bar</comment>
+  </data>
+  <data name="HomeMenuBar_FileGroup_NewScript_Caption" xml:space="preserve">
+    <value>New script</value>
+    <comment>New script button caption</comment>
+  </data>
 </root>

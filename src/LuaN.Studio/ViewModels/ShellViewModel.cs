@@ -39,9 +39,16 @@ namespace LuaN.Studio.ViewModels
             //    SourceTools.Add(tool);
             //}
             SourceTools.Add(new Tools.InteractiveLuaToolViewModel(App.LuaHost));
+
+            NewScriptCommand = new RelayCommand(() => NewLuaScript());
         }
 
         #region Implements IShell
+
+        /// <summary>
+        /// Open a new Lua script document
+        /// </summary>
+        ViewModels.Documents.ILuaScriptDocumentViewModel IShell.NewLuaScript() { return this.NewLuaScript(); }
 
         /// <summary>
         /// Returns a document
@@ -71,6 +78,16 @@ namespace LuaN.Studio.ViewModels
         #endregion
 
         /// <summary>
+        /// Open a new Lua script document
+        /// </summary>
+        public Documents.LuaScriptDocumentViewModel NewLuaScript()
+        {
+            var result = new Documents.LuaScriptDocumentViewModel();
+            this.SourceDocuments.Add(result);
+            return result;
+        }
+
+        /// <summary>
         /// Application
         /// </summary>
         public Services.IAppService App { get; private set; }
@@ -85,6 +102,10 @@ namespace LuaN.Studio.ViewModels
         /// </summary>
         public ReadOnlyObservableCollection<IToolViewModel> Tools { get; }
 
+        /// <summary>
+        /// Command for the new script action
+        /// </summary>
+        public RelayCommand NewScriptCommand { get; private set; }
     }
 
 }

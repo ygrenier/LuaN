@@ -121,6 +121,8 @@
     <Compile Include="Services\LuaHostService.cs" />
     <Compile Include="Services\ServiceLocator.cs" />
     <Compile Include="Services\ShellProxy.cs" />
+    <Compile Include="ViewModels\Documents\ILuaScriptDocumentViewModel.cs" />
+    <Compile Include="ViewModels\Documents\LuaScriptDocumentViewModel.cs" />
     <Compile Include="ViewModels\DocumentViewModel.cs" />
     <Compile Include="ViewModels\IShellViewModel.cs" />
     <Compile Include="ViewModels\IToolViewModel.cs" />
@@ -173,7 +175,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <EmbeddedResource Include="Locales\SR.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>SR.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

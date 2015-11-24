@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dt="clr-namespace:LuaN.Studio.DesignTime"
         xmlns:local="clr-namespace:LuaN.Studio"
+        xmlns:locales="clr-namespace:LuaN.Studio.Locales"
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
         mc:Ignorable="d"
@@ -25,6 +26,15 @@
             KeyboardNavigation.IsTabStop="False" 
             KeyboardNavigation.TabNavigation="None"
             >
+            <fluent:RibbonTabItem
+                Header="{x:Static locales:SR.HomeMenuBar_Caption}"
+                >
+                <fluent:RibbonGroupBox
+                    Header="{x:Static locales:SR.HomeMenuBar_FileGroup_Caption}"
+                    >
+                    <fluent:Button Header="{x:Static locales:SR.HomeMenuBar_FileGroup_NewScript_Caption}" Size="Middle" Command="{Binding NewScriptCommand}" />
+                </fluent:RibbonGroupBox>
+            </fluent:RibbonTabItem>
         </fluent:Ribbon>
 
         <dock:DockingManager

@@ -24,6 +24,11 @@ namespace LuaN.Studio.Services
             return _Source.FindTool(name);
         }
 
+        public ViewModels.Documents.ILuaScriptDocumentViewModel NewLuaScript()
+        {
+            return _Source.NewLuaScript();
+        }
+
         public IDocument GetDocument(int idx)
         {
             return _Source.GetDocument(idx);

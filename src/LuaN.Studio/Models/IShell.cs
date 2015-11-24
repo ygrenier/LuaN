@@ -12,6 +12,10 @@ namespace LuaN.Studio.Models
     /// </summary>
     public interface IShell
     {
+        /// <summary>
+        /// Open a new Lua script document
+        /// </summary>
+        ViewModels.Documents.ILuaScriptDocumentViewModel NewLuaScript();
 
         /// <summary>
         /// Returns a document

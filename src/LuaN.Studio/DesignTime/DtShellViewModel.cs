@@ -18,11 +18,14 @@ namespace LuaN.Studio.DesignTime
             this.Tools = new ReadOnlyObservableCollection<IToolViewModel>(SourceTools);
 
             this.SourceTools.Add(new DtInteractiveLuaToolViewModel());
+
+            this.NewScriptCommand = new RelayCommand(() => { });
         }
         protected ObservableCollection<DocumentViewModel> SourceDocuments { get; private set; }
         protected ObservableCollection<IToolViewModel> SourceTools { get; private set; }
         public ReadOnlyObservableCollection<DocumentViewModel> Documents { get; private set; }
         public ReadOnlyObservableCollection<IToolViewModel> Tools { get; private set; }
+        public RelayCommand NewScriptCommand { get; private set; }
     }
 }
 #endif

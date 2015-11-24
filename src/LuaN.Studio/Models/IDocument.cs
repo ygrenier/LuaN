@@ -10,5 +10,14 @@ namespace LuaN.Studio.Models
     /// </summary>
     public interface IDocument
     {
+        /// <summary>
+        /// Title of the document
+        /// </summary>
+        String Title { get; }
+
+        /// <summary>
+        /// Indicates if the document have changes
+        /// </summary>
+        bool IsDirty { get; }
     }
 }
