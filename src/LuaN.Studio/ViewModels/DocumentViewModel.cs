@@ -17,6 +17,7 @@ namespace LuaN.Studio.ViewModels
         private string _Title;
 
         protected readonly int NumDocument;
+        private string _FileName;
 
         /// <summary>
         /// New document
@@ -31,15 +32,23 @@ namespace LuaN.Studio.ViewModels
         /// <summary>
         /// Title of the document
         /// </summary>
-        public String Title {
+        public virtual String Title {
             get { return _Title; }
             protected set { SetProperty(ref _Title, value, () => Title); }
         }
 
         /// <summary>
+        /// Current file name
+        /// </summary>
+        public virtual String FileName {
+            get { return _FileName; }
+            protected set { SetProperty(ref _FileName, value, () => FileName); }
+        }
+
+        /// <summary>
         /// Indicates if the document have changes
         /// </summary>
-        public bool IsDirty {
+        public virtual bool IsDirty {
             get { return this._IsDirty; }
             protected set { this.SetProperty(ref _IsDirty, value, () => IsDirty); }
         }
