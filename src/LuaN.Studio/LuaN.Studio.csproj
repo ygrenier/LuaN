@@ -101,8 +101,12 @@
     <Compile Include="Controls\ConsoleControl.xaml.cs">
       <DependentUpon>ConsoleControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TextEditorControl.xaml.cs">
+      <DependentUpon>TextEditorControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DesignTime\DtInteractiveLuaToolViewModel.cs" />
     <Compile Include="DesignTime\DtShellViewModel.cs" />
+    <Compile Include="DesignTime\DtTextEditorDocumentViewModel.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
     <Compile Include="Locales\SR.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -121,7 +125,7 @@
     <Compile Include="Services\LuaHostService.cs" />
     <Compile Include="Services\ServiceLocator.cs" />
     <Compile Include="Services\ShellProxy.cs" />
-    <Compile Include="ViewModels\Documents\TextEditorViewModel.cs" />
+    <Compile Include="ViewModels\Documents\TextEditorDocumentViewModel.cs" />
     <Compile Include="ViewModels\Documents\ILuaScriptDocumentViewModel.cs" />
     <Compile Include="ViewModels\Documents\LuaScriptDocumentViewModel.cs" />
     <Compile Include="ViewModels\DocumentViewModel.cs" />
@@ -133,10 +137,19 @@
     <Compile Include="ViewModels\Tools\InteractiveLuaToolViewModel.cs" />
     <Compile Include="ViewModels\ToolViewModel.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
+    <Compile Include="Views\DockLayoutStyleSelector.cs" />
+    <Compile Include="Views\DockLayoutTemplateSelector.cs" />
     <Compile Include="Views\InteractiveLuaToolView.xaml.cs">
       <DependentUpon>InteractiveLuaToolView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\TextEditorDocumentView.xaml.cs">
+      <DependentUpon>TextEditorDocumentView.xaml</DependentUpon>
+    </Compile>
     <Page Include="Controls\ConsoleControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TextEditorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -157,6 +170,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\InteractiveLuaToolView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TextEditorDocumentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

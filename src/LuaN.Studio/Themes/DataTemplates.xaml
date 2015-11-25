@@ -2,11 +2,16 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vm="clr-namespace:LuaN.Studio.ViewModels"
                     xmlns:vm_tools="clr-namespace:LuaN.Studio.ViewModels.Tools"
+                    xmlns:vm_docs="clr-namespace:LuaN.Studio.ViewModels.Documents"
                     xmlns:vw="clr-namespace:LuaN.Studio.Views"
                     >
 
     <DataTemplate DataType="{x:Type vm_tools:InteractiveLuaToolViewModel}">
         <vw:InteractiveLuaToolView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm_docs:TextEditorDocumentViewModel}">
+        <vw:TextEditorDocumentView />
     </DataTemplate>
 
 </ResourceDictionary>

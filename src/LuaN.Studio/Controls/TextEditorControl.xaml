@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="LuaN.Studio.Controls.TextEditorControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LuaN.Studio.Controls"
+             xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             mc:Ignorable="d" 
+             FocusManager.FocusedElement="{Binding ElementName=teEditor}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <avalonEdit:TextEditor
+			x:Name="teEditor"
+			FontFamily="Consolas"
+			FontSize="10pt"
+			ShowLineNumbers="True"
+			Document="{Binding Document, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:TextEditorControl}}}"
+            />
+    </Grid>
+</UserControl>

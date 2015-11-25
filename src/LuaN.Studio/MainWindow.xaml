@@ -7,6 +7,7 @@
         xmlns:dt="clr-namespace:LuaN.Studio.DesignTime"
         xmlns:local="clr-namespace:LuaN.Studio"
         xmlns:locales="clr-namespace:LuaN.Studio.Locales"
+        xmlns:views="clr-namespace:LuaN.Studio.Views"
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
         mc:Ignorable="d"
@@ -62,7 +63,40 @@
                     </StackPanel>
                 </DataTemplate>
             </dock:DockingManager.DocumentHeaderTemplate>
-            
+            <dock:DockingManager.LayoutItemTemplateSelector>
+                <views:DockLayoutTemplateSelector>
+                    <!--<views:DockLayoutTemplateSelector.TextEditorTemplate>
+                        <DataTemplate DataType="vm:TextEditorViewModel">
+                            <Grid>
+                                <local:EditorControl 
+                                        Document="{Binding TextContent}" 
+                                        TextDefinition="{Binding TextDefinition}"
+                                        EdiCommandListener="{Binding EdiCommandListener}"
+                                        />
+                            </Grid>
+                        </DataTemplate>
+                    </views:DockLayoutTemplateSelector.TextEditorTemplate>-->
+                </views:DockLayoutTemplateSelector>
+            </dock:DockingManager.LayoutItemTemplateSelector>
+            <dock:DockingManager.LayoutItemContainerStyleSelector>
+                <views:DockLayoutStyleSelector>
+                    <!--<views:DockLayoutStyleSelector.TextEditorStyle>
+                        <Style TargetType="{x:Type dock:LayoutDocumentItem}">
+                            <Setter Property="Title" Value="{Binding Model.Title}" />
+                            <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
+                            <Setter Property="CloseCommand" Value="{Binding Model.CloseDocumentCommand}" />
+                            <Setter Property="IsActive" Value="{Binding Model.IsActive}" />
+                            <Setter Property="ToolTip" Value="{Binding Model.Filename}" />
+                        </Style>
+                    </views:DockLayoutStyleSelector.TextEditorStyle>
+                    <views:DockLayoutStyleSelector.ToolWindowStyle>
+                        <Style TargetType="{x:Type dock:LayoutAnchorableItem}">
+                            <Setter Property="Title" Value="{Binding Model.Title}" />
+                            <Setter Property="IsActive" Value="{Binding Model.IsActive}" />
+                        </Style>
+                    </views:DockLayoutStyleSelector.ToolWindowStyle>-->
+                </views:DockLayoutStyleSelector>
+            </dock:DockingManager.LayoutItemContainerStyleSelector>
         </dock:DockingManager>
         
     </Grid>
