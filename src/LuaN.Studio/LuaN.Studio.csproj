@@ -107,6 +107,7 @@
     <Compile Include="DesignTime\DtInteractiveLuaToolViewModel.cs" />
     <Compile Include="DesignTime\DtShellViewModel.cs" />
     <Compile Include="DesignTime\DtTextEditorDocumentViewModel.cs" />
+    <Compile Include="DockManager\LayoutManager.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
     <Compile Include="Locales\SR.Designer.cs">
       <AutoGen>True</AutoGen>

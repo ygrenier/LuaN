@@ -10,6 +10,7 @@
         xmlns:views="clr-namespace:LuaN.Studio.Views"
         xmlns:fluent="clr-namespace:Fluent;assembly=Fluent"
         xmlns:dock="http://schemas.xceed.com/wpf/xaml/avalondock"
+        xmlns:dm="clr-namespace:LuaN.Studio.DockManager"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=dt:DtShellViewModel, IsDesignTimeCreatable=True}"
         Title="LuaN Studio" 
@@ -48,6 +49,9 @@
             AnchorablesSource="{Binding Tools}"
             ActiveContent="{Binding CurrentDocument, Mode=TwoWay}"
             >
+            <dock:DockingManager.LayoutUpdateStrategy>
+                <dm:LayoutManager />
+            </dock:DockingManager.LayoutUpdateStrategy>
             <dock:DockingManager.AnchorableHeaderTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Content.Title}" />
