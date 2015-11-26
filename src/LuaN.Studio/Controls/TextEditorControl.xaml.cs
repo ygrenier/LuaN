@@ -23,6 +23,12 @@ namespace LuaN.Studio.Controls
         public TextEditorControl()
         {
             InitializeComponent();
+            this.Loaded += TextEditorControl_Loaded;
+        }
+
+        private void TextEditorControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            try { teEditor.Focus(); } catch { }
         }
 
         /// <summary>

@@ -25,6 +25,7 @@ namespace LuaN.Studio.ViewModels.Documents
             NumDocument = numdoc++;
             Title = "New document " + NumDocument.ToString();
             IsDirty = false;
+            TextContent = new TextDocument();
         }
 
         private void TextContent_Changed(object sender, DocumentChangeEventArgs e)

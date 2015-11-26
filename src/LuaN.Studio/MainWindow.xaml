@@ -16,6 +16,9 @@
         WindowState="Maximized"
         Height="350" Width="525"
         >
+    <Window.InputBindings>
+        <KeyBinding Gesture="Ctrl+N" Command="{Binding NewScriptCommand}" />
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
