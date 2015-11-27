@@ -23,6 +23,11 @@ namespace LuaN.Studio.Models
         IDocument GetDocument(int idx);
 
         /// <summary>
+        /// Active document
+        /// </summary>
+        IDocument ActiveDocument { get; }
+
+        /// <summary>
         /// Number of opened documents
         /// </summary>
         int DocumentCount { get; }

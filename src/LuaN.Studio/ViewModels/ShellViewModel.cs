@@ -58,6 +58,11 @@ namespace LuaN.Studio.ViewModels
         IDocument IShell.GetDocument(int idx) { return Documents[idx]; }
 
         /// <summary>
+        /// Active document
+        /// </summary>
+        IDocument IShell.ActiveDocument { get { return CurrentDocument; } }
+
+        /// <summary>
         /// Number of opened documents
         /// </summary>
         int IShell.DocumentCount { get { return Documents.Count; } }

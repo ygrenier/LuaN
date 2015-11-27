@@ -38,5 +38,8 @@ namespace LuaN.Studio.Services
         {
             return _Source.GetTool(idx);
         }
+
+        public IDocument ActiveDocument { get { return _Source.ActiveDocument; } }
+
     }
 }
