@@ -86,5 +86,14 @@ namespace LuaN.Studio.Locales {
                 return ResourceManager.GetString("HomeMenuBar_FileGroup_NewScript_Caption", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Lua Script.
+        /// </summary>
+        public static string TextDefinition_Lua_Caption {
+            get {
+                return ResourceManager.GetString("TextDefinition_Lua_Caption", resourceCulture);
+            }
+        }
     }
 }

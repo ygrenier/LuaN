@@ -62,6 +62,16 @@ namespace LuaN.Studio.ViewModels.Documents
         }
         private TextDocument _TextContent;
 
+        /// <summary>
+        /// The text definition for the current document
+        /// </summary>
+        public TextEditors.ITextDefinition TextDefinition
+        {
+            get { return _TextDefinition; }
+            set { SetProperty(ref _TextDefinition, value, () => TextDefinition); }
+        }
+        private TextEditors.ITextDefinition _TextDefinition;
+
     }
 
 }

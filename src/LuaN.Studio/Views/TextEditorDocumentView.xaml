@@ -12,6 +12,7 @@
     <Grid>
         <Controls:TextEditorControl 
             Document="{Binding TextContent}"
+            TextDefinition="{Binding TextDefinition}"
             />
     </Grid>
 </UserControl>

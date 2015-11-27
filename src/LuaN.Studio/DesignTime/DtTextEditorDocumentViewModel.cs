@@ -23,6 +23,7 @@ b = 2
 write(""b = "" .. b)
 
 ";
+            this.TextDefinition = new TextEditors.LuaTextDefinition();
         }
     }
 }

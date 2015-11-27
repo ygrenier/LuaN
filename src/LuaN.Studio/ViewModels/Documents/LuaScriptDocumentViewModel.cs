@@ -20,6 +20,7 @@ namespace LuaN.Studio.ViewModels.Documents
         {
             this.Title = "NewScript" + NumDocument.ToString();
             this._FileName = null;
+            this.TextDefinition = new TextEditors.LuaTextDefinition();
         }
 
         /// <summary>

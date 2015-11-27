@@ -129,4 +129,8 @@
     <value>New script</value>
     <comment>New script button caption</comment>
   </data>
+  <data name="TextDefinition_Lua_Caption" xml:space="preserve">
+    <value>Lua Script</value>
+    <comment>Caption for the Lua text definition</comment>
+  </data>
 </root>

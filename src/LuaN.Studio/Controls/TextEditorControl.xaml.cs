@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LuaN.Studio.TextEditors;
 
 namespace LuaN.Studio.Controls
 {
@@ -29,6 +30,20 @@ namespace LuaN.Studio.Controls
         private void TextEditorControl_Loaded(object sender, RoutedEventArgs e)
         {
             try { teEditor.Focus(); } catch { }
+            if (TextDefinition != null)
+                teEditor.SyntaxHighlighting = TextDefinition.GetHighlightDefinition();
+        }
+
+        private void TextDefinitionChanged(ITextDefinition oldDefinition, ITextDefinition nextDefinition)
+        {
+            if (nextDefinition != null)
+            {
+                teEditor.SyntaxHighlighting = TextDefinition.GetHighlightDefinition();
+            }
+            else
+            {
+                teEditor.SyntaxHighlighting = null;
+            }
         }
 
         /// <summary>
@@ -41,6 +56,21 @@ namespace LuaN.Studio.Controls
         }
         public static readonly DependencyProperty DocumentProperty =
             DependencyProperty.Register("Document", typeof(TextDocument), typeof(TextEditorControl), new PropertyMetadata(new TextDocument()));
+
+        /// <summary>
+        /// Current text definition
+        /// </summary>
+        public TextEditors.ITextDefinition TextDefinition
+        {
+            get { return (TextEditors.ITextDefinition)GetValue(TextDefinitionProperty); }
+            set { SetValue(TextDefinitionProperty, value); }
+        }
+        public static readonly DependencyProperty TextDefinitionProperty =
+            DependencyProperty.Register("TextDefinition", typeof(TextEditors.ITextDefinition), typeof(TextEditorControl), new PropertyMetadata(null, TextDefinitionPropertyChanged));
+        private static void TextDefinitionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((TextEditorControl)d).TextDefinitionChanged(e.OldValue as TextEditors.ITextDefinition, e.NewValue as TextEditors.ITextDefinition);
+        }
 
     }
 }

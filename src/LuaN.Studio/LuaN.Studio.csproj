@@ -126,6 +126,9 @@
     <Compile Include="Services\LuaHostService.cs" />
     <Compile Include="Services\ServiceLocator.cs" />
     <Compile Include="Services\ShellProxy.cs" />
+    <Compile Include="TextEditors\ITextDefinition.cs" />
+    <Compile Include="TextEditors\LuaTextDefinition.cs" />
+    <Compile Include="TextEditors\TextEditorExtensions.cs" />
     <Compile Include="ViewModels\Documents\TextEditorDocumentViewModel.cs" />
     <Compile Include="ViewModels\Documents\ILuaScriptDocumentViewModel.cs" />
     <Compile Include="ViewModels\Documents\LuaScriptDocumentViewModel.cs" />
@@ -208,6 +211,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <EmbeddedResource Include="Syntax\Lua.xshd" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LuaN.DllWrapper\LuaN.DllWrapper.csproj">

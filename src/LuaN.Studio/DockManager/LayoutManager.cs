@@ -25,7 +25,7 @@ namespace LuaN.Studio.DockManager
                 if (tool is ViewModels.IInteractiveLuaToolViewModel)
                 {
                     pSide = AnchorSide.Bottom;
-                    anchorableToShow.AutoHideMinHeight = 350;
+                    anchorableToShow.AutoHideMinHeight = 320;
                 }
                 LayoutAnchorSide aSide = null;
                 switch (pSide)
